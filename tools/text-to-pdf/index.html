@@ -4,43 +4,171 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Text to PDF | Free, Private, Client-Side</title>
-  <meta name="description" content="Convert plain text to PDF documents. Free, private, runs in your browser.">
+  <meta name="description" content="Free text to PDF converter. Font, margins, header/footer, page numbers. All in your browser.">
   <link rel="stylesheet" href="../../assets/style.css">
+  <style>
+    .editor-wrap{display:flex;gap:12px;min-height:400px}
+    .editor-pane{flex:1;display:flex;flex-direction:column}
+    .editor-pane label{font-size:.8rem;color:var(--text2);margin-bottom:4px}
+    .editor-pane textarea,.editor-pane .preview{flex:1;min-height:300px}
+    .preview-pane{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;overflow:auto;font-family:monospace;font-size:.85rem;white-space:pre-wrap;line-height:1.5}
+    .setting-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .setting-row label{min-width:100px;font-size:.85rem;color:var(--text2)}
+    .setting-row select,.setting-row input[type=number]{flex:1}
+    .preview-tabs{display:flex;gap:4px;margin-bottom:16px}
+    .preview-tabs button{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
+    .preview-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .preview-tabs button:hover:not(.active){border-color:var(--accent)}
+    .format-btns{display:flex;gap:6px;margin-bottom:12px}
+    .format-btns button{padding:6px 12px;border-radius:6px;font-size:.8rem;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;font-weight:700}
+    .format-btns button:hover{border-color:var(--accent)}
+    .pdf-preview{background:#fff;color:#000;border:1px solid var(--border);border-radius:8px;padding:20px;margin:12px 0;font-family:monospace;font-size:10pt;line-height:1.5;min-height:400px;max-height:500px;overflow:auto;white-space:pre-wrap}
+    .template-btns{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+    .template-btns button{padding:6px 12px;border-radius:6px;font-size:.8rem;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer}
+    .template-btns button:hover{border-color:var(--accent);background:var(--surface)}
+    select,input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px}
+  </style>
 </head>
 <body>
 <div class="container">
   <div class="tool-page">
     <a href="../../" class="back-link">← Back to Tools</a>
     <h1>Text to PDF</h1>
-    <p class="subtitle">Convert text to PDF. No uploads.</p>
+    <p class="subtitle">Convert text to PDF. Font, margins, header/footer. All in your browser.</p>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="editor">Editor</button>
+      <button class="tab" data-tab="settings">Settings</button>
+      <button class="tab" data-tab="header">Header/Footer</button>
+      <button class="tab" data-tab="preview">Preview</button>
+    </div>
+
     <div class="tool-area">
       <div class="upload-zone" id="dropZone">
         <div class="big-icon">📁</div>
-        <strong>Drop a text file here</strong>
+        <strong>Drop text file(s) here</strong>
         <p>or click to browse (.txt, .md, .csv)</p>
-        <input type="file" id="fileInput" accept=".txt,.md,.csv,text/*">
+        <input type="file" id="fileInput" accept=".txt,.md,.csv,text/*" multiple>
       </div>
-      <div class="preview-area" id="previewArea">
-        <textarea id="textInput" style="width:100%;min-height:300px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.9rem;resize:vertical" placeholder="Or paste your text here..."></textarea>
+
+      <div id="editorSection" style="display:none">
+        <div class="editor-wrap">
+          <div class="editor-pane">
+            <label>Text Input</label>
+            <textarea id="textInput" placeholder="Type or paste your text here..." style="flex:1;min-height:300px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.9rem;resize:vertical"></textarea>
+          </div>
+          <div class="editor-pane">
+            <label>Live Preview</label>
+            <div class="pdf-preview" id="livePreview"></div>
+          </div>
+        </div>
+
+        <div class="format-btns">
+          <button id="btnBold" title="Bold"><b>B</b></button>
+          <button id="btnItalic" title="Italic"><i>I</i></button>
+          <button id="btnUnderline" title="Underline"><u>U</u></button>
+          <button id="btnH1" title="Heading 1">H1</button>
+          <button id="btnH2" title="Heading 2">H2</button>
+          <button id="btnList" title="Bullet List">• List</button>
+          <button id="btnClear" title="Clear Formatting">Clear</button>
+        </div>
+
+        <div class="template-btns">
+          <button data-tpl="blank">Blank</button>
+          <button data-tpl="letter">Letter</button>
+          <button data-tpl="resume">Resume</button>
+          <button data-tpl="report">Report</button>
+          <button data-tpl="invoice">Invoice</button>
+        </div>
       </div>
-      <div class="controls" id="controls">
-        <label>Font Size</label>
-        <select id="fontSize">
-          <option value="10">10pt</option>
-          <option value="12" selected>12pt</option>
-          <option value="14">14pt</option>
-          <option value="16">16pt</option>
-        </select>
-        <label>Page Size</label>
-        <select id="pageSize">
-          <option value="a4" selected>A4</option>
-          <option value="letter">Letter</option>
-          <option value="legal">Legal</option>
-        </select>
+
+      <div id="settingsSection" class="tool-section" style="display:none">
+        <div class="setting-row">
+          <label>Font</label>
+          <select id="fontFamily">
+            <option value="courier" selected>Courier</option>
+            <option value="helvetica">Helvetica</option>
+            <option value="times">Times</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label>Font Size</label>
+          <select id="fontSize">
+            <option value="8">8pt</option>
+            <option value="10">10pt</option>
+            <option value="12" selected>12pt</option>
+            <option value="14">14pt</option>
+            <option value="16">16pt</option>
+            <option value="18">18pt</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label>Line Height</label>
+          <select id="lineHeight">
+            <option value="1.2">1.2 (tight)</option>
+            <option value="1.5" selected>1.5 (normal)</option>
+            <option value="1.8">1.8 (loose)</option>
+            <option value="2.0">2.0 (double)</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label>Page Size</label>
+          <select id="pageSize">
+            <option value="a4" selected>A4</option>
+            <option value="letter">Letter</option>
+            <option value="legal">Legal</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label>Margins (pt)</label>
+          <input type="number" id="marginTop" value="40" min="10" max="100" style="width:60px">
+          <span style="color:var(--text2)">Top</span>
+          <input type="number" id="marginBottom" value="40" min="10" max="100" style="width:60px">
+          <span style="color:var(--text2)">Bottom</span>
+          <input type="number" id="marginLeft" value="40" min="10" max="100" style="width:60px">
+          <span style="color:var(--text2)">Left</span>
+          <input type="number" id="marginRight" value="40" min="10" max="100" style="width:60px">
+          <span style="color:var(--text2)">Right</span>
+        </div>
       </div>
+
+      <div id="headerSection" class="tool-section" style="display:none">
+        <div class="setting-row">
+          <label>Header Text</label>
+          <input type="text" id="headerText" placeholder="Header text (optional)" style="flex:1">
+        </div>
+        <div class="setting-row">
+          <label>Header Font Size</label>
+          <select id="headerFontSize">
+            <option value="8">8pt</option>
+            <option value="10" selected>10pt</option>
+            <option value="12">12pt</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label>Footer Text</label>
+          <input type="text" id="footerText" placeholder="Footer text (optional)" style="flex:1">
+        </div>
+        <div class="setting-row">
+          <label>Page Numbers</label>
+          <select id="pageNumberPos">
+            <option value="none">None</option>
+            <option value="bottom-center" selected>Bottom Center</option>
+            <option value="bottom-left">Bottom Left</option>
+            <option value="bottom-right">Bottom Right</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="previewSection" class="tool-section" style="display:none">
+        <div class="pdf-preview" id="fullPreview" style="min-height:500px"></div>
+      </div>
+
       <div class="status" id="status"></div>
+
       <div class="action-row" id="actionRow" style="display:none">
         <button class="btn" id="convertBtn">Generate PDF</button>
+        <button class="btn btn-secondary" id="downloadTextBtn">Download TXT</button>
         <button class="btn btn-secondary" id="resetBtn">Reset</button>
       </div>
     </div>
@@ -51,34 +179,192 @@
 <script>
 (function(){
   if(typeof jspdf==='undefined'){Tools.setStatus(document.getElementById('status'),'Error: PDF library not loaded.','error');return;}
-  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),textInput=document.getElementById('textInput'),controls=document.getElementById('controls'),actionRow=document.getElementById('actionRow'),convertBtn=document.getElementById('convertBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status');
-  function handleFile(file){
-    var reader=new FileReader();reader.onload=function(){textInput.value=reader.result;};
-    reader.readAsText(file);previewArea.style.display='block';controls.style.display='block';
-    actionRow.style.display='flex';dropZone.style.display='none';
+
+  var dropZone=document.getElementById('dropZone');
+  var fileInput=document.getElementById('fileInput');
+  var editorSection=document.getElementById('editorSection');
+  var textInput=document.getElementById('textInput');
+  var actionRow=document.getElementById('actionRow');
+  var convertBtn=document.getElementById('convertBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var downloadTextBtn=document.getElementById('downloadTextBtn');
+  var statusEl=document.getElementById('status');
+  var livePreview=document.getElementById('livePreview');
+  var fullPreview=document.getElementById('fullPreview');
+  var headerText=document.getElementById('headerText');
+  var footerText=document.getElementById('footerText');
+
+  var files=[];
+
+  Tools.setupDropZone(dropZone,function(f){handleFile(f)});
+  fileInput.addEventListener('change',function(e){for(var i=0;i<e.target.files.length;i++)handleFile(e.target.files[i]);});
+
+  function handleFile(f){
+    var reader=new FileReader();
+    reader.onload=function(){
+      textInput.value=reader.result;
+      showEditor();
+      updatePreview();
+    };
+    reader.readAsText(f);
   }
-  Tools.setupDropZone(dropZone,handleFile);
-  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
-  textInput.addEventListener('input',function(){if(textInput.value.length>0){controls.style.display='block';actionRow.style.display='flex';dropZone.style.display='none';}});
-  resetBtn.addEventListener('click',function(){textInput.value='';dropZone.style.display='block';previewArea.style.display='none';controls.style.display='none';actionRow.style.display='none';statusEl.style.display='none';fileInput.value='';});
+
+  function showEditor(){
+    dropZone.style.display='none';
+    editorSection.style.display='block';
+    actionRow.style.display='flex';
+  }
+
+  textInput.addEventListener('input',function(){
+    if(textInput.value.length>0){showEditor();updatePreview();}
+  });
+
+  document.querySelectorAll('.format-btns button').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var start=textInput.selectionStart;
+      var end=textInput.selectionEnd;
+      var text=textInput.value;
+      var selected=text.substring(start,end);
+      var before=text.substring(0,start);
+      var after=text.substring(end);
+      var replacement='';
+      switch(btn.id){
+        case'btnBold':replacement='**'+selected+'**';break;
+        case'btnItalic':replacement='*'+selected+'*';break;
+        case'btnUnderline':replacement='__'+selected+'__';break;
+        case'btnH1':replacement='# '+selected;break;
+        case'btnH2':replacement='## '+selected;break;
+        case'btnList':replacement=selected.split('\n').map(function(l){return '- '+l;}).join('\n');break;
+        case'btnClear':replacement=selected.replace(/[#*_\-]/g,'');break;
+      }
+      textInput.value=before+replacement+after;
+      updatePreview();
+    });
+  });
+
+  document.querySelectorAll('.template-btns button').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var templates={
+        blank:'',
+        letter:'Dear [Name],\n\n[Your letter content here]\n\nSincerely,\n[Your Name]',
+        resume:'[YOUR NAME]\n[Address] | [Phone] | [Email]\n\nSUMMARY\n[Your professional summary]\n\nEXPERIENCE\n[Job Title] - [Company]\n[Dates]\n- [Achievement 1]\n- [Achievement 2]\n\nEDUCATION\n[Degree] - [University]\n[Year]',
+        report:'REPORT TITLE\n\nDate: [Date]\nAuthor: [Author]\n\n1. INTRODUCTION\n[Content]\n\n2. FINDINGS\n[Content]\n\n3. CONCLUSION\n[Content]',
+        invoice:'INVOICE\n\nInvoice #: [Number]\nDate: [Date]\n\nBill To:\n[Client Name]\n[Client Address]\n\nItem                    Qty     Price\n[Item 1]                [1]     $[0.00]\n[Item 2]                [1]     $[0.00]\n\nTotal: $[0.00]'
+      };
+      textInput.value=templates[btn.dataset.tpl]||'';
+      showEditor();
+      updatePreview();
+    });
+  });
+
+  function updatePreview(){
+    var text=textInput.value;
+    var font=document.getElementById('fontFamily').value;
+    var size=document.getElementById('fontSize').value;
+    var lh=document.getElementById('lineHeight').value;
+    livePreview.style.fontFamily=font===('courier'?'courier':'helvetica')?font+',monospace':'serif';
+    livePreview.style.fontSize=size+'pt';
+    livePreview.style.lineHeight=lh;
+    var formatted=text
+      .replace(/\*\*(.*?)\*\*/g,'<b>$1</b>')
+      .replace(/\*(.*?)\*/g,'<i>$1</i>')
+      .replace(/__(.*?)__/g,'<u>$1</u>')
+      .replace(/^# (.+)$/gm,'<span style="font-size:1.5em;font-weight:bold">$1</span>')
+      .replace(/^## (.+)$/gm,'<span style="font-size:1.2em;font-weight:bold">$1</span>')
+      .replace(/^- (.+)$/gm,'• $1');
+    livePreview.innerHTML=formatted||'<span style="color:#999">Preview will appear here...</span>';
+  }
+
+  textInput.addEventListener('input',updatePreview);
+
   convertBtn.addEventListener('click',function(){
-    var text=textInput.value;if(!text.trim()){Tools.setStatus(statusEl,'Enter or paste some text.','error');return;}
-    convertBtn.disabled=true;Tools.setStatus(statusEl,'Generating PDF...','');
+    var text=textInput.value;
+    if(!text.trim()){Tools.setStatus(statusEl,'Enter some text.','error');return;}
+    convertBtn.disabled=true;
+    Tools.setStatus(statusEl,'Generating PDF...','');
     try{
-      var {jsPDF}=jspdf;var fontSize=parseInt(document.getElementById('fontSize').value);
+      var {jsPDF}=jspdf;
+      var font=document.getElementById('fontFamily').value;
+      var fontSize=parseInt(document.getElementById('fontSize').value);
+      var lh=parseFloat(document.getElementById('lineHeight').value);
       var pageSize=document.getElementById('pageSize').value;
+      var mt=parseInt(document.getElementById('marginTop').value);
+      var mb=parseInt(document.getElementById('marginBottom').value);
+      var ml=parseInt(document.getElementById('marginLeft').value);
+      var mr=parseInt(document.getElementById('marginRight').value);
+
       var doc=new jsPDF({orientation:'portrait',unit:'pt',format:pageSize});
-      var pageWidth=doc.internal.pageSize.getWidth();var pageHeight=doc.internal.pageSize.getHeight();
-      var margin=40;var usableWidth=pageWidth-margin*2;var lineHeight=fontSize*1.5;
-      var y=margin;var lines=doc.splitTextToSize(text,usableWidth);
+      var pageWidth=doc.internal.pageSize.getWidth();
+      var pageHeight=doc.internal.pageSize.getHeight();
+      var usableWidth=pageWidth-ml-mr;
+      var y=mt;
+      var pageNum=1;
+      var totalEstPages=1;
+
+      var hdrText=headerText.value;
+      var ftrText=footerText.value;
+      var pageNumPos=document.getElementById('pageNumberPos').value;
+      var hdrFontSize=parseInt(document.getElementById('headerFontSize').value);
+
+      function addHeaderFooter(){
+        if(hdrText){
+          doc.setFont(font==='times'?'times':'helvetica','normal');
+          doc.setFontSize(hdrFontSize);
+          doc.text(hdrText,ml,mt-hdrFontSize);
+        }
+        if(ftrText||pageNumPos!=='none'){
+          doc.setFont(font==='times'?'times':'helvetica','normal');
+          doc.setFontSize(hdrFontSize);
+          var fy=pageHeight-mb+hdrFontSize;
+          if(ftrText)doc.text(ftrText,ml,fy);
+          if(pageNumPos!=='none'){
+            var px=pageWidth/2;
+            if(pageNumPos.includes('left'))px=ml;
+            if(pageNumPos.includes('right'))px=pageWidth-mr;
+            doc.text('Page '+pageNum,px,fy,{align:'center'});
+          }
+        }
+      }
+
+      var lines=doc.splitTextToSize(text,usableWidth);
+      doc.setFont(font==='times'?'times':'helvetica','normal');
+      doc.setFontSize(fontSize);
+
       lines.forEach(function(line){
-        if(y+fontSize>pageHeight-margin){doc.addPage();y=margin;}
-        doc.setFont('courier','normal');doc.setFontSize(fontSize);doc.text(line,margin,y);y+=lineHeight;
+        if(y+fontSize*lh>pageHeight-mb){
+          addHeaderFooter();
+          doc.addPage();
+          pageNum++;
+          y=mt;
+          doc.setFont(font==='times'?'times':'helvetica','normal');
+          doc.setFontSize(fontSize);
+        }
+        doc.text(line,ml,y);
+        y+=fontSize*lh;
       });
+      addHeaderFooter();
+
       doc.save('text_document.pdf');
-      Tools.setStatus(statusEl,'Done! PDF generated.','done');
-    }catch(err){Tools.setStatus(statusEl,'Error: '+err.message,'error');}
+      Tools.setStatus(statusEl,'Done! PDF generated ('+pageNum+' pages).','done');
+    }catch(err){
+      Tools.setStatus(statusEl,'Error: '+err.message,'error');
+    }
     convertBtn.disabled=false;
+  });
+
+  downloadTextBtn.addEventListener('click',function(){
+    var text=textInput.value;
+    if(!text.trim())return;
+    Tools.downloadBlob(new Blob([text],{type:'text/plain'}),'text.txt');
+  });
+
+  resetBtn.addEventListener('click',function(){
+    textInput.value='';
+    dropZone.style.display='block';
+    editorSection.style.display='none';
+    actionRow.style.display='none';
+    statusEl.style.display='none';
+    fileInput.value='';
   });
 })();
 </script>
