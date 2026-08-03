@@ -4,38 +4,130 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Font Preview | Free, Private, Client-Side</title>
-  <meta name="description" content="Preview TTF, OTF, WOFF fonts. Free, private, runs in your browser.">
+  <meta name="description" content="Preview TTF, OTF, WOFF fonts. Character sets, metrics, comparison. All in your browser.">
   <link rel="stylesheet" href="../../assets/style.css">
+  <style>
+    .tabs{display:flex;gap:4px;margin-bottom:16px}
+    .tab{padding:10px 20px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
+    .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .tab:hover:not(.active){border-color:var(--accent)}
+    .font-preview-box{padding:30px;background:var(--bg);border-radius:8px;min-height:80px;word-wrap:break-word;line-height:1.4;margin-bottom:12px;border:1px solid var(--border)}
+    .size-preview{display:flex;flex-direction:column;gap:8px}
+    .size-row{display:flex;align-items:baseline;gap:12px;padding:8px;border-bottom:1px solid var(--border)}
+    .size-label{min-width:50px;font-size:.8rem;color:var(--text2);text-align:right}
+    .size-sample{flex:1;word-wrap:break-word}
+    .char-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:8px;margin:12px 0}
+    .char-cell{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;cursor:pointer;transition:.15s}
+    .char-cell:hover{border-color:var(--accent);transform:scale(1.05)}
+    .char-cell .char{font-size:1.5rem;display:block;margin-bottom:4px}
+    .char-cell .code{font-size:.7rem;color:var(--text2)}
+    .metrics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:12px 0}
+    .metric-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px}
+    .metric-label{font-size:.8rem;color:var(--text2);margin-bottom:4px}
+    .metric-value{font-size:1.2rem;font-weight:700;color:var(--accent)}
+    .compare-area{margin:12px 0}
+    .compare-row{display:flex;gap:12px;margin-bottom:12px}
+    .compare-col{flex:1}
+    .compare-col label{font-size:.8rem;color:var(--text2);display:block;margin-bottom:4px}
+    .kerning-pairs{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin:12px 0}
+    .kerning-pair{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;font-size:1.2rem}
+    .font-info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:12px 0}
+    .font-info-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px}
+    .font-info-label{font-size:.8rem;color:var(--text2)}
+    .font-info-value{font-size:.95rem;font-weight:600;margin-top:4px}
+    .setting-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .setting-row label{min-width:100px;font-size:.85rem;color:var(--text2)}
+    .setting-row select,.setting-row input[type=number]{flex:1}
+    .bg-options{display:flex;gap:8px;margin:12px 0}
+    .bg-option{width:40px;height:40px;border-radius:8px;border:2px solid var(--border);cursor:pointer}
+    .bg-option.active{border-color:var(--accent)}
+    .bg-option:hover{border-color:var(--accent)}
+    select,input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px}
+  </style>
 </head>
 <body>
 <div class="container">
   <div class="tool-page">
     <a href="../../" class="back-link">← Back to Tools</a>
     <h1>Font Preview</h1>
-    <p class="subtitle">Preview fonts with custom text. No uploads.</p>
+    <p class="subtitle">Preview fonts with custom text, character sets, metrics. All in your browser.</p>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="preview">Preview</button>
+      <button class="tab" data-tab="characters">Characters</button>
+      <button class="tab" data-tab="metrics">Metrics</button>
+      <button class="tab" data-tab="compare">Compare</button>
+      <button class="tab" data-tab="info">Info</button>
+    </div>
+
     <div class="tool-area">
       <div class="upload-zone" id="dropZone">
         <div class="big-icon">🔤</div>
-        <strong>Drop a font file here</strong>
+        <strong>Drop font file(s) here</strong>
         <p>or click to browse (TTF, OTF, WOFF, WOFF2)</p>
-        <input type="file" id="fileInput" accept=".ttf,.otf,.woff,.woff2,.woff,.ttc">
+        <input type="file" id="fileInput" accept=".ttf,.otf,.woff,.woff2,.ttc" multiple>
       </div>
-      <div class="preview-area" id="previewArea">
-        <div style="margin-bottom:16px">
-          <label style="color:var(--text2);font-size:.85rem;display:block;margin-bottom:6px">Preview Text</label>
-          <input type="text" id="previewText" value="The quick brown fox jumps over the lazy dog" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:10px 12px;border-radius:8px;font-size:1rem">
+
+      <div id="previewSection">
+        <div class="setting-row">
+          <label>Preview Text</label>
+          <input type="text" id="previewText" value="The quick brown fox jumps over the lazy dog" style="flex:1">
         </div>
-        <div style="margin-bottom:16px">
-          <label style="color:var(--text2);font-size:.85rem;display:block;margin-bottom:6px">Font Size</label>
-          <input type="range" id="fontSize" min="12" max="120" value="36" style="width:100%">
-          <div style="text-align:center;color:var(--text2);font-size:.85rem" id="fontSizeVal">36px</div>
+        <div class="setting-row">
+          <label>Font Size</label>
+          <input type="range" id="fontSize" min="12" max="120" value="36" style="flex:1">
+          <span id="fontSizeVal" style="min-width:50px;text-align:right">36px</span>
         </div>
-        <div id="fontPreview" style="padding:30px;background:var(--bg);border-radius:8px;min-height:100px;word-wrap:break-word;line-height:1.4"></div>
-        <div id="fontInfo" style="color:var(--text2);margin-top:12px;font-size:.85rem"></div>
+        <div class="setting-row">
+          <label>Background</label>
+          <div class="bg-options">
+            <div class="bg-option active" data-bg="#1a1a2e" style="background:#1a1a2e"></div>
+            <div class="bg-option" data-bg="#ffffff" style="background:#ffffff"></div>
+            <div class="bg-option" data-bg="#f5f5f5" style="background:#f5f5f5"></div>
+            <div class="bg-option" data-bg="#000000" style="background:#000000"></div>
+          </div>
+        </div>
+        <div class="font-preview-box" id="fontPreview"></div>
+        <div class="size-preview" id="sizePreview"></div>
       </div>
+
+      <div id="charactersSection" class="tool-section" style="display:none">
+        <div class="setting-row">
+          <label>Character Set</label>
+          <select id="charSet">
+            <option value="lowercase">Lowercase</option>
+            <option value="uppercase">Uppercase</option>
+            <option value="numbers">Numbers</option>
+            <option value="punctuation">Punctuation</option>
+            <option value="symbols">Symbols</option>
+            <option value="extended">Extended Latin</option>
+            <option value="all">All Printable</option>
+          </select>
+        </div>
+        <div class="char-grid" id="charGrid"></div>
+      </div>
+
+      <div id="metricsSection" class="tool-section" style="display:none">
+        <div class="metrics-grid" id="metricsGrid"></div>
+        <h3 style="margin:16px 0 8px">Glyph Visualization</h3>
+        <div class="font-preview-box" id="glyphViz" style="text-align:center"></div>
+      </div>
+
+      <div id="compareSection" class="tool-section" style="display:none">
+        <div class="compare-area" id="compareArea">
+          <p class="small">Load multiple fonts to compare them side by side.</p>
+        </div>
+      </div>
+
+      <div id="infoSection" class="tool-section" style="display:none">
+        <div class="font-info-grid" id="fontInfoGrid"></div>
+      </div>
+
       <div class="status" id="status"></div>
+
       <div class="action-row" id="actionRow" style="display:none">
-        <button class="btn btn-secondary" id="resetBtn">Load Another Font</button>
+        <button class="btn btn-secondary" id="downloadSampleBtn">Download Sample</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
       </div>
     </div>
   </div>
@@ -44,29 +136,251 @@
 <script src="../../assets/tools.js"></script>
 <script>
 (function(){
-  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),previewText=document.getElementById('previewText'),fontSize=document.getElementById('fontSize'),fontSizeVal=document.getElementById('fontSizeVal'),fontPreview=document.getElementById('fontPreview'),fontInfo=document.getElementById('fontInfo'),actionRow=document.getElementById('actionRow'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status');
-  var fontObj=null;var fontFamily='preview_font_'+Date.now();
+  if(typeof opentype==='undefined'){Tools.setStatus(document.getElementById('status'),'Error: opentype.js not loaded.','error');return;}
+
+  var dropZone=document.getElementById('dropZone');
+  var fileInput=document.getElementById('fileInput');
+  var previewSection=document.getElementById('previewSection');
+  var charactersSection=document.getElementById('charactersSection');
+  var metricsSection=document.getElementById('metricsSection');
+  var compareSection=document.getElementById('compareSection');
+  var infoSection=document.getElementById('infoSection');
+  var previewText=document.getElementById('previewText');
+  var fontSize=document.getElementById('fontSize');
+  var fontSizeVal=document.getElementById('fontSizeVal');
+  var fontPreview=document.getElementById('fontPreview');
+  var sizePreview=document.getElementById('sizePreview');
+  var charGrid=document.getElementById('charGrid');
+  var charSet=document.getElementById('charSet');
+  var metricsGrid=document.getElementById('metricsGrid');
+  var glyphViz=document.getElementById('glyphViz');
+  var compareArea=document.getElementById('compareArea');
+  var fontInfoGrid=document.getElementById('fontInfoGrid');
+  var actionRow=document.getElementById('actionRow');
+  var downloadSampleBtn=document.getElementById('downloadSampleBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var statusEl=document.getElementById('status');
+
+  var fonts=[];
+  var fontFaces=[];
+  var activeFontIdx=0;
+
+  Tools.setupDropZone(dropZone,function(f){handleFile(f)});
+  fileInput.addEventListener('change',function(e){for(var i=0;i<e.target.files.length;i++)handleFile(e.target.files[i]);});
+
   function handleFile(file){
-    var reader=new FileReader();reader.onload=function(){
+    var reader=new FileReader();
+    reader.onload=function(){
       try{
-        fontObj=opentype.parse(reader.result);
-        var fontFace=new FontFace(fontFamily,'url(data:font/opentype;base64,'+btoa(String.fromCharCode.apply(null,new Uint8Array(reader.result)))+')');
-        fontFace.load().then(function(loaded){document.fonts.add(loaded);updatePreview();});
-        fontInfo.textContent='Font: '+(fontObj.names.fontFamily?fontObj.names.fontFamily.en:'Unknown')+' | Glyphs: '+fontObj.numGlyphs;
-        previewArea.style.display='block';actionRow.style.display='flex';dropZone.style.display='none';
-        Tools.setStatus(statusEl,'Font loaded.','done');
+        var fontObj=opentype.parse(reader.result);
+        var fontFamily='font_preview_'+Date.now()+'_'+fonts.length;
+        var base64=btoa(String.fromCharCode.apply(null,new Uint8Array(reader.result)));
+        var fontFace=new FontFace(fontFamily,'url(data:font/opentype;base64,'+base64+')');
+        fontFace.load().then(function(loaded){
+          document.fonts.add(loaded);
+          fonts.push(fontObj);
+          fontFaces.push({face:loaded,family:fontFamily,name:file.name});
+          activeFontIdx=fonts.length-1;
+          showPreview();
+          showCharacters();
+          showMetrics();
+          showCompare();
+          showInfo();
+          actionRow.style.display='flex';
+          dropZone.style.display='none';
+          Tools.setStatus(statusEl,fontObj.names.fontFamily?.en||file.name+' loaded.','done');
+        });
       }catch(err){Tools.setStatus(statusEl,'Error: '+err.message,'error');}
-    };reader.readAsArrayBuffer(file);
+    };
+    reader.readAsArrayBuffer(file);
   }
-  Tools.setupDropZone(dropZone,handleFile);
-  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
-  fontSize.addEventListener('input',function(){fontSizeVal.textContent=this.value+'px';updatePreview();});
-  previewText.addEventListener('input',updatePreview);
-  function updatePreview(){
-    fontPreview.style.fontFamily="'"+fontFamily+"'";fontPreview.style.fontSize=fontSize.value+'px';
-    fontPreview.textContent=previewText.value||'The quick brown fox jumps over the lazy dog';
+
+  function showPreview(){
+    if(fonts.length===0)return;
+    var font=fonts[activeFontIdx];
+    var ff=fontFaces[activeFontIdx];
+    var text=previewText.value||'The quick brown fox jumps over the lazy dog';
+    var size=fontSize.value;
+    fontPreview.style.fontFamily="'"+ff.family+"'";
+    fontPreview.style.fontSize=size+'px';
+    fontPreview.textContent=text;
+    fontSizeVal.textContent=size+'px';
+    renderSizePreview(text,ff.family);
   }
-  resetBtn.addEventListener('click',function(){fontObj=null;dropZone.style.display='block';previewArea.style.display='none';actionRow.style.display='none';statusEl.style.display='none';fileInput.value='';});
+
+  function renderSizePreview(text,family){
+    sizePreview.innerHTML='';
+    [12,16,20,24,32,48,64].forEach(function(s){
+      var row=document.createElement('div');
+      row.className='size-row';
+      row.innerHTML='<div class="size-label">'+s+'px</div><div class="size-sample" style="font-family:\''+family+'\';font-size:'+s+'px">'+text+'</div>';
+      sizePreview.appendChild(row);
+    });
+  }
+
+  fontSize.addEventListener('input',showPreview);
+  previewText.addEventListener('input',showPreview);
+
+  document.querySelectorAll('.bg-option').forEach(function(opt){
+    opt.addEventListener('click',function(){
+      document.querySelectorAll('.bg-option').forEach(function(o){o.classList.remove('active');});
+      opt.classList.add('active');
+      fontPreview.style.background=opt.dataset.bg;
+      fontPreview.style.color=opt.dataset.bg==='#ffffff'||opt.dataset.bg==='#f5f5f5'?'#1a1a2e':'#fff';
+    });
+  });
+
+  var charSets={
+    lowercase:'abcdefghijklmnopqrstuvwxyz',
+    uppercase:'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+    numbers:'0123456789',
+    punctuation:'.,;:!?\'"-()[]{}',
+    symbols:'@#$%^&*+=/\\|~`<>',
+    extended:'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ',
+    all:'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 !@#$%^&*()-_=+[]{}|;:\'",.<>?/\\`~'
+  };
+
+  function showCharacters(){
+    if(fonts.length===0)return;
+    var ff=fontFaces[activeFontIdx];
+    var chars=charSets[charSet.value]||charSets.lowercase;
+    charGrid.innerHTML='';
+    for(var i=0;i<chars.length;i++){
+      var c=chars[i];
+      var cell=document.createElement('div');
+      cell.className='char-cell';
+      cell.innerHTML='<span class="char" style="font-family:\''+ff.family+'\'">'+c+'</span><span class="code">U+'+c.charCodeAt(0).toString(16).toUpperCase().padStart(4,'0')+'</span>';
+      cell.addEventListener('click',function(){navigator.clipboard.writeText(this.querySelector('.char').textContent);});
+      charGrid.appendChild(cell);
+    }
+  }
+
+  charSet.addEventListener('change',showCharacters);
+
+  function showMetrics(){
+    if(fonts.length===0)return;
+    var font=fonts[activeFontIdx];
+    var unitsPerEm=font.unitsPerEm||1000;
+    var ascent=font.ascender||0;
+    var descent=font.descender||0;
+    var lineGap=font.lineGap||0;
+    var glyphs=font.numGlyphs;
+    var charWidths={};
+    var avgWidth=0;
+    var count=0;
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(function(c){
+      var glyph=font.charToGlyph(c);
+      if(glyph.advanceWidth){
+        charWidths[c]=glyph.advanceWidth;
+        avgWidth+=glyph.advanceWidth;
+        count++;
+      }
+    });
+    avgWidth=count>0?avgWidth/count:0;
+
+    metricsGrid.innerHTML='';
+    var metrics=[
+      {label:'Units per EM',value:unitsPerEm},
+      {label:'Ascender',value:ascent},
+      {label:'Descender',value:descent},
+      {label:'Line Gap',value:lineGap},
+      {label:'Total Glyphs',value:glyphs},
+      {label:'Avg Character Width',value:Math.round(avgWidth)}
+    ];
+    metrics.forEach(function(m){
+      var card=document.createElement('div');
+      card.className='metric-card';
+      card.innerHTML='<div class="metric-label">'+m.label+'</div><div class="metric-value">'+m.value+'</div>';
+      metricsGrid.appendChild(card);
+    });
+
+    glyphViz.style.fontFamily="'"+fontFaces[activeFontIdx].family+"'";
+    glyphViz.style.fontSize='48px';
+    glyphViz.textContent='Hxg Wh 0123';
+  }
+
+  function showCompare(){
+    if(fonts.length===0)return;
+    compareArea.innerHTML='';
+    fonts.forEach(function(font,i){
+      var ff=fontFaces[i];
+      var row=document.createElement('div');
+      row.style.cssText='margin-bottom:16px;padding:16px;background:var(--bg);border:1px solid var(--border);border-radius:8px';
+      row.innerHTML='<div style="font-size:.85rem;color:var(--text2);margin-bottom:8px">'+ff.name+' ('+font.numGlyphs+' glyphs)</div><div style="font-family:\''+ff.family+'\';font-size:24px;word-wrap:break-word">'+previewText.value+'</div>';
+      compareArea.appendChild(row);
+    });
+  }
+
+  function showInfo(){
+    if(fonts.length===0)return;
+    fontInfoGrid.innerHTML='';
+    var font=fonts[activeFontIdx];
+    var ff=fontFaces[activeFontIdx];
+    var items=[
+      {label:'Font Family',value:font.names.fontFamily?.en||'Unknown'},
+      {label:'Font Style',value:font.names.fontStyle?.en||'Regular'},
+      {label:'Version',value:font.names.version?.en||'Unknown'},
+      {label:'Manufacturer',value:font.names.manufacturer?.en||'Unknown'},
+      {label:'Designer',value:font.names.designer?.en||'Unknown'},
+      {label:'License',value:font.names.license?.en||'Unknown'},
+      {label:'File Name',value:ff.name},
+      {label:'Number of Glyphs',value:font.numGlyphs},
+      {label:'Units per EM',value:font.unitsPerEm||1000},
+      {label:'Is Variable',value:font.outlines?'True':'False'}
+    ];
+    items.forEach(function(item){
+      var div=document.createElement('div');
+      div.className='font-info-item';
+      div.innerHTML='<div class="font-info-label">'+item.label+'</div><div class="font-info-value">'+item.value+'</div>';
+      fontInfoGrid.appendChild(div);
+    });
+  }
+
+  downloadSampleBtn.addEventListener('click',function(){
+    if(fonts.length===0)return;
+    var canvas=document.createElement('canvas');
+    canvas.width=800;canvas.height=400;
+    var ctx=canvas.getContext('2d');
+    ctx.fillStyle='#1a1a2e';ctx.fillRect(0,0,800,400);
+    ctx.fillStyle='#ffffff';
+    var ff=fontFaces[activeFontIdx];
+    ctx.font='36px '+ff.family;
+    ctx.fillText(previewText.value||'The quick brown fox',40,60);
+    ctx.font='24px '+ff.family;
+    ctx.fillText('ABCDEFGHIJKLMNOPQRSTUVWXYZ',40,120);
+    ctx.font='24px '+ff.family;
+    ctx.fillText('abcdefghijklmnopqrstuvwxyz',40,160);
+    ctx.font='24px '+ff.family;
+    ctx.fillText('0123456789 !@#$%^&*()',40,200);
+    canvas.toBlob(function(blob){Tools.downloadBlob(blob,'font_sample.png');});
+  });
+
+  resetBtn.addEventListener('click',function(){
+    fonts=[];fontFaces=[];activeFontIdx=0;
+    dropZone.style.display='block';
+    previewSection.style.display='none';
+    charactersSection.style.display='none';
+    metricsSection.style.display='none';
+    compareSection.style.display='none';
+    infoSection.style.display='none';
+    actionRow.style.display='none';statusEl.style.display='none';
+    fileInput.value='';
+    document.querySelectorAll('.tabs .tab').forEach(function(t){t.classList.remove('active');});
+    document.querySelector('.tabs .tab').classList.add('active');
+  });
+
+  document.querySelectorAll('.tabs .tab').forEach(function(tab){
+    tab.addEventListener('click',function(){
+      document.querySelectorAll('.tabs .tab').forEach(function(t){t.classList.remove('active');});
+      tab.classList.add('active');
+      var t=tab.dataset.tab;
+      previewSection.style.display=t==='preview'?'block':'none';
+      charactersSection.style.display=t==='characters'?'block':'none';
+      metricsSection.style.display=t==='metrics'?'block':'none';
+      compareSection.style.display=t==='compare'?'block':'none';
+      infoSection.style.display=t==='info'?'block':'none';
+    });
+  });
 })();
 </script>
 </body>
