@@ -4,257 +4,563 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PDF Tools | Free, Private, Client-Side</title>
-  <meta name="description" content="Free PDF tools: compress PDFs and extract pages as images. No uploads, no tracking. Everything runs in your browser.">
+  <meta name="description" content="Free PDF tools: compress, extract, rotate, merge, page numbers, info. All in your browser.">
   <link rel="stylesheet" href="../../assets/style.css">
+  <style>
+    .tool-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+    .tool-tabs button{padding:8px 14px;border-radius:8px;font-size:.85rem;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;transition:.15s}
+    .tool-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .tool-tabs button:hover:not(.active){border-color:var(--accent)}
+    .tool-section{display:none}
+    .tool-section.active{display:block}
+    .page-grid{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+    .page-thumb{position:relative;border:2px solid var(--border);border-radius:6px;overflow:hidden;cursor:pointer;transition:.15s}
+    .page-thumb:hover{border-color:var(--accent)}
+    .page-thumb.selected{border-color:#22c55e;background:rgba(34,197,94,.1)}
+    .page-thumb .page-num{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.6);color:#fff;text-align:center;font-size:.7rem;padding:2px}
+    .page-thumb .page-check{position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;background:#22c55e;color:#fff;display:none;align-items:center;justify-content:center;font-size:.7rem}
+    .page-thumb.selected .page-check{display:flex}
+    .setting-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .setting-row label{min-width:120px;font-size:.85rem;color:var(--text2)}
+    .setting-row select,.setting-row input{flex:1}
+    .preview-tabs{display:flex;gap:4px;margin-bottom:16px}
+    .preview-tabs button{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
+    .preview-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .preview-tabs button:hover:not(.active){border-color:var(--accent)}
+    .stat-row{display:flex;gap:8px;margin:12px 0}
+    .stat-box{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+    .stat-box .stat-val{font-size:1.1rem;font-weight:700;color:var(--accent)}
+    .stat-box .stat-label{font-size:.7rem;color:var(--text2);margin-top:4px}
+    .info-table{width:100%;border-collapse:collapse;font-size:.85rem}
+    .info-table td{padding:8px 12px;border-bottom:1px solid var(--border)}
+    .info-table td:first-child{color:var(--text2);width:120px}
+    select,input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px}
+  </style>
 </head>
 <body>
-
 <div class="container">
   <div class="tool-page">
     <a href="../../" class="back-link">← Back to Tools</a>
     <h1>PDF Tools</h1>
-    <p class="subtitle">Compress and extract PDF pages. Everything stays in your browser.</p>
+    <p class="subtitle">Compress, extract, rotate, merge, add page numbers. All in your browser.</p>
+
+    <div class="tool-tabs" id="toolTabs">
+      <button class="active" data-tool="compress">Compress</button>
+      <button data-tool="extract">Extract Pages</button>
+      <button data-tool="rotate">Rotate</button>
+      <button data-tool="merge">Merge</button>
+      <button data-tool="numbers">Page Numbers</button>
+      <button data-tool="info">PDF Info</button>
+    </div>
 
     <div class="tool-area">
       <div class="upload-zone" id="dropZone">
         <div class="big-icon">📁</div>
-        <strong>Drop a PDF here</strong>
+        <strong>Drop PDF file(s) here</strong>
         <p>or click to browse</p>
-        <input type="file" id="fileInput" accept=".pdf,application/pdf">
+        <input type="file" id="fileInput" accept=".pdf,application/pdf" multiple>
       </div>
 
-      <div class="preview-area" id="previewArea">
-        <div id="fileInfo" style="color:var(--text2);margin-bottom:16px;font-size:.9rem"></div>
-        <div id="pagePreviews" style="display:flex;flex-wrap:wrap;gap:12px"></div>
+      <div id="previewArea" style="display:none">
+        <div id="fileInfo" style="color:var(--text2);margin-bottom:12px;font-size:.9rem"></div>
+        <div class="page-grid" id="pageGrid"></div>
       </div>
 
-      <div class="controls" id="controls">
-        <label>Action</label>
-        <select id="action">
-          <option value="toImages">Extract pages as images</option>
-          <option value="compress">Reduce file size</option>
-        </select>
-
-        <div id="extractOptions">
-          <label>Output format</label>
-          <select id="imgFormat">
-            <option value="png">PNG</option>
-            <option value="jpeg" selected>JPEG</option>
-          </select>
-          <label>Scale (resolution multiplier)</label>
-          <select id="scale">
-            <option value="1">1x (fast, smaller files)</option>
-            <option value="1.5" selected>1.5x (balanced)</option>
-            <option value="2">2x (high quality)</option>
-          </select>
-        </div>
-
-        <div id="compressOptions" style="display:none">
-          <label>Output quality</label>
-          <select id="pdfQuality">
+      <div id="tool-compress" class="tool-section active">
+        <div class="setting-row">
+          <label>Quality</label>
+          <select id="compressQuality">
             <option value="0.5">Low (smallest)</option>
             <option value="0.7" selected>Medium</option>
             <option value="0.9">High</option>
           </select>
         </div>
+        <div class="setting-row">
+          <label>Scale</label>
+          <select id="compressScale">
+            <option value="1">1x (fast)</option>
+            <option value="1.5" selected>1.5x (balanced)</option>
+            <option value="2">2x (quality)</option>
+          </select>
+        </div>
       </div>
 
-      <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+      <div id="tool-extract" class="tool-section">
+        <div class="setting-row">
+          <label>Format</label>
+          <select id="extractFormat">
+            <option value="png">PNG</option>
+            <option value="jpeg" selected>JPEG</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label>Scale</label>
+          <select id="extractScale">
+            <option value="1">1x</option>
+            <option value="1.5" selected>1.5x</option>
+            <option value="2">2x</option>
+          </select>
+        </div>
+        <div style="font-size:.8rem;color:var(--text2);margin-bottom:12px">Click pages to select. If none selected, all pages are extracted.</div>
+      </div>
+
+      <div id="tool-rotate" class="tool-section">
+        <div class="setting-row">
+          <label>Rotation</label>
+          <select id="rotateDeg">
+            <option value="90">90° Clockwise</option>
+            <option value="180">180°</option>
+            <option value="270">90° Counter-clockwise</option>
+          </select>
+        </div>
+        <div style="font-size:.8rem;color:var(--text2);margin-bottom:12px">Click pages to select. If none selected, all pages are rotated.</div>
+      </div>
+
+      <div id="tool-merge" class="tool-section">
+        <div style="font-size:.85rem;color:var(--text2);margin-bottom:12px">Drop multiple PDFs to merge them. Pages appear in order below. Drag to reorder.</div>
+        <div class="page-grid" id="mergePages"></div>
+      </div>
+
+      <div id="tool-numbers" class="tool-section">
+        <div class="setting-row">
+          <label>Position</label>
+          <select id="numPosition">
+            <option value="bottom-center" selected>Bottom Center</option>
+            <option value="bottom-left">Bottom Left</option>
+            <option value="bottom-right">Bottom Right</option>
+            <option value="top-center">Top Center</option>
+            <option value="top-left">Top Left</option>
+            <option value="top-right">Top Right</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label>Start Page</label>
+          <input type="number" id="numStart" value="1" min="1" style="width:80px">
+        </div>
+        <div class="setting-row">
+          <label>Font Size</label>
+          <select id="numFontSize">
+            <option value="10">10</option>
+            <option value="12" selected>12</option>
+            <option value="14">14</option>
+            <option value="16">16</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="tool-info" class="tool-section">
+        <div id="pdfInfoContent"></div>
+      </div>
+
+      <div class="stat-row" id="statRow" style="display:none">
+        <div class="stat-box"><div class="stat-val" id="statPages">-</div><div class="stat-label">Pages</div></div>
+        <div class="stat-box"><div class="stat-val" id="statSize">-</div><div class="stat-label">File Size</div></div>
+      </div>
+
+      <div class="progress-bar" id="progressBar" style="display:none"><div class="fill" id="progressFill"></div></div>
       <div class="status" id="status"></div>
 
       <div class="action-row" id="actionRow" style="display:none">
-        <button class="btn" id="processBtn">Process PDF</button>
-        <button class="btn btn-secondary" id="downloadBtn" style="display:none">Download All</button>
+        <button class="btn" id="processBtn">Process</button>
+        <button class="btn btn-secondary" id="downloadBtn" style="display:none">Download</button>
         <button class="btn btn-secondary" id="resetBtn">Reset</button>
       </div>
     </div>
   </div>
 </div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="../../assets/tools.js"></script>
 <script>
 (function(){
-  if (typeof pdfjsLib === 'undefined') {
-    Tools.setStatus(document.getElementById('status'), 'Error: PDF library not loaded. Check your internet connection.', 'error');
+  if(typeof pdfjsLib==='undefined'){
+    Tools.setStatus(document.getElementById('status'),'Error: PDF library not loaded.','error');
     return;
   }
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  var dropZone=document.getElementById('dropZone');
+  var fileInput=document.getElementById('fileInput');
+  var previewArea=document.getElementById('previewArea');
+  var processBtn=document.getElementById('processBtn');
+  var downloadBtn=document.getElementById('downloadBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var statusEl=document.getElementById('status');
+  var fileInfo=document.getElementById('fileInfo');
+  var pageGrid=document.getElementById('pageGrid');
+  var mergePages=document.getElementById('mergePages');
+  var progressBar=document.getElementById('progressBar');
+  var progressFill=document.getElementById('progressFill');
+  var statRow=document.getElementById('statRow');
+  var toolTabs=document.getElementById('toolTabs');
+  var pdfInfoContent=document.getElementById('pdfInfoContent');
 
-  var dropZone = document.getElementById('dropZone');
-  var fileInput = document.getElementById('fileInput');
-  var previewArea = document.getElementById('previewArea');
-  var controls = document.getElementById('controls');
-  var actionRow = document.getElementById('actionRow');
-  var processBtn = document.getElementById('processBtn');
-  var downloadBtn = document.getElementById('downloadBtn');
-  var resetBtn = document.getElementById('resetBtn');
-  var statusEl = document.getElementById('status');
-  var fileInfo = document.getElementById('fileInfo');
-  var pagePreviews = document.getElementById('pagePreviews');
-  var extractOptions = document.getElementById('extractOptions');
-  var compressOptions = document.getElementById('compressOptions');
-  var progressBar = document.getElementById('progressBar');
-  var progressFill = document.getElementById('progressFill');
-  var actionSelect = document.getElementById('action');
+  var currentFile=null;
+  var pdfDoc=null;
+  var selectedPages=new Set();
+  var resultBlob=null;
+  var allFiles=[];
+  var currentTool='compress';
 
-  var currentFile = null;
-  var pdfDoc = null;
-  var resultBlobs = [];
-
-  Tools.setupDropZone(dropZone, handleFile);
-  fileInput.addEventListener('change', function(e) { if (e.target.files[0]) handleFile(e.target.files[0]); });
-
-  actionSelect.addEventListener('change', function() {
-    extractOptions.style.display = actionSelect.value === 'toImages' ? 'block' : 'none';
-    compressOptions.style.display = actionSelect.value === 'compress' ? 'block' : 'none';
+  toolTabs.addEventListener('click',function(e){
+    var btn=e.target.closest('button');if(!btn)return;
+    toolTabs.querySelectorAll('button').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    currentTool=btn.dataset.tool;
+    document.querySelectorAll('.tool-section').forEach(function(s){s.classList.remove('active');});
+    document.getElementById('tool-'+currentTool).classList.add('active');
   });
 
-  async function handleFile(file) {
-    currentFile = file;
-    dropZone.style.display = 'none';
-    previewArea.style.display = 'block';
-    controls.style.display = 'block';
-    actionRow.style.display = 'flex';
-    statusEl.style.display = 'none';
-    downloadBtn.style.display = 'none';
-    progressBar.style.display = 'none';
-    fileInfo.textContent = 'File: ' + file.name + ' (' + Tools.formatSize(file.size) + ')';
+  Tools.setupDropZone(dropZone,function(f){handleFile(f)});
+  fileInput.addEventListener('change',function(e){
+    for(var i=0;i<e.target.files.length;i++){
+      if(currentTool==='merge')addMergeFile(e.target.files[i]);
+      else{handleFile(e.target.files[i]);break;}
+    }
+  });
 
-    Tools.setStatus(statusEl, 'Loading PDF...', '');
+  async function handleFile(file){
+    currentFile=file;
+    dropZone.style.display='none';
+    previewArea.style.display='block';
+    document.getElementById('actionRow').style.display='flex';
+    statusEl.style.display='none';
+    downloadBtn.style.display='none';
+    progressBar.style.display='none';
+    fileInfo.textContent='File: '+file.name+' ('+Tools.formatSize(file.size)+')';
+    document.getElementById('statSize').textContent=Tools.formatSize(file.size);
+    statRow.style.display='grid';
 
-    try {
-      var data = await Tools.readAsArrayBuffer(file);
-      pdfDoc = await pdfjsLib.getDocument({ data: data }).promise;
-      var pages = pdfDoc.numPages;
+    Tools.setStatus(statusEl,'Loading PDF...','');
+    try{
+      var data=await Tools.readAsArrayBuffer(file);
+      pdfDoc=await pdfjsLib.getDocument({data:data}).promise;
+      var pages=pdfDoc.numPages;
+      document.getElementById('statPages').textContent=pages;
 
-      pagePreviews.innerHTML = '';
-      var renderLimit = Math.min(pages, 6);
+      pageGrid.innerHTML='';
+      selectedPages.clear();
+      var renderLimit=Math.min(pages,20);
 
-      for (var i = 1; i <= renderLimit; i++) {
-        var page = await pdfDoc.getPage(i);
-        var viewport = page.getViewport({ scale: 0.3 });
-        var canvas = document.createElement('canvas');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        canvas.style.borderRadius = '6px';
-        canvas.style.border = '1px solid var(--border)';
-        canvas.style.maxWidth = '200px';
-        await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
-        pagePreviews.appendChild(canvas);
+      for(var i=1;i<=renderLimit;i++){
+        var page=await pdfDoc.getPage(i);
+        var viewport=page.getViewport({scale:0.3});
+        var canvas=document.createElement('canvas');
+        canvas.width=viewport.width;
+        canvas.height=viewport.height;
+        canvas.dataset.page=i;
+        await page.render({canvasContext:canvas.getContext('2d'),viewport:viewport}).promise;
+
+        var thumb=document.createElement('div');
+        thumb.className='page-thumb';
+        thumb.dataset.page=i;
+        thumb.appendChild(canvas);
+        var num=document.createElement('div');
+        num.className='page-num';
+        num.textContent=i;
+        thumb.appendChild(num);
+        var check=document.createElement('div');
+        check.className='page-check';
+        check.textContent='✓';
+        thumb.appendChild(check);
+
+        thumb.addEventListener('click',function(){
+          var p=parseInt(this.dataset.page);
+          if(selectedPages.has(p)){selectedPages.delete(p);this.classList.remove('selected');}
+          else{selectedPages.add(p);this.classList.add('selected');}
+        });
+        pageGrid.appendChild(thumb);
       }
 
-      if (pages > renderLimit) {
-        var more = document.createElement('div');
-        more.style.cssText = 'display:flex;align-items:center;color:var(--text2);font-size:.9rem';
-        more.textContent = '+ ' + (pages - renderLimit) + ' more pages';
-        pagePreviews.appendChild(more);
+      if(pages>renderLimit){
+        var more=document.createElement('div');
+        more.style.cssText='display:flex;align-items:center;color:var(--text2);font-size:.9rem';
+        more.textContent='+'+(pages-renderLimit)+' more pages';
+        pageGrid.appendChild(more);
       }
 
-      Tools.setStatus(statusEl, 'PDF loaded: ' + pages + ' page' + (pages > 1 ? 's' : ''), 'done');
-    } catch(err) {
-      Tools.setStatus(statusEl, 'Error loading PDF: ' + err.message, 'error');
+      Tools.setStatus(statusEl,'PDF loaded: '+pages+' pages','done');
+    }catch(err){
+      Tools.setStatus(statusEl,'Error: '+err.message,'error');
     }
   }
 
-  resetBtn.addEventListener('click', function() {
-    currentFile = null;
-    pdfDoc = null;
-    resultBlobs = [];
-    dropZone.style.display = 'block';
-    previewArea.style.display = 'none';
-    controls.style.display = 'none';
-    actionRow.style.display = 'none';
-    statusEl.style.display = 'none';
-    progressBar.style.display = 'none';
-    downloadBtn.style.display = 'none';
-    fileInput.value = '';
+  async function addMergeFile(file){
+    if(!file.name.endsWith('.pdf'))return;
+    allFiles.push(file);
+    renderMergePages();
+  }
+
+  async function renderMergePages(){
+    mergePages.innerHTML='';
+    for(var f=0;f<allFiles.length;f++){
+      var file=allFiles[f];
+      var data=await Tools.readAsArrayBuffer(file);
+      var doc=await pdfjsLib.getDocument({data:data}).promise;
+      for(var i=1;i<=doc.numPages;i++){
+        var page=await doc.getPage(i);
+        var viewport=page.getViewport({scale:0.2});
+        var canvas=document.createElement('canvas');
+        canvas.width=viewport.width;
+        canvas.height=viewport.height;
+        await page.render({canvasContext:canvas.getContext('2d'),viewport:viewport}).promise;
+
+        var thumb=document.createElement('div');
+        thumb.className='page-thumb';
+        thumb.style.cursor='grab';
+        thumb.dataset.file=f;
+        thumb.dataset.page=i;
+        thumb.appendChild(canvas);
+        var num=document.createElement('div');
+        num.className='page-num';
+        num.textContent=file.name.split('/').pop()+' p'+i;
+        thumb.appendChild(num);
+        mergePages.appendChild(thumb);
+      }
+    }
+  }
+
+  processBtn.addEventListener('click',async function(){
+    if(currentTool==='merge'&&!allFiles.length)return;
+    if(currentTool!=='merge'&&!pdfDoc)return;
+    processBtn.disabled=true;
+    progressBar.style.display='block';
+    resultBlob=null;
+
+    try{
+      switch(currentTool){
+        case 'compress':await compressPDF();break;
+        case 'extract':await extractPages();break;
+        case 'rotate':await rotatePages();break;
+        case 'merge':await mergePDFs();break;
+        case 'numbers':await addPageNumbers();break;
+        case 'info':showInfo();break;
+      }
+    }catch(e){
+      Tools.setStatus(statusEl,'Error: '+e.message,'error');
+    }
+    processBtn.disabled=false;
   });
 
-  processBtn.addEventListener('click', async function() {
-    if (!pdfDoc) return;
-    processBtn.disabled = true;
-    progressBar.style.display = 'block';
-    resultBlobs = [];
+  async function compressPDF(){
+    var pages=pdfDoc.numPages;
+    var quality=parseFloat(document.getElementById('compressQuality').value);
+    var scale=parseFloat(document.getElementById('compressScale').value);
+    Tools.setStatus(statusEl,'Compressing...','');
 
-    if (actionSelect.value === 'toImages') {
-      await extractImages();
-    } else {
-      await compressPDF();
+    var jsPDF=window.jspdf.jsPDF;
+    var pdf=new jsPDF({orientation:'portrait',unit:'px',format:[595,842]});
+
+    for(var i=1;i<=pages;i++){
+      var page=await pdfDoc.getPage(i);
+      var viewport=page.getViewport({scale:scale});
+      var canvas=document.createElement('canvas');
+      canvas.width=viewport.width;
+      canvas.height=viewport.height;
+      await page.render({canvasContext:canvas.getContext('2d'),viewport:viewport}).promise;
+
+      var imgData=canvas.toDataURL('image/jpeg',quality);
+      if(i>1)pdf.addPage();
+      pdf.addImage(imgData,'JPEG',0,0,595,842);
+
+      progressFill.style.width=Math.floor((i/pages)*100)+'%';
     }
-    processBtn.disabled = false;
+
+    resultBlob=new Blob([pdf.output('arraybuffer')],{type:'application/pdf'});
+    Tools.setStatus(statusEl,'Done! Compressed: '+Tools.formatSize(resultBlob.size),'done');
+    progressFill.style.width='100%';
+    downloadBtn.style.display='inline-block';
+  }
+
+  async function extractPages(){
+    var pages=pdfDoc.numPages;
+    var format=document.getElementById('extractFormat').value;
+    var scale=parseFloat(document.getElementById('extractScale').value);
+    var toExtract=selectedPages.size>0?Array.from(selectedPages).sort(function(a,b){return a-b;}):Array.from({length:pages},function(_,i){return i+1;});
+    Tools.setStatus(statusEl,'Extracting...','');
+
+    var zip=new JSZip();
+    for(var idx=0;idx<toExtract.length;idx++){
+      var i=toExtract[idx];
+      var page=await pdfDoc.getPage(i);
+      var viewport=page.getViewport({scale:scale});
+      var canvas=document.createElement('canvas');
+      canvas.width=viewport.width;
+      canvas.height=viewport.height;
+      await page.render({canvasContext:canvas.getContext('2d'),viewport:viewport}).promise;
+
+      var mimeType=format==='jpeg'?'image/jpeg':'image/png';
+      var blob=await new Promise(function(r){canvas.toBlob(r,mimeType,0.92);});
+      zip.file('page_'+i+'.'+format,blob);
+      progressFill.style.width=Math.floor(((idx+1)/toExtract.length)*100)+'%';
+    }
+
+    resultBlob=await zip.generateAsync({type:'blob'});
+    Tools.setStatus(statusEl,'Done! '+toExtract.length+' pages extracted.','done');
+    progressFill.style.width='100%';
+    downloadBtn.style.display='inline-block';
+  }
+
+  async function rotatePages(){
+    var pages=pdfDoc.numPages;
+    var deg=parseInt(document.getElementById('rotateDeg').value);
+    var toRotate=selectedPages.size>0?Array.from(selectedPages):Array.from({length:pages},function(_,i){return i+1;});
+    Tools.setStatus(statusEl,'Rotating...','');
+
+    var jsPDF=window.jspdf.jsPDF;
+    var pdf=new jsPDF({orientation:'portrait',unit:'px',format:[595,842]});
+
+    for(var i=1;i<=pages;i++){
+      var page=await pdfDoc.getPage(i);
+      var viewport=page.getViewport({scale:1.5});
+      var canvas=document.createElement('canvas');
+      canvas.width=viewport.width;
+      canvas.height=viewport.height;
+      await page.render({canvasContext:canvas.getContext('2d'),viewport:viewport}).promise;
+
+      if(toRotate.indexOf(i)!==-1){
+        var ctx=canvas.getContext('2d');
+        var tempCanvas=document.createElement('canvas');
+        tempCanvas.width=canvas.height;
+        tempCanvas.height=canvas.width;
+        var tempCtx=tempCanvas.getContext('2d');
+        tempCtx.translate(tempCanvas.width/2,tempCanvas.height/2);
+        tempCtx.rotate(deg*Math.PI/180);
+        tempCtx.drawImage(canvas,-canvas.width/2,-canvas.height/2);
+        canvas=tempCanvas;
+      }
+
+      var imgData=canvas.toDataURL('image/jpeg',0.9);
+      if(i>1)pdf.addPage();
+      pdf.addImage(imgData,'JPEG',0,0,595,842);
+      progressFill.style.width=Math.floor((i/pages)*100)+'%';
+    }
+
+    resultBlob=new Blob([pdf.output('arraybuffer')],{type:'application/pdf'});
+    Tools.setStatus(statusEl,'Done! Rotated.','done');
+    progressFill.style.width='100%';
+    downloadBtn.style.display='inline-block';
+  }
+
+  async function mergePDFs(){
+    Tools.setStatus(statusEl,'Merging...','');
+
+    var jsPDF=window.jspdf.jsPDF;
+    var pdf=null;
+    var pageNum=0;
+
+    for(var f=0;f<allFiles.length;f++){
+      var data=await Tools.readAsArrayBuffer(allFiles[f]);
+      var doc=await pdfjsLib.getDocument({data:data}).promise;
+
+      for(var i=1;i<=doc.numPages;i++){
+        var page=await doc.getPage(i);
+        var viewport=page.getViewport({scale:1.5});
+        var canvas=document.createElement('canvas');
+        canvas.width=viewport.width;
+        canvas.height=viewport.height;
+        await page.render({canvasContext:canvas.getContext('2d'),viewport:viewport}).promise;
+
+        var imgData=canvas.toDataURL('image/jpeg',0.9);
+        if(!pdf)pdf=new jsPDF({orientation:'portrait',unit:'px',format:[595,842]});
+        else pdf.addPage();
+        pdf.addImage(imgData,'JPEG',0,0,595,842);
+        pageNum++;
+        progressFill.style.width=Math.floor((pageNum/10)*100)+'%';
+      }
+    }
+
+    if(pdf){
+      resultBlob=new Blob([pdf.output('arraybuffer')],{type:'application/pdf'});
+      Tools.setStatus(statusEl,'Done! Merged '+pageNum+' pages.','done');
+      downloadBtn.style.display='inline-block';
+    }
+    progressFill.style.width='100%';
+  }
+
+  async function addPageNumbers(){
+    var pages=pdfDoc.numPages;
+    var position=document.getElementById('numPosition').value;
+    var startPage=parseInt(document.getElementById('numStart').value)||1;
+    var fontSize=parseInt(document.getElementById('numFontSize').value)||12;
+    Tools.setStatus(statusEl,'Adding page numbers...','');
+
+    var jsPDF=window.jspdf.jsPDF;
+    var pdf=new jsPDF({orientation:'portrait',unit:'px',format:[595,842]});
+
+    for(var i=1;i<=pages;i++){
+      var page=await pdfDoc.getPage(i);
+      var viewport=page.getViewport({scale:1.5});
+      var canvas=document.createElement('canvas');
+      canvas.width=viewport.width;
+      canvas.height=viewport.height;
+      await page.render({canvasContext:canvas.getContext('2d'),viewport:viewport}).promise;
+
+      var imgData=canvas.toDataURL('image/jpeg',0.9);
+      if(i>1)pdf.addPage();
+      pdf.addImage(imgData,'JPEG',0,0,595,842);
+
+      if(i>=startPage){
+        var num=i-startPage+1;
+        pdf.setFontSize(fontSize);
+        var text=num.toString();
+        var x=297,y=830;
+        if(position.includes('left'))x=40;
+        if(position.includes('right'))x=555;
+        if(position.includes('top'))y=30;
+        pdf.text(text,x,y,{align:'center'});
+      }
+      progressFill.style.width=Math.floor((i/pages)*100)+'%';
+    }
+
+    resultBlob=new Blob([pdf.output('arraybuffer')],{type:'application/pdf'});
+    Tools.setStatus(statusEl,'Done! Page numbers added.','done');
+    progressFill.style.width='100%';
+    downloadBtn.style.display='inline-block';
+  }
+
+  async function showInfo(){
+    if(!pdfDoc)return;
+    var pages=pdfDoc.numPages;
+    var metadata=await pdfDoc.getMetadata();
+    var info=metadata.info||{};
+    var html='<table class="info-table">';
+    html+='<tr><td>Title</td><td>'+(info.Title||'-')+'</td></tr>';
+    html+='<tr><td>Author</td><td>'+(info.Author||'-')+'</td></tr>';
+    html+='<tr><td>Subject</td><td>'+(info.Subject||'-')+'</td></tr>';
+    html+='<tr><td>Creator</td><td>'+(info.Creator||'-')+'</td></tr>';
+    html+='<tr><td>Producer</td><td>'+(info.Producer||'-')+'</td></tr>';
+    html+='<tr><td>Pages</td><td>'+pages+'</td></tr>';
+    html+='<tr><td>File Size</td><td>'+Tools.formatSize(currentFile.size)+'</td></tr>';
+    html+='<tr><td>Created</td><td>'+(info.CreationDate||'-')+'</td></tr>';
+    html+='<tr><td>Modified</td><td>'+(info.ModDate||'-')+'</td></tr>';
+    html+='</table>';
+    pdfInfoContent.innerHTML=html;
+    Tools.setStatus(statusEl,'PDF info loaded.','done');
+  }
+
+  downloadBtn.addEventListener('click',function(){
+    if(!resultBlob)return;
+    var name=currentFile?currentFile.name.replace(/\.[^.]+$/,'_processed.pdf'):'merged.pdf';
+    Tools.downloadBlob(resultBlob,name);
   });
 
-  async function extractImages() {
-    var format = document.getElementById('imgFormat').value;
-    var scale = parseFloat(document.getElementById('scale').value);
-    var pages = pdfDoc.numPages;
-
-    Tools.setStatus(statusEl, 'Extracting pages...', '');
-
-    for (var i = 1; i <= pages; i++) {
-      var page = await pdfDoc.getPage(i);
-      var viewport = page.getViewport({ scale: scale });
-      var canvas = document.createElement('canvas');
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-      await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
-
-      var mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
-      var quality = format === 'jpeg' ? 0.92 : undefined;
-
-      var blob = await new Promise(function(resolve) {
-        canvas.toBlob(resolve, mimeType, quality);
-      });
-      resultBlobs.push({ blob: blob, name: 'page_' + i + '.' + format });
-
-      var pct = Math.floor((i / pages) * 100);
-      progressFill.style.width = pct + '%';
-      Tools.setStatus(statusEl, 'Extracted page ' + i + '/' + pages, '');
-    }
-
-    Tools.setStatus(statusEl, 'Done! ' + pages + ' pages extracted.', 'done');
-    progressFill.style.width = '100%';
-    downloadBtn.style.display = 'inline-block';
-  }
-
-  async function compressPDF() {
-    Tools.setStatus(statusEl, 'Reducing image quality across all pages...', '');
-    var pages = pdfDoc.numPages;
-    var quality = parseFloat(document.getElementById('pdfQuality').value);
-
-    for (var i = 1; i <= pages; i++) {
-      var page = await pdfDoc.getPage(i);
-      var viewport = page.getViewport({ scale: 1.5 });
-      var canvas = document.createElement('canvas');
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-      await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
-
-      var blob = await new Promise(function(resolve) {
-        canvas.toBlob(resolve, 'image/jpeg', quality);
-      });
-      resultBlobs.push({ blob: blob, name: 'compressed_page_' + i + '.jpg' });
-
-      var pct = Math.floor((i / pages) * 100);
-      progressFill.style.width = pct + '%';
-    }
-
-    Tools.setStatus(statusEl, 'Done! ' + pages + ' compressed images ready.', 'done');
-    progressFill.style.width = '100%';
-    downloadBtn.style.display = 'inline-block';
-  }
-
-  downloadBtn.addEventListener('click', function() {
-    resultBlobs.forEach(function(item, i) {
-      setTimeout(function() {
-        Tools.downloadBlob(item.blob, item.name);
-      }, i * 300);
-    });
+  resetBtn.addEventListener('click',function(){
+    currentFile=null;pdfDoc=null;resultBlob=null;allFiles=[];
+    selectedPages.clear();
+    dropZone.style.display='block';
+    previewArea.style.display='none';
+    document.getElementById('actionRow').style.display='none';
+    statusEl.style.display='none';
+    progressBar.style.display='none';
+    downloadBtn.style.display='none';
+    statRow.style.display='none';
+    pageGrid.innerHTML='';
+    mergePages.innerHTML='';
+    pdfInfoContent.innerHTML='';
+    fileInput.value='';
   });
 })();
 </script>
-
 </body>
 </html>
