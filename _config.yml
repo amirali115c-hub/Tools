@@ -1,0 +1,12 @@
+:title: Free Tools Hub
+:description: Free, private, client-side tools. No uploads, no accounts, no tracking.
+:baseurl: /Tools
+url: ""
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+exclude:
+  - node_modules
+  - README.md

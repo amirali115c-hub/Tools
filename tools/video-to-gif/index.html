@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video to GIF | Free, Private, Client-Side</title>
+  <meta name="description" content="Convert any video to a GIF for free. Choose start time, duration, and size. All processing happens in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>Video to GIF</h1>
+    <p class="subtitle">Convert video clips to GIFs. Everything happens in your browser.</p>
+
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop a video here</strong>
+        <p>or click to browse (MP4, WebM, MOV)</p>
+        <input type="file" id="fileInput" accept="video/*">
+      </div>
+
+      <div class="preview-area" id="previewArea">
+        <video id="videoPreview" controls style="max-width:100%;border-radius:8px"></video>
+        <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
+      </div>
+
+      <div class="controls" id="controls">
+        <label>Start time (seconds)</label>
+        <input type="number" id="startTime" value="0" min="0" step="0.1" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
+
+        <label>Duration (seconds, max 10)</label>
+        <input type="number" id="duration" value="3" min="0.5" max="10" step="0.1" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
+
+        <label>Width (pixels)</label>
+        <select id="width">
+          <option value="320">320px</option>
+          <option value="480" selected>480px</option>
+          <option value="640">640px</option>
+        </select>
+
+        <label>Frame rate (fps)</label>
+        <select id="fps">
+          <option value="8">8 fps (small file)</option>
+          <option value="12" selected>12 fps (balanced)</option>
+          <option value="15">15 fps (smooth)</option>
+        </select>
+      </div>
+
+      <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+      <div class="status" id="status"></div>
+
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="convertBtn">Convert to GIF</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../assets/tools.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const previewArea = document.getElementById('previewArea');
+const videoPreview = document.getElementById('videoPreview');
+const controls = document.getElementById('controls');
+const actionRow = document.getElementById('actionRow');
+const convertBtn = document.getElementById('convertBtn');
+const resetBtn = document.getElementById('resetBtn');
+const status = document.getElementById('status');
+const fileInfo = document.getElementById('fileInfo');
+const progressBar = document.getElementById('progressBar');
+const progressFill = document.getElementById('progressFill');
+
+let currentFile = null;
+
+Tools.setupDropZone(dropZone, handleFile);
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+function handleFile(file) {
+  currentFile = file;
+  videoPreview.src = URL.createObjectURL(file);
+  Tools.showPreview(previewArea);
+  controls.style.display = 'block';
+  actionRow.style.display = 'flex';
+  dropZone.style.display = 'none';
+  status.style.display = 'none';
+  fileInfo.textContent = `File: ${file.name} (${Tools.formatSize(file.size)})`;
+}
+
+resetBtn.addEventListener('click', () => {
+  currentFile = null;
+  dropZone.style.display = 'block';
+  previewArea.style.display = 'none';
+  controls.style.display = 'none';
+  actionRow.style.display = 'none';
+  status.style.display = 'none';
+  progressBar.style.display = 'none';
+  videoPreview.src = '';
+  fileInput.value = '';
+});
+
+convertBtn.addEventListener('click', async () => {
+  if (!currentFile) return;
+  convertBtn.disabled = true;
+  progressBar.style.display = 'block';
+  Tools.setStatus(status, 'Loading video...', '');
+  progressFill.style.width = '5%';
+
+  try {
+    const video = document.createElement('video');
+    video.muted = true;
+    video.preload = 'auto';
+    await new Promise((resolve, reject) => {
+      video.onloadeddata = resolve;
+      video.onerror = reject;
+      video.src = videoPreview.src;
+    });
+
+    const startTime = parseFloat(document.getElementById('startTime').value) || 0;
+    const duration = Math.min(parseFloat(document.getElementById('duration').value) || 3, 10);
+    const targetWidth = parseInt(document.getElementById('width').value);
+    const fps = parseInt(document.getElementById('fps').value);
+    const scale = targetWidth / video.videoWidth;
+    const targetHeight = Math.round(video.videoHeight * scale);
+
+    // Create canvas for frame capture
+    const canvas = document.createElement('canvas');
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    const ctx = canvas.getContext('2d');
+
+    // Create GIF encoder
+    const gif = new GIF({
+      workers: 2,
+      quality: 10,
+      width: targetWidth,
+      height: targetHeight,
+      workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'
+    });
+
+    gif.on('progress', p => {
+      const pct = Math.floor(p * 100);
+      progressFill.style.width = (50 + pct * 0.5) + '%';
+      Tools.setStatus(status, `Encoding GIF... ${pct}%`, '');
+    });
+
+    gif.on('finished', blob => {
+      const name = currentFile.name.replace(/\.[^.]+$/, '.gif');
+      Tools.downloadBlob(blob, name);
+      Tools.setStatus(status, `Done! GIF size: ${Tools.formatSize(blob.size)}`, 'done');
+      progressFill.style.width = '100%';
+      convertBtn.disabled = false;
+    });
+
+    // Seek to start
+    video.currentTime = startTime;
+    await new Promise(r => { video.onseeked = r; });
+
+    // Capture frames
+    const totalFrames = Math.ceil(duration * fps);
+    const frameInterval = 1 / fps;
+    let frame = 0;
+
+    Tools.setStatus(status, 'Capturing frames...', '');
+
+    function captureFrame() {
+      if (frame >= totalFrames || video.currentTime >= startTime + duration) {
+        Tools.setStatus(status, `Captured ${frame} frames. Encoding GIF...`, '');
+        progressFill.style.width = '50%';
+        gif.render();
+        return;
+      }
+
+      ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
+      gif.addFrame(ctx, { copy: true, delay: 1000 / fps });
+
+      frame++;
+      const pct = Math.floor((frame / totalFrames) * 45);
+      progressFill.style.width = pct + '%';
+
+      video.currentTime += frameInterval;
+      video.onseeked = () => requestAnimationFrame(captureFrame);
+    }
+
+    captureFrame();
+  } catch(err) {
+    Tools.setStatus(status, 'Error: ' + err.message, 'error');
+    convertBtn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>

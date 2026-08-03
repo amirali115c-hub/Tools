@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Tools | Free, Private, Client-Side</title>
+  <meta name="description" content="Free image tools: convert formats, resize, compress images. PNG, JPG, WebP, GIF support. Everything runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>Image Tools</h1>
+    <p class="subtitle">Convert, resize, and compress images. All in your browser.</p>
+
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop an image here</strong>
+        <p>or click to browse (PNG, JPG, WebP, GIF, BMP)</p>
+        <input type="file" id="fileInput" accept="image/*">
+      </div>
+
+      <div class="preview-area" id="previewArea">
+        <img id="imagePreview" style="max-width:100%;border-radius:8px">
+        <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
+      </div>
+
+      <div class="controls" id="controls">
+        <label>Action</label>
+        <select id="action">
+          <option value="convert">Convert format</option>
+          <option value="resize">Resize</option>
+          <option value="compress">Compress (reduce quality)</option>
+        </select>
+
+        <div id="formatOptions">
+          <label>Output format</label>
+          <select id="format">
+            <option value="image/png">PNG</option>
+            <option value="image/jpeg" selected>JPEG</option>
+            <option value="image/webp">WebP</option>
+          </select>
+        </div>
+
+        <div id="resizeOptions" style="display:none">
+          <label>Max width (px)</label>
+          <input type="number" id="maxWidth" value="800" min="10" max="10000" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
+          <label>Max height (px)</label>
+          <input type="number" id="maxHeight" value="600" min="10" max="10000" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
+        </div>
+
+        <div id="compressOptions">
+          <label>Quality (for JPEG/WebP)</label>
+          <input type="range" id="quality" min="10" max="100" value="80">
+          <div style="display:flex;justify-content:space-between;color:var(--text2);font-size:.8rem;margin-top:-12px;margin-bottom:16px">
+            <span>Smaller file</span>
+            <span id="qualityVal">80%</span>
+            <span>Better quality</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="status" id="status"></div>
+      <div id="resultArea" style="display:none;margin-top:16px">
+        <div id="resultInfo" style="color:var(--text2);margin-bottom:12px;font-size:.9rem"></div>
+        <img id="resultPreview" style="max-width:100%;border-radius:8px;border:1px solid var(--border)">
+      </div>
+
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="processBtn">Process Image</button>
+        <button class="btn btn-secondary" id="downloadBtn" style="display:none">Download Result</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../assets/tools.js"></script>
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const previewArea = document.getElementById('previewArea');
+const imagePreview = document.getElementById('imagePreview');
+const controls = document.getElementById('controls');
+const actionRow = document.getElementById('actionRow');
+const processBtn = document.getElementById('processBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const resetBtn = document.getElementById('resetBtn');
+const status = document.getElementById('status');
+const fileInfo = document.getElementById('fileInfo');
+const actionSelect = document.getElementById('action');
+const formatOptions = document.getElementById('formatOptions');
+const resizeOptions = document.getElementById('resizeOptions');
+const compressOptions = document.getElementById('compressOptions');
+const qualitySlider = document.getElementById('quality');
+const qualityVal = document.getElementById('qualityVal');
+const resultArea = document.getElementById('resultArea');
+const resultInfo = document.getElementById('resultInfo');
+const resultPreview = document.getElementById('resultPreview');
+
+let currentFile = null;
+let resultBlob = null;
+
+Tools.setupDropZone(dropZone, handleFile);
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+actionSelect.addEventListener('change', () => {
+  const v = actionSelect.value;
+  formatOptions.style.display = v === 'convert' ? 'block' : 'none';
+  resizeOptions.style.display = v === 'resize' ? 'block' : 'none';
+  compressOptions.style.display = v === 'compress' ? 'block' : 'none';
+});
+
+qualitySlider.addEventListener('input', () => {
+  qualityVal.textContent = qualitySlider.value + '%';
+});
+
+function handleFile(file) {
+  currentFile = file;
+  imagePreview.src = URL.createObjectURL(file);
+  Tools.showPreview(previewArea);
+  controls.style.display = 'block';
+  actionRow.style.display = 'flex';
+  dropZone.style.display = 'none';
+  status.style.display = 'none';
+  resultArea.style.display = 'none';
+  downloadBtn.style.display = 'none';
+  fileInfo.textContent = `File: ${file.name} (${Tools.formatSize(file.size)})`;
+}
+
+resetBtn.addEventListener('click', () => {
+  currentFile = null;
+  dropZone.style.display = 'block';
+  previewArea.style.display = 'none';
+  controls.style.display = 'none';
+  actionRow.style.display = 'none';
+  status.style.display = 'none';
+  resultArea.style.display = 'none';
+  downloadBtn.style.display = 'none';
+  imagePreview.src = '';
+  fileInput.value = '';
+});
+
+processBtn.addEventListener('click', () => {
+  if (!currentFile) return;
+  processBtn.disabled = true;
+  Tools.setStatus(status, 'Processing...', '');
+
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    const action = actionSelect.value;
+
+    let w = img.naturalWidth;
+    let h = img.naturalHeight;
+
+    if (action === 'resize') {
+      const maxW = parseInt(document.getElementById('maxWidth').value) || 800;
+      const maxH = parseInt(document.getElementById('maxHeight').value) || 600;
+      const scale = Math.min(maxW / w, maxH / h, 1);
+      w = Math.round(w * scale);
+      h = Math.round(h * scale);
+    }
+
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+
+    const outputType = action === 'convert' ? document.getElementById('format').value : currentFile.type || 'image/png';
+    const quality = parseInt(qualitySlider.value) / 100;
+
+    canvas.toBlob(blob => {
+      resultBlob = blob;
+      const url = URL.createObjectURL(blob);
+      resultPreview.src = url;
+      resultInfo.textContent = `${Tools.formatSize(currentFile.size)} → ${Tools.formatSize(blob.size)} (${outputType.split('/')[1].toUpperCase()}, ${w}x${h})`;
+      resultArea.style.display = 'block';
+      downloadBtn.style.display = 'inline-block';
+      Tools.setStatus(status, 'Done!', 'done');
+      processBtn.disabled = false;
+    }, outputType, quality);
+  };
+  img.src = currentFile;
+});
+
+downloadBtn.addEventListener('click', () => {
+  if (!resultBlob || !currentFile) return;
+  const ext = document.getElementById('format').value.split('/')[1] || 'png';
+  const name = currentFile.name.replace(/\.[^.]+$/, '.' + ext);
+  Tools.downloadBlob(resultBlob, name);
+});
+</script>
+
+</body>
+</html>

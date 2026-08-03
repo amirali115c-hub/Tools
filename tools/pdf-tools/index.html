@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Tools | Free, Private, Client-Side</title>
+  <meta name="description" content="Free PDF tools: compress PDFs and extract pages as images. No uploads, no tracking. Everything runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>PDF Tools</h1>
+    <p class="subtitle">Compress and extract PDF pages. Everything stays in your browser.</p>
+
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop a PDF here</strong>
+        <p>or click to browse</p>
+        <input type="file" id="fileInput" accept=".pdf,application/pdf">
+      </div>
+
+      <div class="preview-area" id="previewArea">
+        <div id="fileInfo" style="color:var(--text2);margin-bottom:16px;font-size:.9rem"></div>
+        <div id="pagePreviews" style="display:flex;flex-wrap:wrap;gap:12px"></div>
+      </div>
+
+      <div class="controls" id="controls">
+        <label>Action</label>
+        <select id="action">
+          <option value="toImages">Extract pages as images</option>
+          <option value="compress">Reduce file size</option>
+        </select>
+
+        <div id="extractOptions">
+          <label>Output format</label>
+          <select id="imgFormat">
+            <option value="png">PNG</option>
+            <option value="jpeg" selected>JPEG</option>
+          </select>
+          <label>Scale (resolution multiplier)</label>
+          <select id="scale">
+            <option value="1">1x (fast, smaller files)</option>
+            <option value="1.5" selected>1.5x (balanced)</option>
+            <option value="2">2x (high quality)</option>
+          </select>
+        </div>
+
+        <div id="compressOptions" style="display:none">
+          <label>Output quality</label>
+          <select id="pdfQuality">
+            <option value="0.5">Low (smallest)</option>
+            <option value="0.7" selected>Medium</option>
+            <option value="0.9">High</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+      <div class="status" id="status"></div>
+
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="processBtn">Process PDF</button>
+        <button class="btn btn-secondary" id="downloadBtn" style="display:none">Download All</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="../../assets/tools.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const previewArea = document.getElementById('previewArea');
+const controls = document.getElementById('controls');
+const actionRow = document.getElementById('actionRow');
+const processBtn = document.getElementById('processBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const resetBtn = document.getElementById('resetBtn');
+const status = document.getElementById('status');
+const fileInfo = document.getElementById('fileInfo');
+const pagePreviews = document.getElementById('pagePreviews');
+const extractOptions = document.getElementById('extractOptions');
+const compressOptions = document.getElementById('compressOptions');
+const progressBar = document.getElementById('progressBar');
+const progressFill = document.getElementById('progressFill');
+const actionSelect = document.getElementById('action');
+
+let currentFile = null;
+let pdfDoc = null;
+let resultBlobs = [];
+
+Tools.setupDropZone(dropZone, handleFile);
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+actionSelect.addEventListener('change', () => {
+  extractOptions.style.display = actionSelect.value === 'toImages' ? 'block' : 'none';
+  compressOptions.style.display = actionSelect.value === 'compress' ? 'block' : 'none';
+});
+
+async function handleFile(file) {
+  currentFile = file;
+  dropZone.style.display = 'none';
+  Tools.showPreview(previewArea);
+  controls.style.display = 'block';
+  actionRow.style.display = 'flex';
+  status.style.display = 'none';
+  downloadBtn.style.display = 'none';
+  fileInfo.textContent = `File: ${file.name} (${Tools.formatSize(file.size)})`;
+
+  Tools.setStatus(status, 'Loading PDF...', '');
+
+  try {
+    const data = await Tools.readAsArrayBuffer(file);
+    pdfDoc = await pdfjsLib.getDocument({ data }).promise;
+    const pages = pdfDoc.numPages;
+
+    pagePreviews.innerHTML = '';
+    const renderLimit = Math.min(pages, 6);
+
+    for (let i = 1; i <= renderLimit; i++) {
+      const page = await pdfDoc.getPage(i);
+      const viewport = page.getViewport({ scale: 0.3 });
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      canvas.style.borderRadius = '6px';
+      canvas.style.border = '1px solid var(--border)';
+      canvas.style.maxWidth = '200px';
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+      pagePreviews.appendChild(canvas);
+    }
+
+    if (pages > renderLimit) {
+      const more = document.createElement('div');
+      more.style.cssText = 'display:flex;align-items:center;color:var(--text2);font-size:.9rem';
+      more.textContent = `+ ${pages - renderLimit} more pages`;
+      pagePreviews.appendChild(more);
+    }
+
+    Tools.setStatus(status, `PDF loaded: ${pages} page${pages > 1 ? 's' : ''}`, 'done');
+  } catch(err) {
+    Tools.setStatus(status, 'Error loading PDF: ' + err.message, 'error');
+  }
+}
+
+resetBtn.addEventListener('click', () => {
+  currentFile = null;
+  pdfDoc = null;
+  resultBlobs = [];
+  dropZone.style.display = 'block';
+  previewArea.style.display = 'none';
+  controls.style.display = 'none';
+  actionRow.style.display = 'none';
+  status.style.display = 'none';
+  progressBar.style.display = 'none';
+  downloadBtn.style.display = 'none';
+  fileInput.value = '';
+});
+
+processBtn.addEventListener('click', async () => {
+  if (!pdfDoc) return;
+  processBtn.disabled = true;
+  progressBar.style.display = 'block';
+  resultBlobs = [];
+
+  if (actionSelect.value === 'toImages') {
+    await extractImages();
+  } else {
+    await compressPDF();
+  }
+  processBtn.disabled = false;
+});
+
+async function extractImages() {
+  const format = document.getElementById('imgFormat').value;
+  const scale = parseFloat(document.getElementById('scale').value);
+  const pages = pdfDoc.numPages;
+
+  Tools.setStatus(status, 'Extracting pages...', '');
+
+  for (let i = 1; i <= pages; i++) {
+    const page = await pdfDoc.getPage(i);
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+
+    const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
+    const quality = format === 'jpeg' ? 0.92 : undefined;
+
+    await new Promise(resolve => {
+      canvas.toBlob(blob => {
+        resultBlobs.push({ blob, name: `page_${i}.${format}` });
+        resolve();
+      }, mimeType, quality);
+    });
+
+    const pct = Math.floor((i / pages) * 100);
+    progressFill.style.width = pct + '%';
+    Tools.setStatus(status, `Extracted page ${i}/${pages}`, '');
+  }
+
+  Tools.setStatus(status, `Done! ${pages} pages extracted.`, 'done');
+  progressFill.style.width = '100%';
+  downloadBtn.style.display = 'inline-block';
+}
+
+async function compressPDF() {
+  Tools.setStatus(status, 'Reducing image quality across all pages...', '');
+  const pages = pdfDoc.numPages;
+  const quality = parseFloat(document.getElementById('pdfQuality').value);
+
+  for (let i = 1; i <= pages; i++) {
+    const page = await pdfDoc.getPage(i);
+    const viewport = page.getViewport({ scale: 1.5 });
+    const canvas = document.createElement('canvas');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+
+    const blob = await new Promise(resolve => {
+      canvas.toBlob(resolve, 'image/jpeg', quality);
+    });
+
+    resultBlobs.push({ blob, name: `compressed_page_${i}.jpg` });
+
+    const pct = Math.floor((i / pages) * 100);
+    progressFill.style.width = pct + '%';
+  }
+
+  Tools.setStatus(status, `Done! ${pages} compressed images ready.`, 'done');
+  progressFill.style.width = '100%';
+  downloadBtn.style.display = 'inline-block';
+}
+
+downloadBtn.addEventListener('click', () => {
+  resultBlobs.forEach((item, i) => {
+    setTimeout(() => {
+      Tools.downloadBlob(item.blob, item.name);
+    }, i * 300);
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Compressor | Free, Private, Client-Side</title>
+  <meta name="description" content="Compress video files for free without losing quality. Reduces file size in your browser. No uploads, no tracking.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>Video Compressor</h1>
+    <p class="subtitle">Compress videos in your browser. No server. No uploads.</p>
+
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop a video here</strong>
+        <p>or click to browse (MP4, WebM, MOV)</p>
+        <input type="file" id="fileInput" accept="video/*">
+      </div>
+
+      <div class="preview-area" id="previewArea">
+        <video id="videoPreview" controls style="max-width:100%;border-radius:8px"></video>
+        <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
+      </div>
+
+      <div class="controls" id="controls">
+        <label>Quality (bitrate)</label>
+        <select id="quality">
+          <option value="1000000">Low (1 Mbps) - smallest file</option>
+          <option value="2500000" selected>Medium (2.5 Mbps) - balanced</option>
+          <option value="5000000">High (5 Mbps) - best quality</option>
+        </select>
+
+        <label>Resolution</label>
+        <select id="resolution">
+          <option value="0">Keep original</option>
+          <option value="360">360p</option>
+          <option value="480">480p</option>
+          <option value="720">720p</option>
+        </select>
+
+        <label>FPS</label>
+        <select id="fps">
+          <option value="0">Keep original</option>
+          <option value="24">24 fps</option>
+          <option value="30" selected>30 fps</option>
+        </select>
+      </div>
+
+      <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+      <div class="status" id="status"></div>
+
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="compressBtn">Compress Video</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../assets/tools.js"></script>
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const previewArea = document.getElementById('previewArea');
+const videoPreview = document.getElementById('videoPreview');
+const controls = document.getElementById('controls');
+const actionRow = document.getElementById('actionRow');
+const compressBtn = document.getElementById('compressBtn');
+const resetBtn = document.getElementById('resetBtn');
+const status = document.getElementById('status');
+const fileInfo = document.getElementById('fileInfo');
+const progressBar = document.getElementById('progressBar');
+const progressFill = document.getElementById('progressFill');
+const qualitySelect = document.getElementById('quality');
+const resolutionSelect = document.getElementById('resolution');
+const fpsSelect = document.getElementById('fps');
+
+let currentFile = null;
+
+Tools.setupDropZone(dropZone, handleFile);
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+function handleFile(file) {
+  currentFile = file;
+  videoPreview.src = URL.createObjectURL(file);
+  Tools.showPreview(previewArea);
+  controls.style.display = 'block';
+  actionRow.style.display = 'flex';
+  dropZone.style.display = 'none';
+  status.style.display = 'none';
+  fileInfo.textContent = `File: ${file.name} (${Tools.formatSize(file.size)})`;
+}
+
+resetBtn.addEventListener('click', () => {
+  currentFile = null;
+  dropZone.style.display = 'block';
+  previewArea.style.display = 'none';
+  controls.style.display = 'none';
+  actionRow.style.display = 'none';
+  status.style.display = 'none';
+  progressBar.style.display = 'none';
+  videoPreview.src = '';
+  fileInput.value = '';
+});
+
+compressBtn.addEventListener('click', async () => {
+  if (!currentFile) return;
+  compressBtn.disabled = true;
+  progressBar.style.display = 'block';
+  Tools.setStatus(status, 'Loading video...', '');
+  progressFill.style.width = '10%';
+
+  try {
+    const video = document.createElement('video');
+    video.muted = true;
+    video.preload = 'auto';
+    await new Promise((resolve, reject) => {
+      video.onloadeddata = resolve;
+      video.onerror = reject;
+      video.src = videoPreview.src;
+    });
+
+    const targetBitrate = parseInt(qualitySelect.value);
+    const targetFps = parseInt(fpsSelect.value) || 30;
+    let targetHeight = parseInt(resolutionSelect.value) || video.videoHeight;
+    const scale = targetHeight / video.videoHeight;
+    const targetWidth = Math.round(video.videoWidth * scale);
+
+    // Create offscreen canvas at target resolution
+    const offCanvas = document.createElement('canvas');
+    offCanvas.width = targetWidth;
+    offCanvas.height = targetHeight;
+    const offCtx = offCanvas.getContext('2d');
+
+    Tools.setStatus(status, 'Compressing...', '');
+
+    const stream = offCanvas.captureStream(targetFps);
+    // Set bitrate via track settings
+    stream.getVideoTracks().forEach(t => {
+      try {
+        t.applyConstraints({ advanced: [{ videoBitrate: targetBitrate }] });
+      } catch(e) {}
+    });
+
+    const chunks = [];
+    const recorder = new MediaRecorder(stream, {
+      mimeType: 'video/webm;codecs=vp9',
+      videoBitsPerSecond: targetBitrate
+    });
+
+    recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      const pctOriginal = Math.round((blob.size / currentFile.size) * 100);
+      const name = currentFile.name.replace(/\.[^.]+$/, '_compressed.webm');
+      Tools.downloadBlob(blob, name);
+      Tools.setStatus(status, `Done! ${Tools.formatSize(currentFile.size)} → ${Tools.formatSize(blob.size)} (${pctOriginal}% of original)`, 'done');
+      progressFill.style.width = '100%';
+      compressBtn.disabled = false;
+    };
+
+    video.currentTime = 0;
+    await new Promise(r => { video.onseeked = r; });
+
+    recorder.start();
+    const frameInterval = 1 / targetFps;
+    const duration = video.duration;
+    const totalFrames = Math.ceil(duration * targetFps);
+    let frame = 0;
+
+    function processFrame() {
+      if (video.currentTime >= duration || frame >= totalFrames) {
+        recorder.stop();
+        return;
+      }
+
+      offCtx.drawImage(video, 0, 0, targetWidth, targetHeight);
+
+      frame++;
+      const pct = Math.floor((frame / totalFrames) * 85) + 10;
+      progressFill.style.width = pct + '%';
+
+      if (frame % 100 === 0) {
+        Tools.setStatus(status, `Compressing... frame ${frame}/${totalFrames}`, '');
+      }
+
+      video.currentTime += frameInterval;
+      video.onseeked = () => requestAnimationFrame(processFrame);
+    }
+
+    processFrame();
+  } catch(err) {
+    Tools.setStatus(status, 'Error: ' + err.message, 'error');
+    compressBtn.disabled = false;
+  }
+});
+</script>
+
+</body>
+</html>

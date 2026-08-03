@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Watermark Remover | Free, Private, Client-Side</title>
+  <meta name="description" content="Remove watermarks from videos and images for free. All processing happens in your browser. No uploads, no tracking.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>Watermark Remover</h1>
+    <p class="subtitle">Remove watermarks from videos and images. Everything stays in your browser.</p>
+
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop a video or image here</strong>
+        <p>or click to browse (MP4, WebM, PNG, JPG, GIF)</p>
+        <input type="file" id="fileInput" accept="video/*,image/*">
+      </div>
+
+      <div class="preview-area" id="previewArea">
+        <video id="videoPreview" controls style="display:none"></video>
+        <img id="imagePreview" style="display:none">
+        <canvas id="canvas" style="display:none"></canvas>
+      </div>
+
+      <div class="controls" id="controls">
+        <p style="color:var(--text2);margin-bottom:12px">Draw a rectangle around the watermark area, then click Remove.</p>
+        <label>Method</label>
+        <select id="method">
+          <option value="crop">Crop watermark from edge</option>
+          <option value="blur">Blur watermark region</option>
+        </select>
+        <div id="blurControls" style="display:none">
+          <label>Blur Strength</label>
+          <input type="range" id="blurStrength" min="5" max="30" value="15">
+        </div>
+      </div>
+
+      <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+      <div class="status" id="status"></div>
+
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="removeBtn">Remove Watermark</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../../assets/tools.js"></script>
+<script>
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const previewArea = document.getElementById('previewArea');
+const videoPreview = document.getElementById('videoPreview');
+const imagePreview = document.getElementById('imagePreview');
+const canvas = document.getElementById('canvas');
+const controls = document.getElementById('controls');
+const actionRow = document.getElementById('actionRow');
+const removeBtn = document.getElementById('removeBtn');
+const resetBtn = document.getElementById('resetBtn');
+const status = document.getElementById('status');
+const methodSelect = document.getElementById('method');
+const blurControls = document.getElementById('blurControls');
+const blurStrength = document.getElementById('blurStrength');
+const progressBar = document.getElementById('progressBar');
+const progressFill = document.getElementById('progressFill');
+
+let currentFile = null;
+let isVideo = false;
+let selectionBox = null;
+let selectionStart = null;
+
+Tools.setupDropZone(dropZone, handleFile);
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+methodSelect.addEventListener('change', () => {
+  blurControls.style.display = methodSelect.value === 'blur' ? 'block' : 'none';
+});
+
+function handleFile(file) {
+  currentFile = file;
+  isVideo = file.type.startsWith('video/');
+  const url = URL.createObjectURL(file);
+
+  if (isVideo) {
+    videoPreview.src = url;
+    videoPreview.style.display = 'block';
+    imagePreview.style.display = 'none';
+  } else {
+    imagePreview.src = url;
+    imagePreview.style.display = 'block';
+    videoPreview.style.display = 'none';
+  }
+
+  Tools.showPreview(previewArea);
+  controls.style.display = 'block';
+  actionRow.style.display = 'flex';
+  dropZone.style.display = 'none';
+  status.style.display = 'none';
+
+  if (!isVideo) setupImageSelection();
+}
+
+function setupImageSelection() {
+  const img = imagePreview;
+  img.onload = () => {
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+  };
+}
+
+resetBtn.addEventListener('click', () => {
+  currentFile = null;
+  dropZone.style.display = 'block';
+  previewArea.style.display = 'none';
+  controls.style.display = 'none';
+  actionRow.style.display = 'none';
+  status.style.display = 'none';
+  progressBar.style.display = 'none';
+  videoPreview.src = '';
+  imagePreview.src = '';
+  fileInput.value = '';
+});
+
+removeBtn.addEventListener('click', async () => {
+  if (!currentFile) return;
+  removeBtn.disabled = true;
+  progressBar.style.display = 'block';
+
+  if (isVideo) {
+    await processVideo();
+  } else {
+    processImage();
+  }
+  removeBtn.disabled = false;
+});
+
+function processImage() {
+  Tools.setStatus(status, 'Processing image...', '');
+  const img = new Image();
+  img.onload = () => {
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+
+    const method = methodSelect.value;
+    if (method === 'crop') {
+      // Crop right 15% where watermarks usually sit
+      const cropWidth = Math.floor(canvas.width * 0.85);
+      const cropped = document.createElement('canvas');
+      cropped.width = cropWidth;
+      cropped.height = canvas.height;
+      const cCtx = cropped.getContext('2d');
+      cCtx.drawImage(canvas, 0, 0, cropWidth, canvas.height, 0, 0, cropWidth, canvas.height);
+      cropped.toBlob(blob => {
+        const name = currentFile.name.replace(/\.[^.]+$/, '_no_wm.png');
+        Tools.downloadBlob(blob, name);
+        Tools.setStatus(status, 'Done. Image downloaded.', 'done');
+        progressFill.style.width = '100%';
+      }, 'image/png');
+    } else {
+      // Blur edges (simple approach: blur the right 15% and bottom 5%)
+      const strength = parseInt(blurStrength.value);
+      const rightX = Math.floor(canvas.width * 0.85);
+      const bottomY = Math.floor(canvas.height * 0.95);
+      const imageData = ctx.getImageData(rightX, 0, canvas.width - rightX, canvas.height);
+      const blurred = blurRegion(imageData, strength);
+      ctx.putImageData(blurred, rightX, 0);
+      // Bottom strip
+      const bottomData = ctx.getImageData(0, bottomY, canvas.width, canvas.height - bottomY);
+      const blurredBottom = blurRegion(bottomData, strength);
+      ctx.putImageData(blurredBottom, 0, bottomY);
+
+      canvas.toBlob(blob => {
+        const name = currentFile.name.replace(/\.[^.]+$/, '_no_wm.png');
+        Tools.downloadBlob(blob, name);
+        Tools.setStatus(status, 'Done. Image downloaded.', 'done');
+        progressFill.style.width = '100%';
+      }, 'image/png');
+    }
+  };
+  img.src = currentFile;
+}
+
+function blurRegion(imageData, strength) {
+  const d = imageData.data;
+  const w = imageData.width;
+  const h = imageData.height;
+  const out = new ImageData(w, h);
+  const o = out.data;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let r=0,g=0,b=0,count=0;
+      for (let dy=-strength;dy<=strength;dy++) {
+        for (let dx=-strength;dx<=strength;dx++) {
+          const nx=x+dx,ny=y+dy;
+          if (nx>=0&&nx<w&&ny>=0&&ny<h) {
+            const i=(ny*w+nx)*4;
+            r+=d[i];g+=d[i+1];b+=d[i+2];count++;
+          }
+        }
+      }
+      const i=(y*w+x)*4;
+      o[i]=r/count;o[i+1]=g/count;o[i+2]=b/count;o[i+3]=d[i+3];
+    }
+  }
+  return out;
+}
+
+async function processVideo() {
+  Tools.setStatus(status, 'Loading video frames...', '');
+  progressFill.style.width = '10%';
+
+  const video = document.createElement('video');
+  video.muted = true;
+  video.preload = 'auto';
+
+  await new Promise((resolve, reject) => {
+    video.onloadeddata = resolve;
+    video.onerror = reject;
+    video.src = videoPreview.src;
+  });
+
+  const duration = video.duration;
+  const method = methodSelect.value;
+  const strength = parseInt(blurStrength.value);
+
+  // Create offscreen canvas
+  const offCanvas = document.createElement('canvas');
+  offCanvas.width = video.videoWidth;
+  offCanvas.height = video.videoHeight;
+  const offCtx = offCanvas.getContext('2d');
+
+  // We will capture frames and build a new video using MediaRecorder
+  // For a true client-side watermark removal, the simplest approach
+  // is to re-encode with the watermark region blurred.
+  // We use requestVideoFrameCallback or a manual loop.
+
+  const stream = offCanvas.captureStream(30);
+  const chunks = [];
+  const recorder = new MediaRecorder(stream, {
+    mimeType: 'video/webm;codecs=vp9',
+    videoBitsPerSecond: 5000000
+  });
+
+  recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+  recorder.onstop = () => {
+    const blob = new Blob(chunks, { type: 'video/webm' });
+    const name = currentFile.name.replace(/\.[^.]+$/, '_no_wm.webm');
+    Tools.downloadBlob(blob, name);
+    Tools.setStatus(status, 'Done. Video downloaded.', 'done');
+    progressFill.style.width = '100%';
+  };
+
+  video.currentTime = 0;
+  await new Promise(r => { video.onseeked = r; });
+
+  recorder.start();
+
+  const frameInterval = 1/30;
+  let framesProcessed = 0;
+  const totalFrames = Math.ceil(duration * 30);
+
+  function processFrame() {
+    if (video.currentTime >= duration) {
+      recorder.stop();
+      return;
+    }
+
+    offCtx.drawImage(video, 0, 0);
+
+    if (method === 'crop') {
+      // Overlay black bar on right 15%
+      const barWidth = Math.floor(offCanvas.width * 0.15);
+      offCtx.fillStyle = '#000';
+      offCtx.fillRect(offCanvas.width - barWidth, 0, barWidth, offCanvas.height);
+    } else {
+      // Blur the right edge and bottom
+      try {
+        const rightX = Math.floor(offCanvas.width * 0.85);
+        const imgData = offCtx.getImageData(rightX, 0, offCanvas.width - rightX, offCanvas.height);
+        const blurred = blurRegion(imgData, strength);
+        offCtx.putImageData(blurred, rightX, 0);
+      } catch(e) {}
+    }
+
+    framesProcessed++;
+    const pct = Math.floor((framesProcessed / totalFrames) * 90);
+    progressFill.style.width = pct + '%';
+    Tools.setStatus(status, `Processing frame ${framesProcessed}/${totalFrames}...`, '');
+
+    video.currentTime += frameInterval;
+    video.onseeked = () => requestAnimationFrame(processFrame);
+  }
+
+  processFrame();
+}
+</script>
+
+</body>
+</html>
