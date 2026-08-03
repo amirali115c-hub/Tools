@@ -4,104 +4,515 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Audio Trimmer | Free, Private, Client-Side</title>
-  <meta name="description" content="Trim and cut audio files for free. Choose start and end time. Runs in your browser.">
+  <meta name="description" content="Free audio trimmer. Cut MP3, WAV, OGG, M4A with waveform preview. Batch mode, fade in/out. Everything runs in your browser.">
   <link rel="stylesheet" href="../../assets/style.css">
+  <style>
+    .waveform-wrap{position:relative;width:100%;height:120px;background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer}
+    .waveform-canvas{display:block;width:100%;height:100%}
+    .trim-region{position:absolute;top:0;bottom:0;background:rgba(34,197,94,.15);border-left:3px solid #22c55e;border-right:3px solid #22c55e;pointer-events:none}
+    .trim-handle{position:absolute;top:0;bottom:0;width:10px;cursor:ew-resize;z-index:5}
+    .trim-handle::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:4px;height:30px;background:#fff;border-radius:2px;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+    .trim-handle.start{left:-5px;background:#22c55e;border-radius:4px 0 0 4px}
+    .trim-handle.end{right:-5px;background:#22c55e;border-radius:0 4px 4px 0}
+    .playhead{position:absolute;top:0;bottom:0;width:2px;background:var(--accent);pointer-events:none;z-index:4}
+    .time-grid{display:flex;justify-content:space-between;margin-top:4px;font-size:.7rem;color:var(--text2)}
+    .segments-list{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+    .segment-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.85rem}
+    .segment-item .seg-num{color:var(--accent);font-weight:700;min-width:20px}
+    .segment-item .seg-range{flex:1;color:var(--text)}
+    .segment-item .seg-dur{color:var(--text2);min-width:60px;text-align:right}
+    .segment-item .seg-remove{cursor:pointer;color:var(--red);padding:2px}
+    .zoom-controls{display:flex;gap:6px;margin-bottom:12px}
+    .zoom-controls button{padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;font-size:.8rem}
+    .zoom-controls button:hover{border-color:var(--accent)}
+    .fade-row{display:flex;gap:12px;margin-bottom:12px}
+    .fade-row>div{flex:1}
+    .fade-row label{display:block;margin-bottom:4px;font-size:.8rem;color:var(--text2)}
+    .fade-row input[type=number]{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px;border-radius:6px}
+    .preview-tabs{display:flex;gap:4px;margin-bottom:16px}
+    .preview-tabs button{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
+    .preview-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .preview-tabs button:hover:not(.active){border-color:var(--accent)}
+    .batch-list{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+    .batch-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.85rem}
+    .batch-item .batch-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .batch-item .batch-dur{color:var(--text2);min-width:60px;text-align:right}
+    .batch-item .batch-remove{cursor:pointer;color:var(--red);padding:2px}
+  </style>
 </head>
 <body>
 <div class="container">
   <div class="tool-page">
     <a href="../../" class="back-link">← Back to Tools</a>
     <h1>Audio Trimmer</h1>
-    <p class="subtitle">Trim and cut audio files. No uploads.</p>
+    <p class="subtitle">Trim audio with waveform preview. Batch mode, fade in/out. All in your browser.</p>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="trim">Trim</button>
+      <button class="tab" data-tab="batch">Batch</button>
+      <button class="tab" data-tab="preview">Preview</button>
+    </div>
+
     <div class="tool-area">
       <div class="upload-zone" id="dropZone">
         <div class="big-icon">📁</div>
-        <strong>Drop an audio file here</strong>
+        <strong>Drop audio file(s) here</strong>
         <p>or click to browse (MP3, WAV, OGG, M4A)</p>
-        <input type="file" id="fileInput" accept="audio/*">
+        <input type="file" id="fileInput" accept="audio/*" multiple>
       </div>
-      <div class="preview-area" id="previewArea">
-        <audio id="audioPreview" controls style="width:100%"></audio>
-        <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
-      </div>
-      <div class="controls" id="controls">
-        <label>Start Time (seconds)</label>
-        <input type="number" id="startTime" value="0" min="0" step="0.1" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
-        <label>End Time (seconds)</label>
-        <input type="number" id="endTime" value="10" min="0.1" step="0.1" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
-        <div style="display:flex;gap:12px">
-          <button class="btn btn-secondary" id="setStartBtn" style="flex:1">Set Start = Now</button>
-          <button class="btn btn-secondary" id="setEndBtn" style="flex:1">Set End = Now</button>
+
+      <div class="batch-list" id="batchList"></div>
+
+      <div id="trimSection" style="display:none">
+        <div class="preview-area">
+          <audio id="audioPreview" controls style="width:100%"></audio>
+          <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
+        </div>
+
+        <div class="zoom-controls">
+          <button id="zoomInBtn">Zoom In</button>
+          <button id="zoomOutBtn">Zoom Out</button>
+          <button id="zoomFitBtn">Fit</button>
+        </div>
+
+        <div class="waveform-wrap" id="waveformWrap">
+          <canvas class="waveform-canvas" id="waveformCanvas"></canvas>
+          <div class="trim-region" id="trimRegion">
+            <div class="trim-handle start" id="trimStart"></div>
+            <div class="trim-handle end" id="trimEnd"></div>
+          </div>
+          <div class="playhead" id="playhead"></div>
+        </div>
+
+        <div class="time-grid" id="timeGrid"></div>
+
+        <div class="preview-tabs" id="modeTabs">
+          <button class="active" data-mode="trim">Trim</button>
+          <button data-mode="fade">Fade In/Out</button>
+          <button data-mode="segments">Segments</button>
+        </div>
+
+        <div id="trimMode">
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <div style="flex:1">
+              <label>Start</label>
+              <div style="display:flex;gap:4px">
+                <input type="number" id="startMin" value="0" min="0" placeholder="min" style="width:60px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:6px;border-radius:4px">
+                <span style="color:var(--text2);align-self:center">:</span>
+                <input type="number" id="startSec" value="0" min="0" max="59" placeholder="sec" style="width:60px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:6px;border-radius:4px">
+                <span style="color:var(--text2);align-self:center">.</span>
+                <input type="number" id="startMs" value="0" min="0" max="999" placeholder="ms" style="width:70px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:6px;border-radius:4px">
+              </div>
+            </div>
+            <div style="flex:1">
+              <label>End</label>
+              <div style="display:flex;gap:4px">
+                <input type="number" id="endMin" value="0" min="0" placeholder="min" style="width:60px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:6px;border-radius:4px">
+                <span style="color:var(--text2);align-self:center">:</span>
+                <input type="number" id="endSec" value="10" min="0" max="59" placeholder="sec" style="width:60px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:6px;border-radius:4px">
+                <span style="color:var(--text2);align-self:center">.</span>
+                <input type="number" id="endMs" value="0" min="0" max="999" placeholder="ms" style="width:70px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:6px;border-radius:4px">
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary" id="setStartBtn" style="flex:1">Set Start = Now</button>
+            <button class="btn btn-secondary" id="setEndBtn" style="flex:1">Set End = Now</button>
+            <button class="btn btn-secondary" id="playTrimBtn" style="flex:1">Play Selection</button>
+          </div>
+        </div>
+
+        <div id="fadeMode" style="display:none">
+          <div class="fade-row">
+            <div>
+              <label>Fade In (seconds)</label>
+              <input type="number" id="fadeIn" value="0" min="0" step="0.1">
+            </div>
+            <div>
+              <label>Fade Out (seconds)</label>
+              <input type="number" id="fadeOut" value="0" min="0" step="0.1">
+            </div>
+          </div>
+          <div style="font-size:.8rem;color:var(--text2)">Fade applies to trimmed audio. 0 = no fade.</div>
+        </div>
+
+        <div id="segmentsMode" style="display:none">
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <button class="btn btn-secondary" id="addSegmentBtn" style="flex:1">+ Add Segment from Selection</button>
+            <button class="btn btn-secondary" id="clearSegmentsBtn" style="flex:1">Clear All</button>
+          </div>
+          <div class="segments-list" id="segmentsList"></div>
+          <div style="font-size:.8rem;color:var(--text2)">Add multiple segments to merge. Each segment uses current selection.</div>
+        </div>
+
+        <div class="action-row">
+          <button class="btn" id="trimBtn">Trim & Download</button>
+          <button class="btn btn-secondary" id="resetBtn">Reset</button>
         </div>
       </div>
-      <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+
+      <div class="progress-bar" id="progressBar" style="display:none"><div class="fill" id="progressFill"></div></div>
       <div class="status" id="status"></div>
-      <div class="action-row" id="actionRow" style="display:none">
-        <button class="btn" id="trimBtn">Trim Audio</button>
-        <button class="btn btn-secondary" id="resetBtn">Reset</button>
-      </div>
     </div>
   </div>
 </div>
 <script src="../../assets/tools.js"></script>
 <script>
 (function(){
-  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),audioPreview=document.getElementById('audioPreview'),controls=document.getElementById('controls'),actionRow=document.getElementById('actionRow'),trimBtn=document.getElementById('trimBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status'),fileInfo=document.getElementById('fileInfo'),progressBar=document.getElementById('progressBar'),progressFill=document.getElementById('progressFill');
+  var dropZone=document.getElementById('dropZone');
+  var fileInput=document.getElementById('fileInput');
+  var trimSection=document.getElementById('trimSection');
+  var audioPreview=document.getElementById('audioPreview');
+  var trimBtn=document.getElementById('trimBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var statusEl=document.getElementById('status');
+  var fileInfo=document.getElementById('fileInfo');
+  var progressBar=document.getElementById('progressBar');
+  var progressFill=document.getElementById('progressFill');
+  var waveformCanvas=document.getElementById('waveformCanvas');
+  var waveformWrap=document.getElementById('waveformWrap');
+  var trimRegion=document.getElementById('trimRegion');
+  var trimStart=document.getElementById('trimStart');
+  var trimEnd=document.getElementById('trimEnd');
+  var playhead=document.getElementById('playhead');
+  var timeGrid=document.getElementById('timeGrid');
+  var batchList=document.getElementById('batchList');
+  var modeTabs=document.getElementById('modeTabs');
+  var trimMode=document.getElementById('trimMode');
+  var fadeMode=document.getElementById('fadeMode');
+  var segmentsMode=document.getElementById('segmentsMode');
+  var segmentsList=document.getElementById('segmentsList');
+  var startMin=document.getElementById('startMin');
+  var startSec=document.getElementById('startSec');
+  var startMs=document.getElementById('startMs');
+  var endMin=document.getElementById('endMin');
+  var endSec=document.getElementById('endSec');
+  var endMs=document.getElementById('endMs');
+
   var currentFile=null;
-  Tools.setupDropZone(dropZone,handleFile);
-  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
-  function handleFile(file){currentFile=file;audioPreview.src=URL.createObjectURL(file);previewArea.style.display='block';controls.style.display='block';actionRow.style.display='flex';dropZone.style.display='none';statusEl.style.display='none';progressBar.style.display='none';fileInfo.textContent='File: '+file.name+' ('+Tools.formatSize(file.size)+')';}
-  resetBtn.addEventListener('click',function(){currentFile=null;dropZone.style.display='block';previewArea.style.display='none';controls.style.display='none';actionRow.style.display='none';statusEl.style.display='none';progressBar.style.display='none';audioPreview.src='';fileInput.value='';});
-  document.getElementById('setStartBtn').addEventListener('click',function(){document.getElementById('startTime').value=audioPreview.currentTime.toFixed(1);});
-  document.getElementById('setEndBtn').addEventListener('click',function(){document.getElementById('endTime').value=audioPreview.currentTime.toFixed(1);});
-  trimBtn.addEventListener('click',async function(){
-    if(!currentFile)return;trimBtn.disabled=true;progressBar.style.display='block';
-    Tools.setStatus(statusEl,'Loading audio...','');progressFill.style.width='10%';
+  var audioBuffer=null;
+  var audioCtx=null;
+  var files=[];
+  var segments=[];
+  var zoom=1;
+  var waveformData=[];
+
+  Tools.setupDropZone(dropZone,function(f){addFile(f)});
+  fileInput.addEventListener('change',function(e){for(var i=0;i<e.target.files.length;i++)addFile(e.target.files[i]);});
+
+  modeTabs.addEventListener('click',function(e){
+    var btn=e.target.closest('button');if(!btn)return;
+    modeTabs.querySelectorAll('button').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    var m=btn.dataset.mode;
+    trimMode.style.display=m==='trim'?'block':'none';
+    fadeMode.style.display=m==='fade'?'block':'none';
+    segmentsMode.style.display=m==='segments'?'block':'none';
+  });
+
+  function addFile(f){
+    if(!f||!f.type.startsWith('audio/'))return;
+    files.push(f);
+    renderBatchList();
+    if(files.length===1)loadFile(f);
+  }
+
+  function renderBatchList(){
+    batchList.innerHTML='';
+    if(files.length<=1){batchList.style.display='none';return;}
+    batchList.style.display='block';
+    files.forEach(function(f,i){
+      var item=document.createElement('div');
+      item.className='batch-item';
+      item.innerHTML='<span class="batch-name">'+f.name+'</span>'+
+        '<span class="batch-dur">'+Tools.formatSize(f.size)+'</span>'+
+        '<span class="batch-remove" data-idx="'+i+'">✕</span>';
+      batchList.appendChild(item);
+    });
+    batchList.querySelectorAll('.batch-remove').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var idx=parseInt(btn.dataset.idx);
+        files.splice(idx,1);
+        renderBatchList();
+        if(files.length===0)resetAll();
+        else if(idx===0&&files.length>0)loadFile(files[0]);
+      });
+    });
+  }
+
+  async function loadFile(f){
     try{
-      var audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-      var arrayBuffer=await Tools.readAsArrayBuffer(currentFile);
-      var audioBuffer=await audioCtx.decodeAudioData(arrayBuffer);
-      var startTime=parseFloat(document.getElementById('startTime').value)||0;
-      var endTime=parseFloat(document.getElementById('endTime').value)||audioBuffer.duration;
-      if(endTime<=startTime)endTime=Math.min(startTime+10,audioBuffer.duration);
-      var sampleRate=audioBuffer.sampleRate;
-      var channels=audioBuffer.numberOfChannels;
-      var startSample=Math.floor(startTime*sampleRate);
-      var endSample=Math.floor(endTime*sampleRate);
-      var newLength=endSample-startSample;
-      var newBuffer=audioCtx.createBuffer(channels,newLength,sampleRate);
-      for(var ch=0;ch<channels;ch++){
-        var oldData=audioBuffer.getChannelData(ch);
-        var newData=newBuffer.getChannelData(ch);
-        for(var i=0;i<newLength;i++)newData[i]=oldData[startSample+i];
+      currentFile=f;
+      trimSection.style.display='block';
+      dropZone.style.display='none';
+      audioPreview.src=URL.createObjectURL(f);
+      fileInfo.textContent='File: '+f.name+' ('+Tools.formatSize(f.size)+')';
+      segments=[];renderSegments();
+
+      audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+      var arrayBuffer=await Tools.readAsArrayBuffer(f);
+      audioBuffer=await audioCtx.decodeAudioData(arrayBuffer);
+
+      drawWaveform();
+      updateTimeInputs(0,audioBuffer.duration);
+      updateTrimRegion();
+    }catch(e){Tools.setStatus(statusEl,'Error loading: '+e.message,'error');}
+  }
+
+  function drawWaveform(){
+    var canvas=waveformCanvas;
+    var ctx=canvas.getContext('2d');
+    var w=canvas.parentElement.clientWidth;
+    var h=canvas.parentElement.clientHeight;
+    canvas.width=w*2;canvas.height=h*2;
+    ctx.scale(2,2);
+    ctx.clearRect(0,0,w,h);
+
+    var data=audioBuffer.getChannelData(0);
+    var step=Math.floor(data.length/w/zoom);
+    var mid=h/2;
+    waveformData=[];
+
+    ctx.beginPath();
+    ctx.moveTo(0,mid);
+    for(var i=0;i<w;i++){
+      var s=i*step*zoom;
+      var min=1,max=-1;
+      for(var j=0;j<step;j++){
+        var v=data[s+j]||0;
+        if(v<min)min=v;if(v>max)max=v;
       }
-      var offlineCtx=new OfflineAudioContext(channels,newLength,sampleRate);
-      var source=offlineCtx.createBufferSource();source.buffer=newBuffer;source.connect(offlineCtx.destination);source.start(0);
+      waveformData.push({min:min,max:max});
+      var y1=mid+min*mid;
+      var y2=mid+max*mid;
+      ctx.fillStyle='rgba(34,197,94,.6)';
+      ctx.fillRect(i,y2,1,y1-y2||1);
+    }
+    ctx.strokeStyle='#22c55e';
+    ctx.lineWidth=0.5;
+    ctx.stroke();
+  }
+
+  function updateTrimRegion(){
+    var start=getTime('start');
+    var end=getTime('end');
+    var dur=audioBuffer?audioBuffer.duration:1;
+    var w=waveformWrap.clientWidth;
+    var left=start/dur*w*zoom;
+    var right=end/dur*w*zoom;
+    trimRegion.style.left=Math.max(0,left)+'px';
+    trimRegion.style.width=Math.min(right-left,w)+'px';
+  }
+
+  function updateTimeInputs(start,end){
+    var sm=Math.floor(start/60);
+    var ss=Math.floor(start%60);
+    var sms=Math.floor((start%1)*1000);
+    var em=Math.floor(end/60);
+    var es=Math.floor(end%60);
+    var ems=Math.floor((end%1)*1000);
+    startMin.value=sm;startSec.value=ss;startMs.value=sms;
+    endMin.value=em;endSec.value=es;endMs.value=ems;
+  }
+
+  function getTime(type){
+    var m=parseInt((type==='start'?startMin:endMin).value)||0;
+    var s=parseInt((type==='start'?startSec:endSec).value)||0;
+    var ms=parseInt((type==='start'?startMs:endMs).value)||0;
+    return m*60+s+ms/1000;
+  }
+
+  function setTime(type,t){
+    var m=Math.floor(t/60);
+    var s=Math.floor(t%60);
+    var ms=Math.floor((t%1)*1000);
+    (type==='start'?startMin:endMin).value=m;
+    (type==='start'?startSec:endSec).value=s;
+    (type==='start'?startMs:endMs).value=ms;
+    updateTrimRegion();
+  }
+
+  [startMin,startSec,startMs,endMin,endSec,endMs].forEach(function(el){
+    el.addEventListener('input',updateTrimRegion);
+  });
+
+  waveformWrap.addEventListener('click',function(e){
+    if(!audioBuffer)return;
+    var rect=waveformWrap.getBoundingClientRect();
+    var x=(e.clientX-rect.left)/rect.width;
+    var t=x*audioBuffer.duration/zoom;
+    audioPreview.currentTime=t;
+  });
+
+  var dragging=null;
+  trimStart.addEventListener('mousedown',function(e){e.preventDefault();dragging='start';});
+  trimEnd.addEventListener('mousedown',function(e){e.preventDefault();dragging='end';});
+  document.addEventListener('mousemove',function(e){
+    if(!dragging||!audioBuffer)return;
+    var rect=waveformWrap.getBoundingClientRect();
+    var x=Math.max(0,Math.min(e.clientX-rect.left,rect.width));
+    var t=x/rect.width*audioBuffer.duration/zoom;
+    t=Math.max(0,Math.min(t,audioBuffer.duration));
+    setTime(dragging,t);
+  });
+  document.addEventListener('mouseup',function(){dragging=null;});
+
+  document.getElementById('setStartBtn').addEventListener('click',function(){setTime('start',audioPreview.currentTime);});
+  document.getElementById('setEndBtn').addEventListener('click',function(){setTime('end',audioPreview.currentTime);});
+
+  document.getElementById('playTrimBtn').addEventListener('click',function(){
+    if(!audioBuffer)return;
+    var start=getTime('start');
+    var end=getTime('end');
+    audioPreview.currentTime=start;
+    audioPreview.play();
+    var check=setInterval(function(){
+      if(audioPreview.currentTime>=end){audioPreview.pause();clearInterval(check);}
+    },50);
+  });
+
+  document.getElementById('zoomInBtn').addEventListener('click',function(){zoom=Math.min(zoom*2,16);drawWaveform();updateTrimRegion();});
+  document.getElementById('zoomOutBtn').addEventListener('click',function(){zoom=Math.max(zoom/2,1);drawWaveform();updateTrimRegion();});
+  document.getElementById('zoomFitBtn').addEventListener('click',function(){zoom=1;drawWaveform();updateTrimRegion();});
+
+  document.getElementById('addSegmentBtn').addEventListener('click',function(){
+    segments.push({start:getTime('start'),end:getTime('end')});
+    renderSegments();
+  });
+  document.getElementById('clearSegmentsBtn').addEventListener('click',function(){segments=[];renderSegments();});
+
+  function renderSegments(){
+    segmentsList.innerHTML='';
+    segments.forEach(function(seg,i){
+      var dur=(seg.end-seg.start).toFixed(1);
+      var item=document.createElement('div');
+      item.className='segment-item';
+      item.innerHTML='<span class="seg-num">#'+(i+1)+'</span>'+
+        '<span class="seg-range">'+formatTime(seg.start)+' → '+formatTime(seg.end)+'</span>'+
+        '<span class="seg-dur">'+dur+'s</span>'+
+        '<span class="seg-remove" data-idx="'+i+'">✕</span>';
+      segmentsList.appendChild(item);
+    });
+    segmentsList.querySelectorAll('.seg-remove').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        segments.splice(parseInt(btn.dataset.idx),1);
+        renderSegments();
+      });
+    });
+  }
+
+  function formatTime(t){
+    var m=Math.floor(t/60);
+    var s=Math.floor(t%60);
+    var ms=Math.floor((t%1)*100);
+    return m+':'+(s<10?'0':'')+s+'.'+(ms<10?'0':'')+ms;
+  }
+
+  trimBtn.addEventListener('click',async function(){
+    if(!currentFile||!audioBuffer)return;
+    trimBtn.disabled=true;
+    progressBar.style.display='block';
+    try{
+      Tools.setStatus(statusEl,'Processing...','');
+      progressFill.style.width='10%';
+
+      var fadeIn=parseFloat(document.getElementById('fadeIn').value)||0;
+      var fadeOut=parseFloat(document.getElementById('fadeOut').value)||0;
+      var sr=audioBuffer.sampleRate;
+      var ch=audioBuffer.numberOfChannels;
+
+      var regions=segments.length>0?segments:[{start:getTime('start'),end:getTime('end')}];
+      var totalSamples=0;
+      regions.forEach(function(r){totalSamples+=Math.floor((r.end-r.start)*sr);});
+
+      var mergedBuffer=audioCtx.createBuffer(ch,totalSamples,sr);
+      var offset=0;
+      regions.forEach(function(r){
+        var s=Math.floor(r.start*sr);
+        var e=Math.floor(r.end*sr);
+        var len=e-s;
+        for(var c=0;c<ch;c++){
+          var src=audioBuffer.getChannelData(c);
+          var dst=mergedBuffer.getChannelData(c);
+          for(var i=0;i<len;i++)dst[offset+i]=src[s+i];
+        }
+        offset+=len;
+      });
+
+      progressFill.style.width='40%';
+
+      if(fadeIn>0||fadeOut>0){
+        var fadeSamples=Math.floor(fadeIn*sr);
+        var fadeOutSamples=Math.floor(fadeOut*sr);
+        for(var c=0;c<ch;c++){
+          var d=mergedBuffer.getChannelData(c);
+          for(var i=0;i<fadeSamples&&i<d.length;i++)d[i]*=i/fadeSamples;
+          for(var i=0;i<fadeOutSamples&&i<d.length;i++)d[d.length-1-i]*=i/fadeOutSamples;
+        }
+      }
+
+      progressFill.style.width='70%';
+
+      var offlineCtx=new OfflineAudioContext(ch,totalSamples,sr);
+      var source=offlineCtx.createBufferSource();
+      source.buffer=mergedBuffer;
+      source.connect(offlineCtx.destination);
+      source.start(0);
       var rendered=await offlineCtx.startRendering();
+
+      progressFill.style.width='90%';
+
       var wav=audioBufferToWav(rendered);
       var blob=new Blob([wav],{type:'audio/wav'});
       var name=currentFile.name.replace(/\.[^.]+$/,'_trimmed.wav');
       Tools.downloadBlob(blob,name);
+
+      progressFill.style.width='100%';
       Tools.setStatus(statusEl,'Done! Trimmed audio downloaded.','done');
-      progressFill.style.width='100%';trimBtn.disabled=false;
-    }catch(err){Tools.setStatus(statusEl,'Error: '+err.message,'error');trimBtn.disabled=false;}
+    }catch(e){Tools.setStatus(statusEl,'Error: '+e.message,'error');}
+    trimBtn.disabled=false;
   });
+
   function audioBufferToWav(buffer){
     var numChannels=buffer.numberOfChannels,sampleRate=buffer.sampleRate,format=1,bitsPerSample=16;
     var bytesPerSample=bitsPerSample/8,blockAlign=numChannels*bytesPerSample;
     var dataLength=buffer.length*blockAlign;
-    var headerLength=44;var totalLength=headerLength+dataLength;
-    var arrayBuffer=new ArrayBuffer(totalLength);var view=new DataView(arrayBuffer);
+    var totalLength=44+dataLength;
+    var arrayBuffer=new ArrayBuffer(totalLength);
+    var view=new DataView(arrayBuffer);
     function writeString(offset,string){for(var i=0;i<string.length;i++)view.setUint8(offset+i,string.charCodeAt(i));}
     writeString(0,'RIFF');view.setUint32(4,totalLength-8,true);writeString(8,'WAVE');
     writeString(12,'fmt ');view.setUint32(16,16,true);view.setUint16(20,format,true);
     view.setUint16(22,numChannels,true);view.setUint32(24,sampleRate,true);
     view.setUint32(28,sampleRate*blockAlign,true);view.setUint16(32,blockAlign,true);
     view.setUint16(34,bitsPerSample,true);writeString(36,'data');view.setUint32(40,dataLength,true);
-    var offset=44;var channels=[];for(var ch=0;ch<numChannels;ch++)channels.push(buffer.getChannelData(ch));
-    for(var i=0;i<buffer.length;i++){for(var ch=0;ch<numChannels;ch++){var sample=Math.max(-1,Math.min(1,channels[ch][i]));view.setInt16(offset,sample<0?sample*0x8000:sample*0x7FFF,true);offset+=2;}}
+    var offset=44;
+    var channels=[];for(var ch=0;ch<numChannels;ch++)channels.push(buffer.getChannelData(ch));
+    for(var i=0;i<buffer.length;i++){for(var ch=0;ch<numChannels;ch++){
+      var sample=Math.max(-1,Math.min(1,channels[ch][i]));
+      view.setInt16(offset,sample<0?sample*0x8000:sample*0x7FFF,true);offset+=2;
+    }}
     return arrayBuffer;
   }
+
+  function resetAll(){
+    currentFile=null;audioBuffer=null;files=[];segments=[];zoom=1;
+    trimSection.style.display='none';
+    dropZone.style.display='block';
+    statusEl.style.display='none';
+    progressBar.style.display='none';
+    audioPreview.src='';fileInput.value='';
+    batchList.innerHTML='';
+  }
+  resetBtn.addEventListener('click',resetAll);
+
+  audioPreview.addEventListener('timeupdate',function(){
+    if(!audioBuffer)return;
+    var t=audioPreview.currentTime;
+    var dur=audioBuffer.duration;
+    var w=waveformWrap.clientWidth;
+    playhead.style.left=(t/dur*w)+'px';
+  });
 })();
 </script>
 </body>
