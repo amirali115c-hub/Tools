@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Image Metadata Remover - Remove EXIF & AI Tags</title>
+  <link rel="stylesheet" href="../../assets/style.css">
+  <meta name="description" content="Free online tool to remove metadata from AI-generated images. Strip EXIF data, AI tags, and identifying information from images created by Midjourney, DALL-E, Stable Diffusion, and more.">
+  <meta name="keywords" content="remove metadata, AI image metadata, EXIF remover, strip metadata, Midjourney metadata, DALL-E metadata, Stable Diffusion metadata, image metadata cleaner">
+</head>
+<body>
+  <div class="hero">
+    <a href="../../" class="logo">Tools<span class="dot">.</span></a>
+    <h1>AI Image Metadata Remover</h1>
+    <p class="subtitle">Remove EXIF data, AI tags, and identifying information from AI-generated images</p>
+  </div>
+  <div class="tool-container">
+    <div class="drop-zone" id="dropZone">
+      <div class="icon">🖼️</div>
+      <p>Drop AI-generated image here or <span class="browse-link">browse</span></p>
+      <p class="small">Supports JPG, PNG, WebP</p>
+      <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" hidden>
+    </div>
+    <div id="previewArea" style="display:none">
+      <div class="file-info" id="fileInfo"></div>
+      <div class="image-compare">
+        <div class="compare-box">
+          <div class="compare-label">Original</div>
+          <img id="originalPreview" class="compare-img">
+          <div class="meta-count original-count" id="originalCount">0 tags</div>
+        </div>
+        <div class="compare-box">
+          <div class="compare-label">Cleaned</div>
+          <img id="cleanedPreview" class="compare-img">
+          <div class="meta-count cleaned-count" id="cleanedCount">0 tags</div>
+        </div>
+      </div>
+      <div class="controls-panel">
+        <h3>Found Metadata</h3>
+        <div id="metaList" class="meta-list"></div>
+      </div>
+      <div class="options-panel">
+        <h3>Clean Options</h3>
+        <label class="checkbox-label">
+          <input type="checkbox" id="optExif" checked> EXIF Data (camera, GPS, software)
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="optXmp" checked> XMP Data (Adobe, AI prompts)
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="optIcc" checked> ICC Color Profile
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="optJfif" checked> JFIF / JFIF Extension
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="optComments" checked> Image Comments
+        </label>
+      </div>
+      <div id="status" class="status"></div>
+      <div class="action-row" id="actionRow">
+        <button class="btn" id="cleanBtn">Clean Metadata</button>
+        <button class="btn btn-secondary" id="downloadBtn" style="display:none">Download Clean Image</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+      <div class="progress-bar" id="progressBar" style="display:none">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+  </div>
+  <script src="../../assets/tools.js"></script>
+  <script>
+  (function(){
+    var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea');
+    var originalPreview=document.getElementById('originalPreview'),cleanedPreview=document.getElementById('cleanedPreview');
+    var originalCount=document.getElementById('originalCount'),cleanedCount=document.getElementById('cleanedCount');
+    var metaList=document.getElementById('metaList'),fileInfo=document.getElementById('fileInfo');
+    var cleanBtn=document.getElementById('cleanBtn'),downloadBtn=document.getElementById('downloadBtn'),resetBtn=document.getElementById('resetBtn');
+    var statusEl=document.getElementById('status'),progressBar=document.getElementById('progressBar'),progressFill=document.getElementById('progressFill');
+    var currentFile=null,currentImageData=null,cleanBlob=null;
+
+    function handleFile(file){
+      if(!file.type.match(/^image\/(jpeg|png|webp)$/)){
+        Tools.setStatus(statusEl,'Please use JPG, PNG, or WebP images.','error');return;
+      }
+      currentFile=file;cleanBlob=null;
+      fileInfo.textContent='File: '+file.name+' ('+Tools.formatSize(file.size)+')';
+      originalPreview.src=URL.createObjectURL(file);
+      previewArea.style.display='block';dropZone.style.display='none';
+      Tools.setStatus(statusEl,'Reading metadata...','');
+      readMetadata(file);
+    }
+
+    function readMetadata(file){
+      var reader=new FileReader();
+      reader.onload=function(e){
+        var buffer=e.target.result;
+        var view=new DataView(buffer);
+        var metadata=[];
+        var metaTags={exif:false,xmp:false,icc:false,jfif:false,comments:false};
+
+        if(file.type==='image/jpeg'||file.type==='image/jpg'){
+          if(view.getUint16(0)!==0xFFD8){Tools.setStatus(statusEl,'Invalid JPEG.','error');return;}
+          var offset=2;
+          while(offset<buffer.byteLength){
+            if(view.getUint16(offset)!==0xFF){offset++;continue;}
+            var marker=view.getUint8(offset+1);
+            if(marker===0xE1){
+              var segLen=view.getUint16(offset+2);
+              var segData=new Uint8Array(buffer,offset+4,segLen-2);
+              var segStr=String.fromCharCode.apply(null,segData);
+              if(segStr.indexOf('Exif')===0){
+                metaTags.exif=true;
+                var exifData=parseExif(segData);
+                exifData.forEach(function(item){metadata.push({type:'EXIF',key:item.key,value:item.value});});
+              }else if(segStr.indexOf('XMP')===0||segStr.indexOf('http://ns.adobe.com')!==-1){
+                metaTags.xmp=true;
+                var xmpData=parseXmp(segStr);
+                xmpData.forEach(function(item){metadata.push({type:'XMP',key:item.key,value:item.value});});
+              }
+            }else if(marker===0xE0){
+              var jfifLen=view.getUint16(offset+2);
+              if(jfifLen>5){
+                var jfifStr=String.fromCharCode.apply(null,new Uint8Array(buffer,offset+4,5));
+                if(jfifStr==='JFIF\0'){metaTags.jfif=true;metadata.push({type:'JFIF',key:'Version',value:'1.'+view.getUint8(offset+9)});}
+              }
+            }else if(marker===0xFE){
+              var comLen=view.getUint16(offset+2);
+              var comStr=String.fromCharCode.apply(null,new Uint8Array(buffer,offset+4,comLen-2));
+              if(comStr.trim()){metaTags.comments=true;metadata.push({type:'Comment',key:'Comment',value:comStr.trim().substring(0,100)});}
+            }else if(marker===0xED){
+              var iccLen=view.getUint16(offset+2);
+              if(iccLen>5){
+                var iccStr=String.fromCharCode.apply(null,new Uint8Array(buffer,offset+4,4));
+                if(iccStr==='ICC_'){metaTags.icc=true;metadata.push({type:'ICC',key:'Profile',value:'Embedded color profile'});}
+              }
+            }
+            if(marker===0xDA)break;
+            offset+=2+view.getUint16(offset+2);
+          }
+        }else if(file.type==='image/png'){
+          if(view.getUint32(0)!==0x89504E47){Tools.setStatus(statusEl,'Invalid PNG.','error');return;}
+          var offset=8;
+          while(offset<buffer.byteLength){
+            var chunkLen=view.getUint32(offset);
+            var chunkType=String.fromCharCode(view.getUint8(offset+4),view.getUint8(offset+5),view.getUint8(offset+6),view.getUint8(offset+7));
+            if(chunkType==='tEXt'||chunkType==='iTXt'||chunkType==='zTXt'){
+              metaTags.xmp=true;
+              var chunkData=new Uint8Array(buffer,offset+8,chunkLen);
+              var chunkStr=String.fromCharCode.apply(null,chunkData);
+              var nullIdx=chunkStr.indexOf('\0');
+              if(nullIdx!==-1){
+                var key=chunkStr.substring(0,nullIdx);
+                var val=chunkStr.substring(nullIdx+1);
+                metadata.push({type:'PNG',key:key,value:val.substring(0,100)});
+                if(key.indexOf('Raw prompt')!==-1||key.indexOf('parameters')!==-1||key.indexOf('prompt')!==-1)metaTags.xmp=true;
+              }
+            }else if(chunkType==='iCCP'){
+              metaTags.icc=true;metadata.push({type:'ICC',key:'Profile',value:'Embedded color profile'});
+            }
+            offset+=12+chunkLen;
+            if(chunkType==='IEND')break;
+          }
+        }else if(file.type==='image/webp'){
+          if(view.getUint32(0)!==0x52494646){Tools.setStatus(statusEl,'Invalid WebP.','error');return;}
+          var offset=12;
+          while(offset<buffer.byteLength-4){
+            var chunkId=String.fromCharCode(view.getUint8(offset),view.getUint8(offset+1),view.getUint8(offset+2),view.getUint8(offset+3));
+            var chunkLen=view.getUint32(offset+4);
+            if(chunkId==='EXIF'){metaTags.exif=true;metadata.push({type:'EXIF',key:'EXIF Data',value:'Embedded EXIF metadata'});}
+            else if(chunkId==='XMP '){metaTags.xmp=true;metadata.push({type:'XMP',key:'XMP Data',value:'Embedded XMP metadata'});}
+            else if(chunkId==='ICCP'){metaTags.icc=true;metadata.push({type:'ICC',key:'Profile',value:'Embedded color profile'});}
+            offset+=8+chunkLen;
+            if(offset>buffer.byteLength)break;
+          }
+        }
+
+        var aiPatterns=['Midjourney','DALL-E','Stable Diffusion','ComfyUI','Automatic1111','Fooocus','Leonardo','Craiyon','Firefly','Bing Image','Copilot','Ideogram','Playground','Bria','Flux'];
+        var fullStr=JSON.stringify(metadata);
+        var foundAI=aiPatterns.filter(function(p){return fullStr.indexOf(p)!==-1;});
+        if(foundAI.length>0){
+          metadata.unshift({type:'AI DETECTED',key:'AI Generator',value:foundAI.join(', ')});
+        }
+
+        currentImageData={buffer:buffer,view:view,metadata:metadata,metaTags:metaTags,type:file.type};
+        renderMetaList(metadata);
+        originalCount.textContent=metadata.length+' tags';
+        cleanedCount.textContent='0 tags';
+        Tools.setStatus(statusEl,metadata.length+' metadata tags found.','done');
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function parseExif(data){
+      var items=[];
+      try{
+        var str=String.fromCharCode.apply(null,data);
+        if(str.substring(0,2)!=='Exif')return items;
+        var tiffStart=6;
+        var view=new DataView(data.buffer,data.byteOffset,data.byteLength);
+        var bigEndian=view.getUint16(tiffStart)===0x4D4D;
+        var ifdOffset=view.getUint32(tiffStart+4,!bigEndian);
+        var numEntries=view.getUint16(tiffStart+ifdOffset,!bigEndian);
+        for(var i=0;i<numEntries;i++){
+          var entryOffset=tiffStart+ifdOffset+2+i*12;
+          var tag=view.getUint16(entryOffset,!bigEndian);
+          var type=view.getUint16(entryOffset+2,!bigEndian);
+          var count=view.getUint32(entryOffset+4,!bigEndian);
+          var valueOffset=entryOffset+8;
+          var tagNames={0x010F:'Make',0x0110:'Model',0x0112:'Orientation',0x011A:'XResolution',0x011B:'YResolution',0x0131:'Software',0x0132:'DateTime',0x8298:'Copyright',0x8769:'ExifOffset',0x8825:'GPSInfo',0xA005:'InteropOffset',0x010E:'ImageDescription',0x0213:'YCbCrPositioning',0xA001:'ColorSpace',0xA430:'CameraOwnerName',0xA431:'BodySerialNumber',0xA432:'LensInfo',0xA433:'LensMake',0xA434:'LensModel',0x9209:'Flash',0x920A:'FocalLength',0xA002:'PixelXDimension',0xA003:'PixelYDimension'};
+          var tagName=tagNames[tag]||('Tag 0x'+tag.toString(16).toUpperCase());
+          var value='';
+          if(type===2){
+            if(count<=4){
+              value=String.fromCharCode.apply(null,new Uint8Array(data.buffer,data.byteOffset+valueOffset,count).slice(0,count));
+            }else{
+              var strOffset=view.getUint32(valueOffset,!bigEndian);
+              value=String.fromCharCode.apply(null,new Uint8Array(data.buffer,data.byteOffset+tiffStart+strOffset,count).slice(0,count));
+            }
+          }else if(type===3){
+            value=view.getUint16(valueOffset,!bigEndian);
+          }else if(type===4){
+            value=view.getUint32(valueOffset,!bigEndian);
+          }else if(type===5||type===10){
+            var num=view.getUint32(valueOffset,!bigEndian);
+            var den=view.getUint32(valueOffset+4,!bigEndian);
+            value=num+'/'+den;
+          }
+          if(tag!==0x8769&&tag!==0xA005&&tag!==0x8825&&tagName!=='Orientation'){
+            items.push({key:tagName,value:String(value).substring(0,80)});
+          }
+        }
+      }catch(e){}
+      return items;
+    }
+
+    function parseXmp(str){
+      var items=[];
+      var patterns=[
+        {re:/<dc:creator[^>]*>([\s\S]*?)<\/dc:creator>/gi,key:'Creator'},
+        {re:/<dc:description[^>]*>([\s\S]*?)<\/dc:description>/gi,key:'Description'},
+        {re:/<photoshop:TransmissionReference[^>]*>([\s\S]*?)<\/photoshop:TransmissionReference>/gi,key:'Prompt'},
+        {re:/<xmp:Prompt[^>]*>([\s\S]*?)<\/xmp:Prompt>/gi,key:'AI Prompt'},
+        {re:/<raw:prompt[^>]*>([\s\S]*?)<\/raw:prompt>/gi,key:'Raw Prompt'},
+        {re:/<lr:hierarchicalSubject[^>]*>([\s\S]*?)<\/lr:hierarchicalSubject>/gi,key:'Tags'},
+        {re:/<dc:subject[^>]*>([\s\S]*?)<\/dc:subject>/gi,key:'Subject'},
+        {re:/<xmp:CreatorTool[^>]*>([\s\S]*?)<\/xmp:CreatorTool>/gi,key:'Creator Tool'},
+        {re:/<rdf:li[^>]*>([\s\S]*?)<\/rdf:li>/gi,key:'Parameter'}
+      ];
+      patterns.forEach(function(p){
+        var match;
+        while((match=p.re.exec(str))!==null){
+          var val=match[1].replace(/<[^>]+>/g,'').trim();
+          if(val)items.push({key:p.key,value:val.substring(0,100)});
+        }
+      });
+      return items;
+    }
+
+    function renderMetaList(metadata){
+      metaList.innerHTML='';
+      if(metadata.length===0){metaList.innerHTML='<p class="small">No metadata found</p>';return;}
+      metadata.forEach(function(m){
+        var div=document.createElement('div');div.className='meta-item';
+        var typeClass=m.type==='AI DETECTED'?'type-ai':m.type==='EXIF'?'type-exif':m.type==='XMP'?'type-xmp':'type-other';
+        div.innerHTML='<span class="meta-type '+typeClass+'">'+m.type+'</span><span class="meta-key">'+m.key+'</span><span class="meta-value">'+m.value+'</span>';
+        metaList.appendChild(div);
+      });
+    }
+
+    function cleanMetadata(){
+      if(!currentImageData)return;
+      Tools.setStatus(statusEl,'Cleaning metadata...','');
+      progressBar.style.display='block';progressFill.style.width='0%';
+
+      setTimeout(function(){
+        try{
+          var buffer=currentImageData.buffer;
+          var type=currentImageData.type;
+
+          if(type==='image/jpeg'||type==='image/jpg'){
+            var cleanBuffer=stripJpeg(buffer,document.getElementById('optExif').checked,document.getElementById('optXmp').checked,document.getElementById('optIcc').checked,document.getElementById('optJfif').checked,document.getElementById('optComments').checked);
+            cleanBlob=new Blob([cleanBuffer],{type:type});
+          }else if(type==='image/png'){
+            var cleanBuffer=stripPng(buffer,document.getElementById('optXmp').checked,document.getElementById('optIcc').checked);
+            cleanBlob=new Blob([cleanBuffer],{type:type});
+          }else if(type==='image/webp'){
+            var cleanBuffer=stripWebp(buffer,document.getElementById('optExif').checked,document.getElementById('optXmp').checked,document.getElementById('optIcc').checked);
+            cleanBlob=new Blob([cleanBuffer],{type:type});
+          }
+
+          cleanedPreview.src=URL.createObjectURL(cleanBlob);
+          cleanedCount.textContent='0 tags';
+          progressBar.style.display='none';
+          downloadBtn.style.display='inline-block';
+          Tools.setStatus(statusEl,'Metadata removed! Original: '+Tools.formatSize(buffer.byteLength)+' | Cleaned: '+Tools.formatSize(cleanBlob.size),'done');
+        }catch(err){
+          progressBar.style.display='none';
+          Tools.setStatus(statusEl,'Error: '+err.message,'error');
+        }
+      },100);
+    }
+
+    function stripJpeg(buffer,stripExif,stripXmp,stripIcc,stripJfif,stripComments){
+      var bytes=new Uint8Array(buffer);
+      var parts=[];
+      if(bytes[0]!==0xFF||bytes[1]!==0xD8)throw new Error('Invalid JPEG');
+      parts.push(bytes.slice(0,2));
+      var offset=2;
+      while(offset<bytes.length){
+        if(bytes[offset]!==0xFF){offset++;continue;}
+        var marker=bytes[offset+1];
+        if(marker===0xD9)break;
+        if(marker===0xDA){parts.push(bytes.slice(offset));break;}
+        var segLen=(bytes[offset+2]<<8)|bytes[offset+3];
+        var totalLen=2+segLen;
+        var skip=false;
+        if(marker===0xE1){
+          var segStr=String.fromCharCode.apply(null,bytes.slice(offset+4,offset+2+segLen));
+          if(stripXmp&&(segStr.indexOf('Exif')===0||segStr.indexOf('XMP')===0||segStr.indexOf('http://ns.adobe.com')!==-1))skip=true;
+          if(stripExif&&segStr.indexOf('Exif')===0)skip=true;
+        }else if(marker===0xE0){
+          if(stripJfif)skip=true;
+        }else if(marker===0xFE){
+          if(stripComments)skip=true;
+        }else if(marker===0xED){
+          if(stripIcc)skip=true;
+        }
+        if(!skip)parts.push(bytes.slice(offset,offset+totalLen));
+        offset+=totalLen;
+      }
+      var totalLen=0;parts.forEach(function(p){totalLen+=p.length;});
+      var result=new Uint8Array(totalLen);var pos=0;
+      parts.forEach(function(p){result.set(p,pos);pos+=p.length;});
+      return result;
+    }
+
+    function stripPng(buffer,stripXmp,stripIcc){
+      var bytes=new Uint8Array(buffer);
+      if(bytes[0]!==0x89||bytes[1]!==0x50)throw new Error('Invalid PNG');
+      var parts=[bytes.slice(0,8)];
+      var offset=8;
+      while(offset<bytes.length){
+        var chunkLen=(bytes[offset]<<24)|(bytes[offset+1]<<16)|(bytes[offset+2]<<8)|bytes[offset+3];
+        var chunkType=String.fromCharCode(bytes[offset+4],bytes[offset+5],bytes[offset+6],bytes[offset+7]);
+        var totalLen=12+chunkLen;
+        var skip=false;
+        if(stripXmp&&(chunkType==='tEXt'||chunkType==='iTXt'||chunkType==='zTXt'))skip=true;
+        if(stripIcc&&chunkType==='iCCP')skip=true;
+        if(!skip)parts.push(bytes.slice(offset,offset+totalLen));
+        offset+=totalLen;
+        if(chunkType==='IEND')break;
+      }
+      var totalLen=0;parts.forEach(function(p){totalLen+=p.length;});
+      var result=new Uint8Array(totalLen);var pos=0;
+      parts.forEach(function(p){result.set(p,pos);pos+=p.length;});
+      return result;
+    }
+
+    function stripWebp(buffer,stripExif,stripXmp,stripIcc){
+      var bytes=new Uint8Array(buffer);
+      if(String.fromCharCode(bytes[0],bytes[1],bytes[2],bytes[3])!=='RIFF')throw new Error('Invalid WebP');
+      var fileSize=(bytes[4]<<24)|(bytes[5]<<16)|(bytes[6]<<8)|bytes[7];
+      var fileType=String.fromCharCode(bytes[8],bytes[9],bytes[10],bytes[11]);
+      var parts=[bytes.slice(0,12)];
+      var offset=12;
+      while(offset<bytes.length-4){
+        var chunkId=String.fromCharCode(bytes[offset],bytes[offset+1],bytes[offset+2],bytes[offset+3]);
+        var chunkLen=(bytes[offset+4]<<24)|(bytes[offset+5]<<16)|(bytes[offset+6]<<8)|bytes[offset+7];
+        var totalLen=8+chunkLen;
+        if(chunkLen%2!==0)totalLen++;
+        var skip=false;
+        if(stripExif&&chunkId==='EXIF')skip=true;
+        if(stripXmp&&chunkId==='XMP ')skip=true;
+        if(stripIcc&&chunkId==='ICCP')skip=true;
+        if(!skip)parts.push(bytes.slice(offset,offset+totalLen));
+        offset+=totalLen;
+      }
+      var totalLen=0;parts.forEach(function(p){totalLen+=p.length;});
+      var result=new Uint8Array(totalLen);var pos=0;
+      parts.forEach(function(p){result.set(p,pos);pos+=p.length;});
+      return result;
+    }
+
+    Tools.setupDropZone(dropZone,handleFile);
+    fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
+    cleanBtn.addEventListener('click',cleanMetadata);
+    downloadBtn.addEventListener('click',function(){
+      if(!cleanBlob)return;
+      var ext=currentFile.type==='image/png'?'.png':currentFile.type==='image/webp'?'.webp':'.jpg';
+      var name=currentFile.name.replace(/\.[^.]+$/,'')+ext;
+      Tools.downloadBlob(cleanBlob,name);
+    });
+    resetBtn.addEventListener('click',function(){
+      currentFile=null;currentImageData=null;cleanBlob=null;
+      previewArea.style.display='none';dropZone.style.display='block';
+      statusEl.style.display='none';downloadBtn.style.display='none';
+      fileInput.value='';
+    });
+  })();
+  </script>
+</body>
+</html>
