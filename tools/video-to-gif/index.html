@@ -4,218 +4,482 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Video to GIF | Free, Private, Client-Side</title>
-  <meta name="description" content="Convert any video to a GIF for free. Choose start time, duration, and size. All processing happens in your browser.">
+  <meta name="description" content="Free video to GIF converter. Frame rate control, resolution, start/end time. Batch mode. All in your browser.">
   <link rel="stylesheet" href="../../assets/style.css">
+  <style>
+    .frame-strip{display:flex;gap:4px;overflow-x:auto;padding:8px 0;margin:12px 0}
+    .frame-strip canvas,.frame-strip img{height:80px;border-radius:4px;border:2px solid transparent;cursor:pointer;flex-shrink:0;transition:.15s}
+    .frame-strip canvas:hover,.frame-strip img:hover{border-color:var(--accent)}
+    .frame-strip .active{border-color:#22c55e;box-shadow:0 0 0 2px rgba(34,197,94,.3)}
+    .time-row{display:flex;gap:8px;margin-bottom:12px}
+    .time-row>div{flex:1}
+    .time-row label{display:block;margin-bottom:4px;font-size:.8rem;color:var(--text2)}
+    .time-row input{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:6px;border-radius:4px}
+    .setting-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .setting-row label{min-width:100px;font-size:.85rem;color:var(--text2)}
+    .setting-row select,.setting-row input[type=number]{flex:1}
+    .setting-row input[type=range]{flex:1}
+    .setting-row .val{min-width:50px;text-align:center;font-weight:600;color:var(--accent);font-size:.85rem}
+    .preview-tabs{display:flex;gap:4px;margin-bottom:16px}
+    .preview-tabs button{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
+    .preview-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .preview-tabs button:hover:not(.active){border-color:var(--accent)}
+    .batch-list{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+    .batch-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.85rem}
+    .batch-item .batch-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .batch-item .batch-size{color:var(--text2);min-width:60px;text-align:right}
+    .batch-item .batch-status{color:#22c55e;font-weight:600;min-width:60px;text-align:right}
+    .batch-item .batch-remove{cursor:pointer;color:var(--red);padding:2px}
+    .gif-preview{max-width:100%;border-radius:8px;border:1px solid var(--border);margin:12px 0}
+    .stat-row{display:flex;gap:8px;margin:12px 0}
+    .stat-box{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+    .stat-box .stat-val{font-size:1.1rem;font-weight:700;color:var(--accent)}
+    .stat-box .stat-label{font-size:.7rem;color:var(--text2);margin-top:4px}
+    select,input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px}
+  </style>
 </head>
 <body>
-
 <div class="container">
   <div class="tool-page">
     <a href="../../" class="back-link">← Back to Tools</a>
     <h1>Video to GIF</h1>
-    <p class="subtitle">Convert video clips to GIFs. Everything happens in your browser.</p>
+    <p class="subtitle">Convert video to animated GIF. Frame rate, resolution, trim. All in your browser.</p>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="convert">Convert</button>
+      <button class="tab" data-tab="batch">Batch</button>
+      <button class="tab" data-tab="preview">Preview</button>
+    </div>
 
     <div class="tool-area">
       <div class="upload-zone" id="dropZone">
         <div class="big-icon">📁</div>
-        <strong>Drop a video here</strong>
+        <strong>Drop video file(s) here</strong>
         <p>or click to browse (MP4, WebM, MOV)</p>
-        <input type="file" id="fileInput" accept="video/*">
+        <input type="file" id="fileInput" accept="video/*" multiple>
       </div>
 
-      <div class="preview-area" id="previewArea">
-        <video id="videoPreview" controls style="max-width:100%;border-radius:8px"></video>
-        <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
+      <div class="batch-list" id="batchList"></div>
+
+      <div id="convertSection" style="display:none">
+        <div class="preview-area">
+          <video id="videoPreview" controls style="max-width:100%;border-radius:8px"></video>
+          <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
+        </div>
+
+        <div class="frame-strip" id="frameStrip"></div>
+
+        <div class="preview-tabs" id="modeTabs">
+          <button class="active" data-mode="settings">Settings</button>
+          <button data-mode="trim">Trim</button>
+          <button data-mode="output">Output</button>
+        </div>
+
+        <div id="settingsMode">
+          <div class="setting-row">
+            <label>Frame Rate</label>
+            <input type="range" id="fps" min="1" max="30" value="12">
+            <span class="val" id="fpsVal">12 fps</span>
+          </div>
+
+          <div class="setting-row">
+            <label>Width</label>
+            <select id="width">
+              <option value="240">240px (tiny)</option>
+              <option value="320">320px (small)</option>
+              <option value="480" selected>480px (medium)</option>
+              <option value="640">640px (large)</option>
+              <option value="800">800px (HD)</option>
+            </select>
+          </div>
+
+          <div class="setting-row">
+            <label>Quality</label>
+            <input type="range" id="gifQuality" min="1" max="30" value="10">
+            <span class="val" id="gifQualityVal">10</span>
+          </div>
+
+          <div class="setting-row">
+            <label>Workers</label>
+            <select id="workers">
+              <option value="1">1 (slow)</option>
+              <option value="2" selected>2 (balanced)</option>
+              <option value="4">4 (fast)</option>
+            </select>
+          </div>
+
+          <div style="font-size:.8rem;color:var(--text2);margin-bottom:12px">Lower quality number = better quality but slower encoding.</div>
+        </div>
+
+        <div id="trimMode" style="display:none">
+          <div class="time-row">
+            <div>
+              <label>Start (sec)</label>
+              <input type="number" id="startTime" value="0" min="0" step="0.1">
+            </div>
+            <div>
+              <label>End (sec)</label>
+              <input type="number" id="endTime" value="5" min="0.1" step="0.1">
+            </div>
+            <div>
+              <label>Duration</label>
+              <input type="number" id="gifDuration" value="5" min="0.5" max="30" step="0.1" readonly style="opacity:.6">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <button class="btn btn-secondary" id="setStartBtn" style="flex:1">Set Start = Now</button>
+            <button class="btn btn-secondary" id="setEndBtn" style="flex:1">Set End = Now</button>
+          </div>
+          <div style="font-size:.8rem;color:var(--text2)">Max 30 seconds for GIF.</div>
+        </div>
+
+        <div id="outputMode" style="display:none">
+          <div class="setting-row">
+            <label>Loop Count</label>
+            <select id="loopCount">
+              <option value="0" selected>Infinite</option>
+              <option value="1">1 time</option>
+              <option value="2">2 times</option>
+              <option value="3">3 times</option>
+              <option value="5">5 times</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <label>Transparent BG</label>
+            <select id="transparent">
+              <option value="no" selected>No</option>
+              <option value="yes">Yes (if supported)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="stat-row" id="statRow" style="display:none">
+          <div class="stat-box"><div class="stat-val" id="statFrames">-</div><div class="stat-label">Frames</div></div>
+          <div class="stat-box"><div class="stat-val" id="statSize">-</div><div class="stat-label">Est. Size</div></div>
+          <div class="stat-box"><div class="stat-val" id="statTime">-</div><div class="stat-label">Duration</div></div>
+        </div>
+
+        <div class="action-row">
+          <button class="btn" id="convertBtn">Convert to GIF</button>
+          <button class="btn btn-secondary" id="resetBtn">Reset</button>
+        </div>
       </div>
 
-      <div class="controls" id="controls">
-        <label>Start time (seconds)</label>
-        <input type="number" id="startTime" value="0" min="0" step="0.1" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
-
-        <label>Duration (seconds, max 10)</label>
-        <input type="number" id="duration" value="3" min="0.5" max="10" step="0.1" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
-
-        <label>Width (pixels)</label>
-        <select id="width">
-          <option value="320">320px</option>
-          <option value="480" selected>480px</option>
-          <option value="640">640px</option>
-        </select>
-
-        <label>Frame rate (fps)</label>
-        <select id="fps">
-          <option value="8">8 fps (small file)</option>
-          <option value="12" selected>12 fps (balanced)</option>
-          <option value="15">15 fps (smooth)</option>
-        </select>
+      <div id="gifResult" style="display:none">
+        <img class="gif-preview" id="gifPreview">
+        <div class="stat-row">
+          <div class="stat-box"><div class="stat-val" id="resultSize">-</div><div class="stat-label">GIF Size</div></div>
+          <div class="stat-box"><div class="stat-val" id="resultFrames">-</div><div class="stat-label">Frames</div></div>
+          <div class="stat-box"><div class="stat-val" id="resultDuration">-</div><div class="stat-label">Duration</div></div>
+        </div>
+        <div class="action-row">
+          <button class="btn" id="downloadBtn">Download GIF</button>
+          <button class="btn btn-secondary" id="downloadAllBtn" style="display:none">Download ZIP</button>
+          <button class="btn btn-secondary" id="newConvertBtn">Convert Another</button>
+        </div>
       </div>
 
-      <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+      <div class="progress-bar" id="progressBar" style="display:none"><div class="fill" id="progressFill"></div></div>
       <div class="status" id="status"></div>
-
-      <div class="action-row" id="actionRow" style="display:none">
-        <button class="btn" id="convertBtn">Convert to GIF</button>
-        <button class="btn btn-secondary" id="resetBtn">Reset</button>
-      </div>
     </div>
   </div>
 </div>
-
 <script src="../../assets/tools.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
 <script>
 (function(){
-  var dropZone = document.getElementById('dropZone');
-  var fileInput = document.getElementById('fileInput');
-  var previewArea = document.getElementById('previewArea');
-  var videoPreview = document.getElementById('videoPreview');
-  var controls = document.getElementById('controls');
-  var actionRow = document.getElementById('actionRow');
-  var convertBtn = document.getElementById('convertBtn');
-  var resetBtn = document.getElementById('resetBtn');
-  var statusEl = document.getElementById('status');
-  var fileInfo = document.getElementById('fileInfo');
-  var progressBar = document.getElementById('progressBar');
-  var progressFill = document.getElementById('progressFill');
+  var dropZone=document.getElementById('dropZone');
+  var fileInput=document.getElementById('fileInput');
+  var convertSection=document.getElementById('convertSection');
+  var videoPreview=document.getElementById('videoPreview');
+  var convertBtn=document.getElementById('convertBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var statusEl=document.getElementById('status');
+  var fileInfo=document.getElementById('fileInfo');
+  var progressBar=document.getElementById('progressBar');
+  var progressFill=document.getElementById('progressFill');
+  var frameStrip=document.getElementById('frameStrip');
+  var gifResult=document.getElementById('gifResult');
+  var gifPreview=document.getElementById('gifPreview');
+  var downloadBtn=document.getElementById('downloadBtn');
+  var downloadAllBtn=document.getElementById('downloadAllBtn');
+  var newConvertBtn=document.getElementById('newConvertBtn');
+  var modeTabs=document.getElementById('modeTabs');
+  var settingsMode=document.getElementById('settingsMode');
+  var trimMode=document.getElementById('trimMode');
+  var outputMode=document.getElementById('outputMode');
+  var batchList=document.getElementById('batchList');
+  var statRow=document.getElementById('statRow');
+  var fpsSlider=document.getElementById('fps');
+  var fpsVal=document.getElementById('fpsVal');
+  var qualitySlider=document.getElementById('gifQuality');
+  var qualityVal=document.getElementById('gifQualityVal');
+  var startTime=document.getElementById('startTime');
+  var endTime=document.getElementById('endTime');
+  var gifDuration=document.getElementById('gifDuration');
 
-  var currentFile = null;
+  var currentFile=null;
+  var currentBlob=null;
+  var files=[];
+  var results=[];
 
-  Tools.setupDropZone(dropZone, handleFile);
-  fileInput.addEventListener('change', function(e) { if (e.target.files[0]) handleFile(e.target.files[0]); });
+  Tools.setupDropZone(dropZone,function(f){addFile(f)});
+  fileInput.addEventListener('change',function(e){for(var i=0;i<e.target.files.length;i++)addFile(e.target.files[i]);});
 
-  function handleFile(file) {
-    currentFile = file;
-    videoPreview.src = URL.createObjectURL(file);
-    previewArea.style.display = 'block';
-    controls.style.display = 'block';
-    actionRow.style.display = 'flex';
-    dropZone.style.display = 'none';
-    statusEl.style.display = 'none';
-    progressBar.style.display = 'none';
-    fileInfo.textContent = 'File: ' + file.name + ' (' + Tools.formatSize(file.size) + ')';
-  }
-
-  resetBtn.addEventListener('click', function() {
-    currentFile = null;
-    dropZone.style.display = 'block';
-    previewArea.style.display = 'none';
-    controls.style.display = 'none';
-    actionRow.style.display = 'none';
-    statusEl.style.display = 'none';
-    progressBar.style.display = 'none';
-    videoPreview.src = '';
-    fileInput.value = '';
+  modeTabs.addEventListener('click',function(e){
+    var btn=e.target.closest('button');if(!btn)return;
+    modeTabs.querySelectorAll('button').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    var m=btn.dataset.mode;
+    settingsMode.style.display=m==='settings'?'block':'none';
+    trimMode.style.display=m==='trim'?'block':'none';
+    outputMode.style.display=m==='output'?'block':'none';
   });
 
-  function seekVideo(video, time) {
-    return new Promise(function(resolve) {
-      function onSeeked() {
-        video.removeEventListener('seeked', onSeeked);
-        resolve();
-      }
-      video.addEventListener('seeked', onSeeked);
-      video.currentTime = time;
+  fpsSlider.addEventListener('input',function(){fpsVal.textContent=fpsSlider.value+' fps';updateStats();});
+  qualitySlider.addEventListener('input',function(){qualityVal.textContent=qualitySlider.value;});
+  startTime.addEventListener('input',updateDuration);
+  endTime.addEventListener('input',updateDuration);
+
+  function updateDuration(){
+    var s=parseFloat(startTime.value)||0;
+    var e=parseFloat(endTime.value)||5;
+    if(e<=s)e=s+1;
+    var d=Math.min(e-s,30);
+    gifDuration.value=d.toFixed(1);
+    updateStats();
+  }
+
+  function updateStats(){
+    if(!videoPreview.duration)return;
+    var d=parseFloat(gifDuration.value)||5;
+    var fps=parseInt(fpsSlider.value)||12;
+    var frames=Math.ceil(d*fps);
+    var w=parseInt(document.getElementById('width').value)||480;
+    var ratio=w/videoPreview.videoWidth;
+    var h=Math.round(videoPreview.videoHeight*ratio);
+    var pixels=w*h*frames;
+    var estBytes=pixels*0.1;
+    document.getElementById('statFrames').textContent=frames;
+    document.getElementById('statSize').textContent=Tools.formatSize(estBytes);
+    document.getElementById('statTime').textContent=d.toFixed(1)+'s';
+    statRow.style.display='grid';
+  }
+
+  function addFile(f){
+    if(!f||!f.type.startsWith('video/'))return;
+    files.push(f);
+    renderBatchList();
+    if(files.length===1)loadFile(f);
+  }
+
+  function renderBatchList(){
+    batchList.innerHTML='';
+    if(files.length<=1){batchList.style.display='none';return;}
+    batchList.style.display='block';
+    files.forEach(function(f,i){
+      var r=results[i];
+      var item=document.createElement('div');
+      item.className='batch-item';
+      item.innerHTML='<span class="batch-name">'+f.name+'</span>'+
+        '<span class="batch-size">'+Tools.formatSize(f.size)+'</span>'+
+        (r?'<span class="batch-status">'+Tools.formatSize(r.size)+'</span>':'<span class="batch-status">-</span>')+
+        '<span class="batch-remove" data-idx="'+i+'">✕</span>';
+      batchList.appendChild(item);
+    });
+    batchList.querySelectorAll('.batch-remove').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var idx=parseInt(btn.dataset.idx);
+        files.splice(idx,1);results.splice(idx,1);
+        renderBatchList();
+        if(files.length===0)resetAll();
+        else if(idx===0&&files.length>0)loadFile(files[0]);
+      });
     });
   }
 
-  convertBtn.addEventListener('click', async function() {
-    if (!currentFile) return;
-    if (typeof GIF === 'undefined') {
-      Tools.setStatus(statusEl, 'Error: GIF encoder not loaded. Check your internet connection.', 'error');
-      return;
+  function loadFile(f){
+    currentFile=f;
+    convertSection.style.display='block';
+    gifResult.style.display='none';
+    dropZone.style.display='none';
+    videoPreview.src=URL.createObjectURL(f);
+    fileInfo.textContent='File: '+f.name+' ('+Tools.formatSize(f.size)+')';
+    videoPreview.onloadedmetadata=function(){
+      endTime.value=Math.min(5,videoPreview.duration).toFixed(1);
+      updateDuration();
+      captureFrames();
+    };
+  }
+
+  async function captureFrames(){
+    frameStrip.innerHTML='';
+    if(!videoPreview.duration)return;
+    var dur=videoPreview.duration;
+    var count=Math.min(8,Math.floor(dur));
+    if(count<1)count=1;
+    var step=dur/count;
+    for(var i=0;i<count;i++){
+      var t=i*step+step/2;
+      if(t>=dur)t=dur-0.1;
+      try{
+        var c=document.createElement('canvas');
+        c.width=120;c.height=80;
+        var ctx=c.getContext('2d');
+        videoPreview.currentTime=t;
+        await new Promise(function(r){videoPreview.onseeked=r;});
+        ctx.drawImage(videoPreview,0,0,120,80);
+        c.dataset.time=t.toFixed(2);
+        c.title='Click to set start: '+t.toFixed(1)+'s';
+        c.addEventListener('click',function(){
+          startTime.value=this.dataset.time;
+          updateDuration();
+        });
+        frameStrip.appendChild(c);
+      }catch(e){}
     }
-    convertBtn.disabled = true;
-    progressBar.style.display = 'block';
-    Tools.setStatus(statusEl, 'Loading video...', '');
-    progressFill.style.width = '5%';
+  }
 
-    try {
-      var video = document.createElement('video');
-      video.muted = true;
-      video.preload = 'auto';
-      video.src = videoPreview.src;
+  document.getElementById('setStartBtn').addEventListener('click',function(){startTime.value=videoPreview.currentTime.toFixed(1);updateDuration();});
+  document.getElementById('setEndBtn').addEventListener('click',function(){endTime.value=videoPreview.currentTime.toFixed(1);updateDuration();});
 
-      await new Promise(function(resolve, reject) {
-        video.onloadeddata = resolve;
-        video.onerror = reject;
+  function seekVideo(video,time){
+    return new Promise(function(resolve){
+      function onSeeked(){video.removeEventListener('seeked',onSeeked);resolve();}
+      video.addEventListener('seeked',onSeeked);
+      video.currentTime=time;
+    });
+  }
+
+  convertBtn.addEventListener('click',async function(){
+    if(!currentFile)return;
+    if(typeof GIF==='undefined'){Tools.setStatus(statusEl,'Error: GIF encoder not loaded.','error');return;}
+    convertBtn.disabled=true;
+    progressBar.style.display='block';
+    gifResult.style.display='none';
+    Tools.setStatus(statusEl,'Loading video...','');
+    progressFill.style.width='5%';
+
+    try{
+      var video=document.createElement('video');
+      video.muted=true;video.preload='auto';
+      video.src=videoPreview.src;
+      await new Promise(function(res,rej){video.onloadeddata=res;video.onerror=rej;});
+
+      var start=parseFloat(startTime.value)||0;
+      var end=parseFloat(endTime.value)||video.duration;
+      if(end<=start)end=Math.min(start+5,video.duration);
+      var dur=Math.min(end-start,30);
+      var targetWidth=parseInt(document.getElementById('width').value);
+      var fps=parseInt(fpsSlider.value);
+      var scale=targetWidth/video.videoWidth;
+      var targetHeight=Math.round(video.videoHeight*scale);
+
+      var canvas=document.createElement('canvas');
+      canvas.width=targetWidth;canvas.height=targetHeight;
+      var ctx=canvas.getContext('2d');
+
+      var gif=new GIF({
+        workers:parseInt(document.getElementById('workers').value),
+        quality:parseInt(qualitySlider.value),
+        width:targetWidth,height:targetHeight,
+        workerScript:'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'
       });
 
-      var startTime = parseFloat(document.getElementById('startTime').value) || 0;
-      var duration = Math.min(parseFloat(document.getElementById('duration').value) || 3, 10);
-      var targetWidth = parseInt(document.getElementById('width').value);
-      var fps = parseInt(document.getElementById('fps').value);
-      var scale = targetWidth / video.videoWidth;
-      var targetHeight = Math.round(video.videoHeight * scale);
+      var loopCount=parseInt(document.getElementById('loopCount').value);
+      gif.setOption('loop',loopCount);
 
-      var canvas = document.createElement('canvas');
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-      var ctx = canvas.getContext('2d');
-
-      var gif = new GIF({
-        workers: 2,
-        quality: 10,
-        width: targetWidth,
-        height: targetHeight,
-        workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'
+      gif.on('progress',function(p){
+        var pct=Math.floor(p*100);
+        progressFill.style.width=(50+pct*0.5)+'%';
+        Tools.setStatus(statusEl,'Encoding GIF... '+pct+'%','');
       });
 
-      gif.on('progress', function(p) {
-        var pct = Math.floor(p * 100);
-        progressFill.style.width = (50 + pct * 0.5) + '%';
-        Tools.setStatus(statusEl, 'Encoding GIF... ' + pct + '%', '');
+      gif.on('finished',function(blob){
+        currentBlob=blob;
+        var url=URL.createObjectURL(blob);
+        gifPreview.src=url;
+        gifResult.style.display='block';
+        document.getElementById('resultSize').textContent=Tools.formatSize(blob.size);
+        document.getElementById('resultFrames').textContent=Math.ceil(dur*fps);
+        document.getElementById('resultDuration').textContent=dur.toFixed(1)+'s';
+        downloadBtn.style.display='inline-block';
+        if(files.length>1){downloadAllBtn.style.display='inline-block';}
+        Tools.setStatus(statusEl,'Done! GIF: '+Tools.formatSize(blob.size),'done');
+        progressFill.style.width='100%';
+        convertBtn.disabled=false;
       });
 
-      gif.on('finished', function(blob) {
-        var name = currentFile.name.replace(/\.[^.]+$/, '.gif');
-        Tools.downloadBlob(blob, name);
-        Tools.setStatus(statusEl, 'Done! GIF size: ' + Tools.formatSize(blob.size), 'done');
-        progressFill.style.width = '100%';
-        convertBtn.disabled = false;
-      });
+      await seekVideo(video,start);
+      var totalFrames=Math.ceil(dur*fps);
+      var frameInterval=1/fps;
+      var frame=0;
 
-      await seekVideo(video, startTime);
+      Tools.setStatus(statusEl,'Capturing frames...','');
 
-      var totalFrames = Math.ceil(duration * fps);
-      var frameInterval = 1 / fps;
-      var frame = 0;
-
-      Tools.setStatus(statusEl, 'Capturing frames...', '');
-
-      async function captureFrame() {
-        if (frame >= totalFrames || video.currentTime >= startTime + duration) {
-          Tools.setStatus(statusEl, 'Captured ' + frame + ' frames. Encoding GIF...', '');
-          progressFill.style.width = '50%';
+      async function captureFrame(){
+        if(frame>=totalFrames||video.currentTime>=start+dur){
+          Tools.setStatus(statusEl,'Captured '+frame+' frames. Encoding...','');
+          progressFill.style.width='50%';
           gif.render();
           return;
         }
-
-        ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
-        gif.addFrame(ctx, { copy: true, delay: 1000 / fps });
-
+        ctx.drawImage(video,0,0,targetWidth,targetHeight);
+        gif.addFrame(ctx,{copy:true,delay:1000/fps});
         frame++;
-        var pct = Math.floor((frame / totalFrames) * 45);
-        progressFill.style.width = pct + '%';
-
-        var nextTime = video.currentTime + frameInterval;
-        if (nextTime >= startTime + duration) {
-          Tools.setStatus(statusEl, 'Captured ' + frame + ' frames. Encoding GIF...', '');
-          progressFill.style.width = '50%';
+        var pct=Math.floor((frame/totalFrames)*45);
+        progressFill.style.width=pct+'%';
+        var nextTime=video.currentTime+frameInterval;
+        if(nextTime>=start+dur){
+          Tools.setStatus(statusEl,'Captured '+frame+' frames. Encoding...','');
+          progressFill.style.width='50%';
           gif.render();
           return;
         }
-        await seekVideo(video, nextTime);
+        await seekVideo(video,nextTime);
         requestAnimationFrame(captureFrame);
       }
-
       captureFrame();
-    } catch(err) {
-      Tools.setStatus(statusEl, 'Error: ' + err.message, 'error');
-      convertBtn.disabled = false;
+    }catch(e){
+      Tools.setStatus(statusEl,'Error: '+e.message,'error');
+      convertBtn.disabled=false;
     }
   });
+
+  downloadBtn.addEventListener('click',function(){
+    if(!currentBlob||!currentFile)return;
+    Tools.downloadBlob(currentBlob,currentFile.name.replace(/\.[^.]+$/,'.gif'));
+  });
+
+  downloadAllBtn.addEventListener('click',async function(){
+    if(results.length===0)return;
+    var JSZip=window.JSZip;
+    if(!JSZip){Tools.setStatus(statusEl,'Loading JSZip...','');return;}
+    var zip=new JSZip();
+    results.forEach(function(r,i){zip.file(files[i].name.replace(/\.[^.]+$/,'.gif'),r.blob);});
+    var blob=await zip.generateAsync({type:'blob'});
+    Tools.downloadBlob(blob,'gifs.zip');
+  });
+
+  newConvertBtn.addEventListener('click',function(){
+    convertSection.style.display='block';
+    gifResult.style.display='none';
+    currentBlob=null;
+  });
+
+  function resetAll(){
+    currentFile=null;currentBlob=null;files=[];results=[];
+    convertSection.style.display='none';
+    gifResult.style.display='none';
+    dropZone.style.display='block';
+    statusEl.style.display='none';
+    progressBar.style.display='none';
+    statRow.style.display='none';
+    videoPreview.src='';fileInput.value='';
+    batchList.innerHTML='';
+  }
+  resetBtn.addEventListener('click',resetAll);
 })();
 </script>
-
 </body>
 </html>
