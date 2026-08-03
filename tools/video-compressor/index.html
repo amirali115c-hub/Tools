@@ -65,141 +65,155 @@
 
 <script src="../../assets/tools.js"></script>
 <script>
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const previewArea = document.getElementById('previewArea');
-const videoPreview = document.getElementById('videoPreview');
-const controls = document.getElementById('controls');
-const actionRow = document.getElementById('actionRow');
-const compressBtn = document.getElementById('compressBtn');
-const resetBtn = document.getElementById('resetBtn');
-const status = document.getElementById('status');
-const fileInfo = document.getElementById('fileInfo');
-const progressBar = document.getElementById('progressBar');
-const progressFill = document.getElementById('progressFill');
-const qualitySelect = document.getElementById('quality');
-const resolutionSelect = document.getElementById('resolution');
-const fpsSelect = document.getElementById('fps');
+(function(){
+  var dropZone = document.getElementById('dropZone');
+  var fileInput = document.getElementById('fileInput');
+  var previewArea = document.getElementById('previewArea');
+  var videoPreview = document.getElementById('videoPreview');
+  var controls = document.getElementById('controls');
+  var actionRow = document.getElementById('actionRow');
+  var compressBtn = document.getElementById('compressBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var statusEl = document.getElementById('status');
+  var fileInfo = document.getElementById('fileInfo');
+  var progressBar = document.getElementById('progressBar');
+  var progressFill = document.getElementById('progressFill');
+  var qualitySelect = document.getElementById('quality');
+  var resolutionSelect = document.getElementById('resolution');
+  var fpsSelect = document.getElementById('fps');
 
-let currentFile = null;
+  var currentFile = null;
 
-Tools.setupDropZone(dropZone, handleFile);
-fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+  Tools.setupDropZone(dropZone, handleFile);
+  fileInput.addEventListener('change', function(e) { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
-function handleFile(file) {
-  currentFile = file;
-  videoPreview.src = URL.createObjectURL(file);
-  Tools.showPreview(previewArea);
-  controls.style.display = 'block';
-  actionRow.style.display = 'flex';
-  dropZone.style.display = 'none';
-  status.style.display = 'none';
-  fileInfo.textContent = `File: ${file.name} (${Tools.formatSize(file.size)})`;
-}
-
-resetBtn.addEventListener('click', () => {
-  currentFile = null;
-  dropZone.style.display = 'block';
-  previewArea.style.display = 'none';
-  controls.style.display = 'none';
-  actionRow.style.display = 'none';
-  status.style.display = 'none';
-  progressBar.style.display = 'none';
-  videoPreview.src = '';
-  fileInput.value = '';
-});
-
-compressBtn.addEventListener('click', async () => {
-  if (!currentFile) return;
-  compressBtn.disabled = true;
-  progressBar.style.display = 'block';
-  Tools.setStatus(status, 'Loading video...', '');
-  progressFill.style.width = '10%';
-
-  try {
-    const video = document.createElement('video');
-    video.muted = true;
-    video.preload = 'auto';
-    await new Promise((resolve, reject) => {
-      video.onloadeddata = resolve;
-      video.onerror = reject;
-      video.src = videoPreview.src;
-    });
-
-    const targetBitrate = parseInt(qualitySelect.value);
-    const targetFps = parseInt(fpsSelect.value) || 30;
-    let targetHeight = parseInt(resolutionSelect.value) || video.videoHeight;
-    const scale = targetHeight / video.videoHeight;
-    const targetWidth = Math.round(video.videoWidth * scale);
-
-    // Create offscreen canvas at target resolution
-    const offCanvas = document.createElement('canvas');
-    offCanvas.width = targetWidth;
-    offCanvas.height = targetHeight;
-    const offCtx = offCanvas.getContext('2d');
-
-    Tools.setStatus(status, 'Compressing...', '');
-
-    const stream = offCanvas.captureStream(targetFps);
-    // Set bitrate via track settings
-    stream.getVideoTracks().forEach(t => {
-      try {
-        t.applyConstraints({ advanced: [{ videoBitrate: targetBitrate }] });
-      } catch(e) {}
-    });
-
-    const chunks = [];
-    const recorder = new MediaRecorder(stream, {
-      mimeType: 'video/webm;codecs=vp9',
-      videoBitsPerSecond: targetBitrate
-    });
-
-    recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
-    recorder.onstop = () => {
-      const blob = new Blob(chunks, { type: 'video/webm' });
-      const pctOriginal = Math.round((blob.size / currentFile.size) * 100);
-      const name = currentFile.name.replace(/\.[^.]+$/, '_compressed.webm');
-      Tools.downloadBlob(blob, name);
-      Tools.setStatus(status, `Done! ${Tools.formatSize(currentFile.size)} → ${Tools.formatSize(blob.size)} (${pctOriginal}% of original)`, 'done');
-      progressFill.style.width = '100%';
-      compressBtn.disabled = false;
-    };
-
-    video.currentTime = 0;
-    await new Promise(r => { video.onseeked = r; });
-
-    recorder.start();
-    const frameInterval = 1 / targetFps;
-    const duration = video.duration;
-    const totalFrames = Math.ceil(duration * targetFps);
-    let frame = 0;
-
-    function processFrame() {
-      if (video.currentTime >= duration || frame >= totalFrames) {
-        recorder.stop();
-        return;
-      }
-
-      offCtx.drawImage(video, 0, 0, targetWidth, targetHeight);
-
-      frame++;
-      const pct = Math.floor((frame / totalFrames) * 85) + 10;
-      progressFill.style.width = pct + '%';
-
-      if (frame % 100 === 0) {
-        Tools.setStatus(status, `Compressing... frame ${frame}/${totalFrames}`, '');
-      }
-
-      video.currentTime += frameInterval;
-      video.onseeked = () => requestAnimationFrame(processFrame);
-    }
-
-    processFrame();
-  } catch(err) {
-    Tools.setStatus(status, 'Error: ' + err.message, 'error');
-    compressBtn.disabled = false;
+  function handleFile(file) {
+    currentFile = file;
+    videoPreview.src = URL.createObjectURL(file);
+    previewArea.style.display = 'block';
+    controls.style.display = 'block';
+    actionRow.style.display = 'flex';
+    dropZone.style.display = 'none';
+    statusEl.style.display = 'none';
+    progressBar.style.display = 'none';
+    fileInfo.textContent = 'File: ' + file.name + ' (' + Tools.formatSize(file.size) + ')';
   }
-});
+
+  resetBtn.addEventListener('click', function() {
+    currentFile = null;
+    dropZone.style.display = 'block';
+    previewArea.style.display = 'none';
+    controls.style.display = 'none';
+    actionRow.style.display = 'none';
+    statusEl.style.display = 'none';
+    progressBar.style.display = 'none';
+    videoPreview.src = '';
+    fileInput.value = '';
+  });
+
+  function seekVideo(video, time) {
+    return new Promise(function(resolve) {
+      function onSeeked() {
+        video.removeEventListener('seeked', onSeeked);
+        resolve();
+      }
+      video.addEventListener('seeked', onSeeked);
+      video.currentTime = time;
+    });
+  }
+
+  compressBtn.addEventListener('click', async function() {
+    if (!currentFile) return;
+    compressBtn.disabled = true;
+    progressBar.style.display = 'block';
+    Tools.setStatus(statusEl, 'Loading video...', '');
+    progressFill.style.width = '10%';
+
+    try {
+      var video = document.createElement('video');
+      video.muted = true;
+      video.preload = 'auto';
+      video.src = videoPreview.src;
+
+      await new Promise(function(resolve, reject) {
+        video.onloadeddata = resolve;
+        video.onerror = reject;
+      });
+
+      var targetBitrate = parseInt(qualitySelect.value);
+      var targetFps = parseInt(fpsSelect.value) || 30;
+      var targetHeight = parseInt(resolutionSelect.value) || video.videoHeight;
+      var scale = targetHeight / video.videoHeight;
+      var targetWidth = Math.round(video.videoWidth * scale);
+
+      var offCanvas = document.createElement('canvas');
+      offCanvas.width = targetWidth;
+      offCanvas.height = targetHeight;
+      var offCtx = offCanvas.getContext('2d');
+
+      Tools.setStatus(statusEl, 'Compressing...', '');
+
+      var stream = offCanvas.captureStream(targetFps);
+      var mimeType = 'video/webm';
+      if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
+        mimeType = 'video/webm;codecs=vp9';
+      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8')) {
+        mimeType = 'video/webm;codecs=vp8';
+      }
+
+      var chunks = [];
+      var recorder = new MediaRecorder(stream, { mimeType: mimeType, videoBitsPerSecond: targetBitrate });
+      recorder.ondataavailable = function(e) { if (e.data.size > 0) chunks.push(e.data); };
+      recorder.onstop = function() {
+        var blob = new Blob(chunks, { type: 'video/webm' });
+        var pctOriginal = Math.round((blob.size / currentFile.size) * 100);
+        var name = currentFile.name.replace(/\.[^.]+$/, '_compressed.webm');
+        Tools.downloadBlob(blob, name);
+        Tools.setStatus(statusEl, 'Done! ' + Tools.formatSize(currentFile.size) + ' -> ' + Tools.formatSize(blob.size) + ' (' + pctOriginal + '% of original)', 'done');
+        progressFill.style.width = '100%';
+        compressBtn.disabled = false;
+      };
+
+      await seekVideo(video, 0);
+      recorder.start();
+
+      var frameInterval = 1 / targetFps;
+      var duration = video.duration;
+      var totalFrames = Math.ceil(duration * targetFps);
+      var frame = 0;
+
+      async function processFrame() {
+        if (video.currentTime >= duration || frame >= totalFrames) {
+          recorder.stop();
+          return;
+        }
+
+        offCtx.drawImage(video, 0, 0, targetWidth, targetHeight);
+
+        frame++;
+        var pct = Math.floor((frame / totalFrames) * 85) + 10;
+        progressFill.style.width = pct + '%';
+
+        if (frame % 100 === 0) {
+          Tools.setStatus(statusEl, 'Compressing... frame ' + frame + '/' + totalFrames, '');
+        }
+
+        var nextTime = video.currentTime + frameInterval;
+        if (nextTime >= duration || frame >= totalFrames) {
+          recorder.stop();
+          return;
+        }
+        await seekVideo(video, nextTime);
+        requestAnimationFrame(processFrame);
+      }
+
+      processFrame();
+    } catch(err) {
+      Tools.setStatus(statusEl, 'Error: ' + err.message, 'error');
+      compressBtn.disabled = false;
+    }
+  });
+})();
 </script>
 
 </body>

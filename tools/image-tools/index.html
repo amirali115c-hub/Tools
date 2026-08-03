@@ -80,119 +80,122 @@
 
 <script src="../../assets/tools.js"></script>
 <script>
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const previewArea = document.getElementById('previewArea');
-const imagePreview = document.getElementById('imagePreview');
-const controls = document.getElementById('controls');
-const actionRow = document.getElementById('actionRow');
-const processBtn = document.getElementById('processBtn');
-const downloadBtn = document.getElementById('downloadBtn');
-const resetBtn = document.getElementById('resetBtn');
-const status = document.getElementById('status');
-const fileInfo = document.getElementById('fileInfo');
-const actionSelect = document.getElementById('action');
-const formatOptions = document.getElementById('formatOptions');
-const resizeOptions = document.getElementById('resizeOptions');
-const compressOptions = document.getElementById('compressOptions');
-const qualitySlider = document.getElementById('quality');
-const qualityVal = document.getElementById('qualityVal');
-const resultArea = document.getElementById('resultArea');
-const resultInfo = document.getElementById('resultInfo');
-const resultPreview = document.getElementById('resultPreview');
+(function(){
+  var dropZone = document.getElementById('dropZone');
+  var fileInput = document.getElementById('fileInput');
+  var previewArea = document.getElementById('previewArea');
+  var imagePreview = document.getElementById('imagePreview');
+  var controls = document.getElementById('controls');
+  var actionRow = document.getElementById('actionRow');
+  var processBtn = document.getElementById('processBtn');
+  var downloadBtn = document.getElementById('downloadBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var statusEl = document.getElementById('status');
+  var fileInfo = document.getElementById('fileInfo');
+  var actionSelect = document.getElementById('action');
+  var formatOptions = document.getElementById('formatOptions');
+  var resizeOptions = document.getElementById('resizeOptions');
+  var compressOptions = document.getElementById('compressOptions');
+  var qualitySlider = document.getElementById('quality');
+  var qualityVal = document.getElementById('qualityVal');
+  var resultArea = document.getElementById('resultArea');
+  var resultInfo = document.getElementById('resultInfo');
+  var resultPreview = document.getElementById('resultPreview');
 
-let currentFile = null;
-let resultBlob = null;
+  var currentFile = null;
+  var resultBlob = null;
 
-Tools.setupDropZone(dropZone, handleFile);
-fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+  Tools.setupDropZone(dropZone, handleFile);
+  fileInput.addEventListener('change', function(e) { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
-actionSelect.addEventListener('change', () => {
-  const v = actionSelect.value;
-  formatOptions.style.display = v === 'convert' ? 'block' : 'none';
-  resizeOptions.style.display = v === 'resize' ? 'block' : 'none';
-  compressOptions.style.display = v === 'compress' ? 'block' : 'none';
-});
+  actionSelect.addEventListener('change', function() {
+    var v = actionSelect.value;
+    formatOptions.style.display = v === 'convert' ? 'block' : 'none';
+    resizeOptions.style.display = v === 'resize' ? 'block' : 'none';
+    compressOptions.style.display = v === 'compress' ? 'block' : 'none';
+  });
 
-qualitySlider.addEventListener('input', () => {
-  qualityVal.textContent = qualitySlider.value + '%';
-});
+  qualitySlider.addEventListener('input', function() {
+    qualityVal.textContent = qualitySlider.value + '%';
+  });
 
-function handleFile(file) {
-  currentFile = file;
-  imagePreview.src = URL.createObjectURL(file);
-  Tools.showPreview(previewArea);
-  controls.style.display = 'block';
-  actionRow.style.display = 'flex';
-  dropZone.style.display = 'none';
-  status.style.display = 'none';
-  resultArea.style.display = 'none';
-  downloadBtn.style.display = 'none';
-  fileInfo.textContent = `File: ${file.name} (${Tools.formatSize(file.size)})`;
-}
+  function handleFile(file) {
+    currentFile = file;
+    imagePreview.src = URL.createObjectURL(file);
+    previewArea.style.display = 'block';
+    controls.style.display = 'block';
+    actionRow.style.display = 'flex';
+    dropZone.style.display = 'none';
+    statusEl.style.display = 'none';
+    resultArea.style.display = 'none';
+    downloadBtn.style.display = 'none';
+    fileInfo.textContent = 'File: ' + file.name + ' (' + Tools.formatSize(file.size) + ')';
+  }
 
-resetBtn.addEventListener('click', () => {
-  currentFile = null;
-  dropZone.style.display = 'block';
-  previewArea.style.display = 'none';
-  controls.style.display = 'none';
-  actionRow.style.display = 'none';
-  status.style.display = 'none';
-  resultArea.style.display = 'none';
-  downloadBtn.style.display = 'none';
-  imagePreview.src = '';
-  fileInput.value = '';
-});
+  resetBtn.addEventListener('click', function() {
+    currentFile = null;
+    dropZone.style.display = 'block';
+    previewArea.style.display = 'none';
+    controls.style.display = 'none';
+    actionRow.style.display = 'none';
+    statusEl.style.display = 'none';
+    resultArea.style.display = 'none';
+    downloadBtn.style.display = 'none';
+    imagePreview.src = '';
+    fileInput.value = '';
+  });
 
-processBtn.addEventListener('click', () => {
-  if (!currentFile) return;
-  processBtn.disabled = true;
-  Tools.setStatus(status, 'Processing...', '');
+  processBtn.addEventListener('click', function() {
+    if (!currentFile) return;
+    processBtn.disabled = true;
+    Tools.setStatus(statusEl, 'Processing...', '');
 
-  const img = new Image();
-  img.onload = () => {
-    const canvas = document.createElement('canvas');
-    const action = actionSelect.value;
+    var img = new Image();
+    img.onload = function() {
+      var c = document.createElement('canvas');
+      var action = actionSelect.value;
 
-    let w = img.naturalWidth;
-    let h = img.naturalHeight;
+      var w = img.naturalWidth;
+      var h = img.naturalHeight;
 
-    if (action === 'resize') {
-      const maxW = parseInt(document.getElementById('maxWidth').value) || 800;
-      const maxH = parseInt(document.getElementById('maxHeight').value) || 600;
-      const scale = Math.min(maxW / w, maxH / h, 1);
-      w = Math.round(w * scale);
-      h = Math.round(h * scale);
-    }
+      if (action === 'resize') {
+        var maxW = parseInt(document.getElementById('maxWidth').value) || 800;
+        var maxH = parseInt(document.getElementById('maxHeight').value) || 600;
+        var scale = Math.min(maxW / w, maxH / h, 1);
+        w = Math.round(w * scale);
+        h = Math.round(h * scale);
+      }
 
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(img, 0, 0, w, h);
+      c.width = w;
+      c.height = h;
+      var ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
 
-    const outputType = action === 'convert' ? document.getElementById('format').value : currentFile.type || 'image/png';
-    const quality = parseInt(qualitySlider.value) / 100;
+      var outputType = action === 'convert' ? document.getElementById('format').value : (currentFile.type || 'image/png');
+      var quality = parseInt(qualitySlider.value) / 100;
 
-    canvas.toBlob(blob => {
-      resultBlob = blob;
-      const url = URL.createObjectURL(blob);
-      resultPreview.src = url;
-      resultInfo.textContent = `${Tools.formatSize(currentFile.size)} → ${Tools.formatSize(blob.size)} (${outputType.split('/')[1].toUpperCase()}, ${w}x${h})`;
-      resultArea.style.display = 'block';
-      downloadBtn.style.display = 'inline-block';
-      Tools.setStatus(status, 'Done!', 'done');
-      processBtn.disabled = false;
-    }, outputType, quality);
-  };
-  img.src = currentFile;
-});
+      c.toBlob(function(blob) {
+        resultBlob = blob;
+        var url = URL.createObjectURL(blob);
+        resultPreview.src = url;
+        var ext = outputType.split('/')[1] || 'png';
+        resultInfo.textContent = Tools.formatSize(currentFile.size) + ' -> ' + Tools.formatSize(blob.size) + ' (' + ext.toUpperCase() + ', ' + w + 'x' + h + ')';
+        resultArea.style.display = 'block';
+        downloadBtn.style.display = 'inline-block';
+        Tools.setStatus(statusEl, 'Done!', 'done');
+        processBtn.disabled = false;
+      }, outputType, quality);
+    };
+    img.src = currentFile;
+  });
 
-downloadBtn.addEventListener('click', () => {
-  if (!resultBlob || !currentFile) return;
-  const ext = document.getElementById('format').value.split('/')[1] || 'png';
-  const name = currentFile.name.replace(/\.[^.]+$/, '.' + ext);
-  Tools.downloadBlob(resultBlob, name);
-});
+  downloadBtn.addEventListener('click', function() {
+    if (!resultBlob || !currentFile) return;
+    var ext = document.getElementById('format').value.split('/')[1] || 'png';
+    var name = currentFile.name.replace(/\.[^.]+$/, '.' + ext);
+    Tools.downloadBlob(resultBlob, name);
+  });
+})();
 </script>
 
 </body>

@@ -74,181 +74,186 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="../../assets/tools.js"></script>
 <script>
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+(function(){
+  if (typeof pdfjsLib === 'undefined') {
+    Tools.setStatus(document.getElementById('status'), 'Error: PDF library not loaded. Check your internet connection.', 'error');
+    return;
+  }
 
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const previewArea = document.getElementById('previewArea');
-const controls = document.getElementById('controls');
-const actionRow = document.getElementById('actionRow');
-const processBtn = document.getElementById('processBtn');
-const downloadBtn = document.getElementById('downloadBtn');
-const resetBtn = document.getElementById('resetBtn');
-const status = document.getElementById('status');
-const fileInfo = document.getElementById('fileInfo');
-const pagePreviews = document.getElementById('pagePreviews');
-const extractOptions = document.getElementById('extractOptions');
-const compressOptions = document.getElementById('compressOptions');
-const progressBar = document.getElementById('progressBar');
-const progressFill = document.getElementById('progressFill');
-const actionSelect = document.getElementById('action');
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-let currentFile = null;
-let pdfDoc = null;
-let resultBlobs = [];
+  var dropZone = document.getElementById('dropZone');
+  var fileInput = document.getElementById('fileInput');
+  var previewArea = document.getElementById('previewArea');
+  var controls = document.getElementById('controls');
+  var actionRow = document.getElementById('actionRow');
+  var processBtn = document.getElementById('processBtn');
+  var downloadBtn = document.getElementById('downloadBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var statusEl = document.getElementById('status');
+  var fileInfo = document.getElementById('fileInfo');
+  var pagePreviews = document.getElementById('pagePreviews');
+  var extractOptions = document.getElementById('extractOptions');
+  var compressOptions = document.getElementById('compressOptions');
+  var progressBar = document.getElementById('progressBar');
+  var progressFill = document.getElementById('progressFill');
+  var actionSelect = document.getElementById('action');
 
-Tools.setupDropZone(dropZone, handleFile);
-fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+  var currentFile = null;
+  var pdfDoc = null;
+  var resultBlobs = [];
 
-actionSelect.addEventListener('change', () => {
-  extractOptions.style.display = actionSelect.value === 'toImages' ? 'block' : 'none';
-  compressOptions.style.display = actionSelect.value === 'compress' ? 'block' : 'none';
-});
+  Tools.setupDropZone(dropZone, handleFile);
+  fileInput.addEventListener('change', function(e) { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
-async function handleFile(file) {
-  currentFile = file;
-  dropZone.style.display = 'none';
-  Tools.showPreview(previewArea);
-  controls.style.display = 'block';
-  actionRow.style.display = 'flex';
-  status.style.display = 'none';
-  downloadBtn.style.display = 'none';
-  fileInfo.textContent = `File: ${file.name} (${Tools.formatSize(file.size)})`;
+  actionSelect.addEventListener('change', function() {
+    extractOptions.style.display = actionSelect.value === 'toImages' ? 'block' : 'none';
+    compressOptions.style.display = actionSelect.value === 'compress' ? 'block' : 'none';
+  });
 
-  Tools.setStatus(status, 'Loading PDF...', '');
+  async function handleFile(file) {
+    currentFile = file;
+    dropZone.style.display = 'none';
+    previewArea.style.display = 'block';
+    controls.style.display = 'block';
+    actionRow.style.display = 'flex';
+    statusEl.style.display = 'none';
+    downloadBtn.style.display = 'none';
+    progressBar.style.display = 'none';
+    fileInfo.textContent = 'File: ' + file.name + ' (' + Tools.formatSize(file.size) + ')';
 
-  try {
-    const data = await Tools.readAsArrayBuffer(file);
-    pdfDoc = await pdfjsLib.getDocument({ data }).promise;
-    const pages = pdfDoc.numPages;
+    Tools.setStatus(statusEl, 'Loading PDF...', '');
 
-    pagePreviews.innerHTML = '';
-    const renderLimit = Math.min(pages, 6);
+    try {
+      var data = await Tools.readAsArrayBuffer(file);
+      pdfDoc = await pdfjsLib.getDocument({ data: data }).promise;
+      var pages = pdfDoc.numPages;
 
-    for (let i = 1; i <= renderLimit; i++) {
-      const page = await pdfDoc.getPage(i);
-      const viewport = page.getViewport({ scale: 0.3 });
-      const canvas = document.createElement('canvas');
+      pagePreviews.innerHTML = '';
+      var renderLimit = Math.min(pages, 6);
+
+      for (var i = 1; i <= renderLimit; i++) {
+        var page = await pdfDoc.getPage(i);
+        var viewport = page.getViewport({ scale: 0.3 });
+        var canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        canvas.style.borderRadius = '6px';
+        canvas.style.border = '1px solid var(--border)';
+        canvas.style.maxWidth = '200px';
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+        pagePreviews.appendChild(canvas);
+      }
+
+      if (pages > renderLimit) {
+        var more = document.createElement('div');
+        more.style.cssText = 'display:flex;align-items:center;color:var(--text2);font-size:.9rem';
+        more.textContent = '+ ' + (pages - renderLimit) + ' more pages';
+        pagePreviews.appendChild(more);
+      }
+
+      Tools.setStatus(statusEl, 'PDF loaded: ' + pages + ' page' + (pages > 1 ? 's' : ''), 'done');
+    } catch(err) {
+      Tools.setStatus(statusEl, 'Error loading PDF: ' + err.message, 'error');
+    }
+  }
+
+  resetBtn.addEventListener('click', function() {
+    currentFile = null;
+    pdfDoc = null;
+    resultBlobs = [];
+    dropZone.style.display = 'block';
+    previewArea.style.display = 'none';
+    controls.style.display = 'none';
+    actionRow.style.display = 'none';
+    statusEl.style.display = 'none';
+    progressBar.style.display = 'none';
+    downloadBtn.style.display = 'none';
+    fileInput.value = '';
+  });
+
+  processBtn.addEventListener('click', async function() {
+    if (!pdfDoc) return;
+    processBtn.disabled = true;
+    progressBar.style.display = 'block';
+    resultBlobs = [];
+
+    if (actionSelect.value === 'toImages') {
+      await extractImages();
+    } else {
+      await compressPDF();
+    }
+    processBtn.disabled = false;
+  });
+
+  async function extractImages() {
+    var format = document.getElementById('imgFormat').value;
+    var scale = parseFloat(document.getElementById('scale').value);
+    var pages = pdfDoc.numPages;
+
+    Tools.setStatus(statusEl, 'Extracting pages...', '');
+
+    for (var i = 1; i <= pages; i++) {
+      var page = await pdfDoc.getPage(i);
+      var viewport = page.getViewport({ scale: scale });
+      var canvas = document.createElement('canvas');
       canvas.width = viewport.width;
       canvas.height = viewport.height;
-      canvas.style.borderRadius = '6px';
-      canvas.style.border = '1px solid var(--border)';
-      canvas.style.maxWidth = '200px';
-      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-      pagePreviews.appendChild(canvas);
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+
+      var mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
+      var quality = format === 'jpeg' ? 0.92 : undefined;
+
+      var blob = await new Promise(function(resolve) {
+        canvas.toBlob(resolve, mimeType, quality);
+      });
+      resultBlobs.push({ blob: blob, name: 'page_' + i + '.' + format });
+
+      var pct = Math.floor((i / pages) * 100);
+      progressFill.style.width = pct + '%';
+      Tools.setStatus(statusEl, 'Extracted page ' + i + '/' + pages, '');
     }
 
-    if (pages > renderLimit) {
-      const more = document.createElement('div');
-      more.style.cssText = 'display:flex;align-items:center;color:var(--text2);font-size:.9rem';
-      more.textContent = `+ ${pages - renderLimit} more pages`;
-      pagePreviews.appendChild(more);
+    Tools.setStatus(statusEl, 'Done! ' + pages + ' pages extracted.', 'done');
+    progressFill.style.width = '100%';
+    downloadBtn.style.display = 'inline-block';
+  }
+
+  async function compressPDF() {
+    Tools.setStatus(statusEl, 'Reducing image quality across all pages...', '');
+    var pages = pdfDoc.numPages;
+    var quality = parseFloat(document.getElementById('pdfQuality').value);
+
+    for (var i = 1; i <= pages; i++) {
+      var page = await pdfDoc.getPage(i);
+      var viewport = page.getViewport({ scale: 1.5 });
+      var canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport: viewport }).promise;
+
+      var blob = await new Promise(function(resolve) {
+        canvas.toBlob(resolve, 'image/jpeg', quality);
+      });
+      resultBlobs.push({ blob: blob, name: 'compressed_page_' + i + '.jpg' });
+
+      var pct = Math.floor((i / pages) * 100);
+      progressFill.style.width = pct + '%';
     }
 
-    Tools.setStatus(status, `PDF loaded: ${pages} page${pages > 1 ? 's' : ''}`, 'done');
-  } catch(err) {
-    Tools.setStatus(status, 'Error loading PDF: ' + err.message, 'error');
+    Tools.setStatus(statusEl, 'Done! ' + pages + ' compressed images ready.', 'done');
+    progressFill.style.width = '100%';
+    downloadBtn.style.display = 'inline-block';
   }
-}
 
-resetBtn.addEventListener('click', () => {
-  currentFile = null;
-  pdfDoc = null;
-  resultBlobs = [];
-  dropZone.style.display = 'block';
-  previewArea.style.display = 'none';
-  controls.style.display = 'none';
-  actionRow.style.display = 'none';
-  status.style.display = 'none';
-  progressBar.style.display = 'none';
-  downloadBtn.style.display = 'none';
-  fileInput.value = '';
-});
-
-processBtn.addEventListener('click', async () => {
-  if (!pdfDoc) return;
-  processBtn.disabled = true;
-  progressBar.style.display = 'block';
-  resultBlobs = [];
-
-  if (actionSelect.value === 'toImages') {
-    await extractImages();
-  } else {
-    await compressPDF();
-  }
-  processBtn.disabled = false;
-});
-
-async function extractImages() {
-  const format = document.getElementById('imgFormat').value;
-  const scale = parseFloat(document.getElementById('scale').value);
-  const pages = pdfDoc.numPages;
-
-  Tools.setStatus(status, 'Extracting pages...', '');
-
-  for (let i = 1; i <= pages; i++) {
-    const page = await pdfDoc.getPage(i);
-    const viewport = page.getViewport({ scale });
-    const canvas = document.createElement('canvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-
-    const mimeType = format === 'jpeg' ? 'image/jpeg' : 'image/png';
-    const quality = format === 'jpeg' ? 0.92 : undefined;
-
-    await new Promise(resolve => {
-      canvas.toBlob(blob => {
-        resultBlobs.push({ blob, name: `page_${i}.${format}` });
-        resolve();
-      }, mimeType, quality);
+  downloadBtn.addEventListener('click', function() {
+    resultBlobs.forEach(function(item, i) {
+      setTimeout(function() {
+        Tools.downloadBlob(item.blob, item.name);
+      }, i * 300);
     });
-
-    const pct = Math.floor((i / pages) * 100);
-    progressFill.style.width = pct + '%';
-    Tools.setStatus(status, `Extracted page ${i}/${pages}`, '');
-  }
-
-  Tools.setStatus(status, `Done! ${pages} pages extracted.`, 'done');
-  progressFill.style.width = '100%';
-  downloadBtn.style.display = 'inline-block';
-}
-
-async function compressPDF() {
-  Tools.setStatus(status, 'Reducing image quality across all pages...', '');
-  const pages = pdfDoc.numPages;
-  const quality = parseFloat(document.getElementById('pdfQuality').value);
-
-  for (let i = 1; i <= pages; i++) {
-    const page = await pdfDoc.getPage(i);
-    const viewport = page.getViewport({ scale: 1.5 });
-    const canvas = document.createElement('canvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-
-    const blob = await new Promise(resolve => {
-      canvas.toBlob(resolve, 'image/jpeg', quality);
-    });
-
-    resultBlobs.push({ blob, name: `compressed_page_${i}.jpg` });
-
-    const pct = Math.floor((i / pages) * 100);
-    progressFill.style.width = pct + '%';
-  }
-
-  Tools.setStatus(status, `Done! ${pages} compressed images ready.`, 'done');
-  progressFill.style.width = '100%';
-  downloadBtn.style.display = 'inline-block';
-}
-
-downloadBtn.addEventListener('click', () => {
-  resultBlobs.forEach((item, i) => {
-    setTimeout(() => {
-      Tools.downloadBlob(item.blob, item.name);
-    }, i * 300);
   });
-});
+})();
 </script>
 
 </body>

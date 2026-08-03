@@ -64,136 +64,157 @@
 <script src="../../assets/tools.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
 <script>
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const previewArea = document.getElementById('previewArea');
-const videoPreview = document.getElementById('videoPreview');
-const controls = document.getElementById('controls');
-const actionRow = document.getElementById('actionRow');
-const convertBtn = document.getElementById('convertBtn');
-const resetBtn = document.getElementById('resetBtn');
-const status = document.getElementById('status');
-const fileInfo = document.getElementById('fileInfo');
-const progressBar = document.getElementById('progressBar');
-const progressFill = document.getElementById('progressFill');
+(function(){
+  var dropZone = document.getElementById('dropZone');
+  var fileInput = document.getElementById('fileInput');
+  var previewArea = document.getElementById('previewArea');
+  var videoPreview = document.getElementById('videoPreview');
+  var controls = document.getElementById('controls');
+  var actionRow = document.getElementById('actionRow');
+  var convertBtn = document.getElementById('convertBtn');
+  var resetBtn = document.getElementById('resetBtn');
+  var statusEl = document.getElementById('status');
+  var fileInfo = document.getElementById('fileInfo');
+  var progressBar = document.getElementById('progressBar');
+  var progressFill = document.getElementById('progressFill');
 
-let currentFile = null;
+  var currentFile = null;
 
-Tools.setupDropZone(dropZone, handleFile);
-fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+  Tools.setupDropZone(dropZone, handleFile);
+  fileInput.addEventListener('change', function(e) { if (e.target.files[0]) handleFile(e.target.files[0]); });
 
-function handleFile(file) {
-  currentFile = file;
-  videoPreview.src = URL.createObjectURL(file);
-  Tools.showPreview(previewArea);
-  controls.style.display = 'block';
-  actionRow.style.display = 'flex';
-  dropZone.style.display = 'none';
-  status.style.display = 'none';
-  fileInfo.textContent = `File: ${file.name} (${Tools.formatSize(file.size)})`;
-}
+  function handleFile(file) {
+    currentFile = file;
+    videoPreview.src = URL.createObjectURL(file);
+    previewArea.style.display = 'block';
+    controls.style.display = 'block';
+    actionRow.style.display = 'flex';
+    dropZone.style.display = 'none';
+    statusEl.style.display = 'none';
+    progressBar.style.display = 'none';
+    fileInfo.textContent = 'File: ' + file.name + ' (' + Tools.formatSize(file.size) + ')';
+  }
 
-resetBtn.addEventListener('click', () => {
-  currentFile = null;
-  dropZone.style.display = 'block';
-  previewArea.style.display = 'none';
-  controls.style.display = 'none';
-  actionRow.style.display = 'none';
-  status.style.display = 'none';
-  progressBar.style.display = 'none';
-  videoPreview.src = '';
-  fileInput.value = '';
-});
+  resetBtn.addEventListener('click', function() {
+    currentFile = null;
+    dropZone.style.display = 'block';
+    previewArea.style.display = 'none';
+    controls.style.display = 'none';
+    actionRow.style.display = 'none';
+    statusEl.style.display = 'none';
+    progressBar.style.display = 'none';
+    videoPreview.src = '';
+    fileInput.value = '';
+  });
 
-convertBtn.addEventListener('click', async () => {
-  if (!currentFile) return;
-  convertBtn.disabled = true;
-  progressBar.style.display = 'block';
-  Tools.setStatus(status, 'Loading video...', '');
-  progressFill.style.width = '5%';
+  function seekVideo(video, time) {
+    return new Promise(function(resolve) {
+      function onSeeked() {
+        video.removeEventListener('seeked', onSeeked);
+        resolve();
+      }
+      video.addEventListener('seeked', onSeeked);
+      video.currentTime = time;
+    });
+  }
 
-  try {
-    const video = document.createElement('video');
-    video.muted = true;
-    video.preload = 'auto';
-    await new Promise((resolve, reject) => {
-      video.onloadeddata = resolve;
-      video.onerror = reject;
+  convertBtn.addEventListener('click', async function() {
+    if (!currentFile) return;
+    if (typeof GIF === 'undefined') {
+      Tools.setStatus(statusEl, 'Error: GIF encoder not loaded. Check your internet connection.', 'error');
+      return;
+    }
+    convertBtn.disabled = true;
+    progressBar.style.display = 'block';
+    Tools.setStatus(statusEl, 'Loading video...', '');
+    progressFill.style.width = '5%';
+
+    try {
+      var video = document.createElement('video');
+      video.muted = true;
+      video.preload = 'auto';
       video.src = videoPreview.src;
-    });
 
-    const startTime = parseFloat(document.getElementById('startTime').value) || 0;
-    const duration = Math.min(parseFloat(document.getElementById('duration').value) || 3, 10);
-    const targetWidth = parseInt(document.getElementById('width').value);
-    const fps = parseInt(document.getElementById('fps').value);
-    const scale = targetWidth / video.videoWidth;
-    const targetHeight = Math.round(video.videoHeight * scale);
+      await new Promise(function(resolve, reject) {
+        video.onloadeddata = resolve;
+        video.onerror = reject;
+      });
 
-    // Create canvas for frame capture
-    const canvas = document.createElement('canvas');
-    canvas.width = targetWidth;
-    canvas.height = targetHeight;
-    const ctx = canvas.getContext('2d');
+      var startTime = parseFloat(document.getElementById('startTime').value) || 0;
+      var duration = Math.min(parseFloat(document.getElementById('duration').value) || 3, 10);
+      var targetWidth = parseInt(document.getElementById('width').value);
+      var fps = parseInt(document.getElementById('fps').value);
+      var scale = targetWidth / video.videoWidth;
+      var targetHeight = Math.round(video.videoHeight * scale);
 
-    // Create GIF encoder
-    const gif = new GIF({
-      workers: 2,
-      quality: 10,
-      width: targetWidth,
-      height: targetHeight,
-      workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'
-    });
+      var canvas = document.createElement('canvas');
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      var ctx = canvas.getContext('2d');
 
-    gif.on('progress', p => {
-      const pct = Math.floor(p * 100);
-      progressFill.style.width = (50 + pct * 0.5) + '%';
-      Tools.setStatus(status, `Encoding GIF... ${pct}%`, '');
-    });
+      var gif = new GIF({
+        workers: 2,
+        quality: 10,
+        width: targetWidth,
+        height: targetHeight,
+        workerScript: 'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'
+      });
 
-    gif.on('finished', blob => {
-      const name = currentFile.name.replace(/\.[^.]+$/, '.gif');
-      Tools.downloadBlob(blob, name);
-      Tools.setStatus(status, `Done! GIF size: ${Tools.formatSize(blob.size)}`, 'done');
-      progressFill.style.width = '100%';
-      convertBtn.disabled = false;
-    });
+      gif.on('progress', function(p) {
+        var pct = Math.floor(p * 100);
+        progressFill.style.width = (50 + pct * 0.5) + '%';
+        Tools.setStatus(statusEl, 'Encoding GIF... ' + pct + '%', '');
+      });
 
-    // Seek to start
-    video.currentTime = startTime;
-    await new Promise(r => { video.onseeked = r; });
+      gif.on('finished', function(blob) {
+        var name = currentFile.name.replace(/\.[^.]+$/, '.gif');
+        Tools.downloadBlob(blob, name);
+        Tools.setStatus(statusEl, 'Done! GIF size: ' + Tools.formatSize(blob.size), 'done');
+        progressFill.style.width = '100%';
+        convertBtn.disabled = false;
+      });
 
-    // Capture frames
-    const totalFrames = Math.ceil(duration * fps);
-    const frameInterval = 1 / fps;
-    let frame = 0;
+      await seekVideo(video, startTime);
 
-    Tools.setStatus(status, 'Capturing frames...', '');
+      var totalFrames = Math.ceil(duration * fps);
+      var frameInterval = 1 / fps;
+      var frame = 0;
 
-    function captureFrame() {
-      if (frame >= totalFrames || video.currentTime >= startTime + duration) {
-        Tools.setStatus(status, `Captured ${frame} frames. Encoding GIF...`, '');
-        progressFill.style.width = '50%';
-        gif.render();
-        return;
+      Tools.setStatus(statusEl, 'Capturing frames...', '');
+
+      async function captureFrame() {
+        if (frame >= totalFrames || video.currentTime >= startTime + duration) {
+          Tools.setStatus(statusEl, 'Captured ' + frame + ' frames. Encoding GIF...', '');
+          progressFill.style.width = '50%';
+          gif.render();
+          return;
+        }
+
+        ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
+        gif.addFrame(ctx, { copy: true, delay: 1000 / fps });
+
+        frame++;
+        var pct = Math.floor((frame / totalFrames) * 45);
+        progressFill.style.width = pct + '%';
+
+        var nextTime = video.currentTime + frameInterval;
+        if (nextTime >= startTime + duration) {
+          Tools.setStatus(statusEl, 'Captured ' + frame + ' frames. Encoding GIF...', '');
+          progressFill.style.width = '50%';
+          gif.render();
+          return;
+        }
+        await seekVideo(video, nextTime);
+        requestAnimationFrame(captureFrame);
       }
 
-      ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
-      gif.addFrame(ctx, { copy: true, delay: 1000 / fps });
-
-      frame++;
-      const pct = Math.floor((frame / totalFrames) * 45);
-      progressFill.style.width = pct + '%';
-
-      video.currentTime += frameInterval;
-      video.onseeked = () => requestAnimationFrame(captureFrame);
+      captureFrame();
+    } catch(err) {
+      Tools.setStatus(statusEl, 'Error: ' + err.message, 'error');
+      convertBtn.disabled = false;
     }
-
-    captureFrame();
-  } catch(err) {
-    Tools.setStatus(status, 'Error: ' + err.message, 'error');
-    convertBtn.disabled = false;
-  }
-});
+  });
+})();
 </script>
 
 </body>
