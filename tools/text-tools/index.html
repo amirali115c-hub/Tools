@@ -4,133 +4,280 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Text Tools | Word Counter, JSON Formatter, Encoders</title>
-  <meta name="description" content="Free text tools: word counter, JSON formatter, Base64 encoder, URL encoder, hash generator, case converter.">
+  <meta name="description" content="Free text tools: word counter, JSON formatter, Base64, URL encoder, hash, case converter, regex, diff, password generator. All in browser.">
   <link rel="stylesheet" href="../../assets/style.css">
+  <style>
+    .tool-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
+    .tool-tabs button{padding:8px 14px;border-radius:8px;font-size:.85rem;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;transition:.15s}
+    .tool-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .tool-tabs button:hover:not(.active){border-color:var(--accent)}
+    .tool-section{display:none}
+    .tool-section.active{display:block}
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin:12px 0}
+    .stat-box{background:var(--bg);padding:14px;border-radius:8px;text-align:center;border:1px solid var(--border)}
+    .stat-box .stat-val{font-size:1.4rem;font-weight:700;color:var(--accent)}
+    .stat-box .stat-label{color:var(--text2);font-size:.75rem;margin-top:4px}
+    .input-row{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+    .input-row input,.input-row select{flex:1}
+    .result-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:monospace;font-size:.85rem;word-break:break-all;margin:8px 0;white-space:pre-wrap;max-height:300px;overflow:auto}
+    textarea{width:100%;min-height:120px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-size:.9rem;resize:vertical;margin-bottom:12px;font-family:inherit}
+    textarea.mono{font-family:monospace;font-size:.85rem}
+    .btn-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+    .btn-row .btn{flex:0 0 auto}
+    .hash-item{background:var(--bg);padding:10px 12px;border-radius:6px;margin-bottom:6px;font-family:monospace;font-size:.8rem;word-break:break-all;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+    .hash-item .hash-label{font-weight:600;color:var(--accent);min-width:80px}
+    .hash-item .hash-val{flex:1;margin:0 8px}
+    .hash-item .hash-copy{cursor:pointer;color:var(--accent);font-size:.75rem}
+    .case-btns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+    .case-btns button{padding:6px 12px;border-radius:6px;font-size:.8rem;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer}
+    .case-btns button:hover{border-color:var(--accent)}
+    .diff-container{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .diff-container textarea{min-height:200px}
+    .diff-result{max-height:300px;overflow:auto;font-family:monospace;font-size:.8rem;line-height:1.5}
+    .diff-add{background:rgba(34,197,94,.15);color:#22c55e}
+    .diff-del{background:rgba(239,68,68,.15);color:#ef4444}
+    .diff-line{padding:2px 4px;border-radius:2px}
+    .lorem-opts{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+    .lorem-opts select,.lorem-opts input{padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text)}
+    .pw-opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px}
+    .pw-opts label{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--text2);cursor:pointer}
+    .pw-strength{height:4px;border-radius:2px;margin:8px 0;transition:.3s}
+    .pw-strength.weak{background:#ef4444;width:33%}
+    .pw-strength.medium{background:#f59e0b;width:66%}
+    .pw-strength.strong{background:#22c55e;width:100%}
+  </style>
 </head>
 <body>
 <div class="container">
   <div class="tool-page">
     <a href="../../" class="back-link">← Back to Tools</a>
     <h1>Text Tools</h1>
-    <p class="subtitle">Word counter, JSON formatter, encoders, and more.</p>
-    <div class="tool-area" style="display:block">
-      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px">
-        <button class="btn tool-tab active" data-tool="word-counter">Word Counter</button>
-        <button class="btn btn-secondary tool-tab" data-tool="json-formatter">JSON Formatter</button>
-        <button class="btn btn-secondary tool-tab" data-tool="base64">Base64</button>
-        <button class="btn btn-secondary tool-tab" data-tool="url-encoder">URL Encoder</button>
-        <button class="btn btn-secondary tool-tab" data-tool="hash-generator">Hash Generator</button>
-        <button class="btn btn-secondary tool-tab" data-tool="case-converter">Case Converter</button>
-      </div>
+    <p class="subtitle">Word counter, JSON formatter, encoders, regex, diff, password generator. All in browser.</p>
 
-      <div id="tool-word-counter" class="tool-section">
-        <textarea id="wcInput" style="width:100%;min-height:150px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-size:.9rem;resize:vertical;margin-bottom:16px" placeholder="Paste or type text here..."></textarea>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px">
-          <div style="background:var(--bg);padding:16px;border-radius:8px;text-align:center"><div style="font-size:1.5rem;font-weight:700" id="wcWords">0</div><div style="color:var(--text2);font-size:.8rem">Words</div></div>
-          <div style="background:var(--bg);padding:16px;border-radius:8px;text-align:center"><div style="font-size:1.5rem;font-weight:700" id="wcChars">0</div><div style="color:var(--text2);font-size:.8rem">Characters</div></div>
-          <div style="background:var(--bg);padding:16px;border-radius:8px;text-align:center"><div style="font-size:1.5rem;font-weight:700" id="wcSentences">0</div><div style="color:var(--text2);font-size:.8rem">Sentences</div></div>
-          <div style="background:var(--bg);padding:16px;border-radius:8px;text-align:center"><div style="font-size:1.5rem;font-weight:700" id="wcParagraphs">0</div><div style="color:var(--text2);font-size:.8rem">Paragraphs</div></div>
-          <div style="background:var(--bg);padding:16px;border-radius:8px;text-align:center"><div style="font-size:1.5rem;font-weight:700" id="wcReadTime">0m</div><div style="color:var(--text2);font-size:.8rem">Read Time</div></div>
+    <div class="tool-tabs" id="toolTabs">
+      <button class="active" data-tool="word-counter">Word Counter</button>
+      <button data-tool="json-formatter">JSON</button>
+      <button data-tool="base64">Base64</button>
+      <button data-tool="url-encoder">URL Encoder</button>
+      <button data-tool="hash">Hash</button>
+      <button data-tool="case">Case</button>
+      <button data-tool="regex">Regex</button>
+      <button data-tool="diff">Diff</button>
+      <button data-tool="lorem">Lorem</button>
+      <button data-tool="password">Password</button>
+      <button data-tool="slug">Slug/UUID</button>
+    </div>
+
+    <div class="tool-area">
+
+      <div id="tool-word-counter" class="tool-section active">
+        <textarea id="wcInput" placeholder="Paste or type text here..."></textarea>
+        <div class="stat-grid" id="wcStats">
+          <div class="stat-box"><div class="stat-val" id="wcWords">0</div><div class="stat-label">Words</div></div>
+          <div class="stat-box"><div class="stat-val" id="wcChars">0</div><div class="stat-label">Characters</div></div>
+          <div class="stat-box"><div class="stat-val" id="wcCharsNoSpace">0</div><div class="stat-label">No Spaces</div></div>
+          <div class="stat-box"><div class="stat-val" id="wcSentences">0</div><div class="stat-label">Sentences</div></div>
+          <div class="stat-box"><div class="stat-val" id="wcParagraphs">0</div><div class="stat-label">Paragraphs</div></div>
+          <div class="stat-box"><div class="stat-val" id="wcLines">0</div><div class="stat-label">Lines</div></div>
+          <div class="stat-box"><div class="stat-val" id="wcReadTime">0m</div><div class="stat-label">Read Time</div></div>
+          <div class="stat-box"><div class="stat-val" id="wcSpeakTime">0m</div><div class="stat-label">Speak Time</div></div>
         </div>
       </div>
 
-      <div id="tool-json-formatter" class="tool-section" style="display:none">
-        <textarea id="jsonInput" style="width:100%;min-height:200px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical;margin-bottom:16px" placeholder='Paste JSON here...'></textarea>
-        <div style="display:flex;gap:12px;margin-bottom:16px">
+      <div id="tool-json-formatter" class="tool-section">
+        <textarea id="jsonInput" class="mono" placeholder='Paste JSON here...'></textarea>
+        <div class="btn-row">
           <button class="btn" id="jsonFormatBtn">Format</button>
           <button class="btn btn-secondary" id="jsonMinifyBtn">Minify</button>
+          <button class="btn btn-secondary" id="jsonValidateBtn">Validate</button>
           <button class="btn btn-secondary" id="jsonCopyBtn">Copy</button>
         </div>
         <div class="status" id="jsonStatus"></div>
       </div>
 
-      <div id="tool-base64" class="tool-section" style="display:none">
-        <div style="display:flex;gap:12px;margin-bottom:16px">
+      <div id="tool-base64" class="tool-section">
+        <div class="btn-row">
           <button class="btn b64dir active" data-dir="encode">Encode</button>
           <button class="btn btn-secondary b64dir" data-dir="decode">Decode</button>
         </div>
-        <textarea id="b64Input" style="width:100%;min-height:120px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical;margin-bottom:16px" placeholder="Enter text to encode..."></textarea>
-        <button class="btn" id="b64Btn" style="margin-bottom:16px">Process</button>
-        <textarea id="b64Output" readonly style="width:100%;min-height:120px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical" placeholder="Result..."></textarea>
+        <textarea id="b64Input" class="mono" placeholder="Enter text to encode..."></textarea>
+        <button class="btn" id="b64Btn" style="margin-bottom:12px">Process</button>
+        <textarea id="b64Output" class="mono" readonly placeholder="Result..."></textarea>
       </div>
 
-      <div id="tool-url-encoder" class="tool-section" style="display:none">
-        <div style="display:flex;gap:12px;margin-bottom:16px">
+      <div id="tool-url-encoder" class="tool-section">
+        <div class="btn-row">
           <button class="btn urlenc active" data-dir="encode">Encode</button>
           <button class="btn btn-secondary urlenc" data-dir="decode">Decode</button>
         </div>
-        <textarea id="urlInput" style="width:100%;min-height:120px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical;margin-bottom:16px" placeholder="Enter URL or text..."></textarea>
-        <button class="btn" id="urlBtn" style="margin-bottom:16px">Process</button>
-        <textarea id="urlOutput" readonly style="width:100%;min-height:120px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical" placeholder="Result..."></textarea>
+        <textarea id="urlInput" class="mono" placeholder="Enter URL or text..."></textarea>
+        <button class="btn" id="urlBtn" style="margin-bottom:12px">Process</button>
+        <textarea id="urlOutput" class="mono" readonly placeholder="Result..."></textarea>
       </div>
 
-      <div id="tool-hash-generator" class="tool-section" style="display:none">
-        <textarea id="hashInput" style="width:100%;min-height:120px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical;margin-bottom:16px" placeholder="Enter text to hash..."></textarea>
-        <button class="btn" id="hashBtn" style="margin-bottom:16px">Generate Hashes</button>
+      <div id="tool-hash" class="tool-section">
+        <textarea id="hashInput" class="mono" placeholder="Enter text to hash..."></textarea>
+        <button class="btn" id="hashBtn" style="margin-bottom:12px">Generate Hashes</button>
         <div id="hashResults"></div>
       </div>
 
-      <div id="tool-case-converter" class="tool-section" style="display:none">
-        <textarea id="caseInput" style="width:100%;min-height:150px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-size:.9rem;resize:vertical;margin-bottom:16px" placeholder="Enter text..."></textarea>
-        <div style="display:flex;flex-wrap:wrap;gap:8px">
-          <button class="btn casebtn" data-case="upper">UPPERCASE</button>
-          <button class="btn btn-secondary casebtn" data-case="lower">lowercase</button>
-          <button class="btn btn-secondary casebtn" data-case="title">Title Case</button>
-          <button class="btn btn-secondary casebtn" data-case="sentence">Sentence case</button>
-          <button class="btn btn-secondary casebtn" data-case="reverse">ReVeRsE</button>
+      <div id="tool-case" class="tool-section">
+        <textarea id="caseInput" placeholder="Enter text..."></textarea>
+        <div class="case-btns" id="caseBtns">
+          <button data-case="upper">UPPERCASE</button>
+          <button data-case="lower">lowercase</button>
+          <button data-case="title">Title Case</button>
+          <button data-case="sentence">Sentence case</button>
+          <button data-case="capitalize">Capitalize Words</button>
+          <button data-case="reverse">ReVeRsE</button>
+          <button data-case="slug">slug-case</button>
+          <button data-case="snake">snake_case</button>
+          <button data-case="camel">camelCase</button>
+          <button data-case="pascal">PascalCase</button>
         </div>
-        <textarea id="caseOutput" readonly style="width:100%;min-height:150px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-size:.9rem;resize:vertical;margin-top:16px" placeholder="Result..."></textarea>
+        <textarea id="caseOutput" readonly placeholder="Result..."></textarea>
       </div>
+
+      <div id="tool-regex" class="tool-section">
+        <div class="input-row">
+          <input type="text" id="regexPattern" placeholder="Regex pattern..." style="font-family:monospace">
+          <input type="text" id="regexFlags" value="g" placeholder="Flags" style="width:60px;font-family:monospace">
+        </div>
+        <textarea id="regexInput" placeholder="Test string..."></textarea>
+        <button class="btn" id="regexBtn" style="margin-bottom:12px">Test</button>
+        <div class="status" id="regexStatus"></div>
+        <div class="result-box" id="regexResult" style="display:none"></div>
+      </div>
+
+      <div id="tool-diff" class="tool-section">
+        <div class="diff-container">
+          <div>
+            <label style="font-size:.85rem;color:var(--text2);margin-bottom:4px;display:block">Original</label>
+            <textarea id="diffLeft" placeholder="Original text..."></textarea>
+          </div>
+          <div>
+            <label style="font-size:.85rem;color:var(--text2);margin-bottom:4px;display:block">Modified</label>
+            <textarea id="diffRight" placeholder="Modified text..."></textarea>
+          </div>
+        </div>
+        <button class="btn" id="diffBtn" style="margin-bottom:12px">Compare</button>
+        <div class="diff-result result-box" id="diffResult" style="display:none"></div>
+      </div>
+
+      <div id="tool-lorem" class="tool-section">
+        <div class="lorem-opts">
+          <select id="loremType">
+            <option value="paragraphs">Paragraphs</option>
+            <option value="sentences">Sentences</option>
+            <option value="words">Words</option>
+          </select>
+          <input type="number" id="loremCount" value="3" min="1" max="100" style="width:80px">
+          <button class="btn" id="loremBtn">Generate</button>
+          <button class="btn btn-secondary" id="loremCopyBtn">Copy</button>
+        </div>
+        <div class="result-box" id="loremResult" style="min-height:100px"></div>
+      </div>
+
+      <div id="tool-password" class="tool-section">
+        <div class="pw-opts">
+          <label><input type="checkbox" id="pwUpper" checked> A-Z</label>
+          <label><input type="checkbox" id="pwLower" checked> a-z</label>
+          <label><input type="checkbox" id="pwDigits" checked> 0-9</label>
+          <label><input type="checkbox" id="pwSymbols" checked> !@#$</label>
+        </div>
+        <div class="input-row">
+          <label style="min-width:70px;font-size:.85rem;color:var(--text2)">Length</label>
+          <input type="range" id="pwLength" min="4" max="64" value="16">
+          <span id="pwLengthVal" style="min-width:30px;text-align:center;font-weight:600;color:var(--accent)">16</span>
+        </div>
+        <div class="pw-strength" id="pwStrength"></div>
+        <button class="btn" id="pwBtn" style="margin-bottom:12px">Generate</button>
+        <div class="input-row">
+          <input type="text" id="pwOutput" readonly style="font-family:monospace;font-size:1rem;flex:1">
+          <button class="btn btn-secondary" id="pwCopyBtn">Copy</button>
+        </div>
+      </div>
+
+      <div id="tool-slug" class="tool-section">
+        <div class="btn-row">
+          <button class="btn slugtab active" data-type="slug">Slug Generator</button>
+          <button class="btn btn-secondary slugtab" data-type="uuid">UUID Generator</button>
+        </div>
+        <div id="slugSection">
+          <textarea id="slugInput" placeholder="Enter title or text..."></textarea>
+          <button class="btn" id="slugBtn" style="margin-bottom:12px">Generate Slug</button>
+          <div class="result-box" id="slugResult"></div>
+        </div>
+        <div id="uuidSection" style="display:none">
+          <div class="input-row">
+            <label style="min-width:70px;font-size:.85rem;color:var(--text2)">Count</label>
+            <input type="number" id="uuidCount" value="5" min="1" max="100" style="width:80px">
+            <button class="btn" id="uuidBtn">Generate</button>
+            <button class="btn btn-secondary" id="uuidCopyBtn">Copy All</button>
+          </div>
+          <div class="result-box" id="uuidResult"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 <script src="../../assets/tools.js"></script>
 <script>
 (function(){
-  document.querySelectorAll('.tool-tab').forEach(function(tab){
-    tab.addEventListener('click',function(){
-      document.querySelectorAll('.tool-tab').forEach(function(t){t.classList.remove('active');t.classList.add('btn-secondary');});
-      tab.classList.add('active');tab.classList.remove('btn-secondary');
-      document.querySelectorAll('.tool-section').forEach(function(s){s.style.display='none';});
-      document.getElementById('tool-'+tab.dataset.tool).style.display='block';
-    });
+  var toolTabs=document.getElementById('toolTabs');
+  toolTabs.addEventListener('click',function(e){
+    var btn=e.target.closest('button');if(!btn)return;
+    toolTabs.querySelectorAll('button').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    document.querySelectorAll('.tool-section').forEach(function(s){s.classList.remove('active');});
+    var sec=document.getElementById('tool-'+btn.dataset.tool);
+    if(sec)sec.classList.add('active');
   });
 
-  // Word Counter
   var wcInput=document.getElementById('wcInput');
   wcInput.addEventListener('input',function(){
-    var t=wcInput.value;var words=t.trim()?t.trim().split(/\s+/).length:0;
+    var t=wcInput.value;
+    var words=t.trim()?t.trim().split(/\s+/).length:0;
+    var chars=t.length;
+    var charsNoSpace=t.replace(/\s/g,'').length;
+    var sentences=t.split(/[.!?]+/).filter(function(s){return s.trim();}).length;
+    var paragraphs=t.split(/\n\s*\n/).filter(function(s){return s.trim();}).length||t.trim()?1:0;
+    var lines=t.split('\n').length;
     document.getElementById('wcWords').textContent=words;
-    document.getElementById('wcChars').textContent=t.length;
-    document.getElementById('wcSentences').textContent=t.split(/[.!?]+/).filter(function(s){return s.trim();}).length;
-    document.getElementById('wcParagraphs').textContent=t.split(/\n\s*\n/).filter(function(s){return s.trim();}).length||t.trim()?1:0;
+    document.getElementById('wcChars').textContent=chars;
+    document.getElementById('wcCharsNoSpace').textContent=charsNoSpace;
+    document.getElementById('wcSentences').textContent=sentences;
+    document.getElementById('wcParagraphs').textContent=paragraphs;
+    document.getElementById('wcLines').textContent=lines;
     document.getElementById('wcReadTime').textContent=Math.ceil(words/200)+'m';
+    document.getElementById('wcSpeakTime').textContent=Math.ceil(words/130)+'m';
   });
 
-  // JSON Formatter
   document.getElementById('jsonFormatBtn').addEventListener('click',function(){
-    try{var d=JSON.parse(document.getElementById('jsonInput').value);document.getElementById('jsonInput').value=JSON.stringify(d,null,2);document.getElementById('jsonStatus').textContent='Formatted!';document.getElementById('jsonStatus').className='status done';}
-    catch(e){document.getElementById('jsonStatus').textContent='Invalid JSON: '+e.message;document.getElementById('jsonStatus').className='status error';}
+    try{var d=JSON.parse(document.getElementById('jsonInput').value);document.getElementById('jsonInput').value=JSON.stringify(d,null,2);Tools.setStatus(document.getElementById('jsonStatus'),'Formatted!','done');}
+    catch(e){Tools.setStatus(document.getElementById('jsonStatus'),'Invalid JSON: '+e.message,'error');}
   });
   document.getElementById('jsonMinifyBtn').addEventListener('click',function(){
-    try{var d=JSON.parse(document.getElementById('jsonInput').value);document.getElementById('jsonInput').value=JSON.stringify(d);document.getElementById('jsonStatus').textContent='Minified!';document.getElementById('jsonStatus').className='status done';}
-    catch(e){document.getElementById('jsonStatus').textContent='Invalid JSON: '+e.message;document.getElementById('jsonStatus').className='status error';}
+    try{var d=JSON.parse(document.getElementById('jsonInput').value);document.getElementById('jsonInput').value=JSON.stringify(d);Tools.setStatus(document.getElementById('jsonStatus'),'Minified!','done');}
+    catch(e){Tools.setStatus(document.getElementById('jsonStatus'),'Invalid JSON: '+e.message,'error');}
+  });
+  document.getElementById('jsonValidateBtn').addEventListener('click',function(){
+    try{JSON.parse(document.getElementById('jsonInput').value);Tools.setStatus(document.getElementById('jsonStatus'),'Valid JSON','done');}
+    catch(e){Tools.setStatus(document.getElementById('jsonStatus'),'Invalid: '+e.message,'error');}
   });
   document.getElementById('jsonCopyBtn').addEventListener('click',function(){navigator.clipboard.writeText(document.getElementById('jsonInput').value);});
 
-  // Base64
   var b64Dir='encode';
   document.querySelectorAll('.b64dir').forEach(function(btn){btn.addEventListener('click',function(){
     document.querySelectorAll('.b64dir').forEach(function(b){b.classList.remove('active');b.classList.add('btn-secondary');});
     btn.classList.add('active');btn.classList.remove('btn-secondary');b64Dir=btn.dataset.dir;
-    document.getElementById('b64Input').placeholder=b64Dir==='encode'?'Enter text to encode...':'Enter Base64 to decode...';
   });});
   document.getElementById('b64Btn').addEventListener('click',function(){
     try{var r=b64Dir==='encode'?btoa(unescape(encodeURIComponent(document.getElementById('b64Input').value))):decodeURIComponent(escape(atob(document.getElementById('b64Input').value.trim())));document.getElementById('b64Output').value=r;}
     catch(e){document.getElementById('b64Output').value='Error: '+e.message;}
   });
 
-  // URL Encoder
   var urlDir='encode';
   document.querySelectorAll('.urlenc').forEach(function(btn){btn.addEventListener('click',function(){
     document.querySelectorAll('.urlenc').forEach(function(b){b.classList.remove('active');b.classList.add('btn-secondary');});
@@ -141,29 +288,162 @@
     catch(e){document.getElementById('urlOutput').value='Error: '+e.message;}
   });
 
-  // Hash Generator
   document.getElementById('hashBtn').addEventListener('click',async function(){
-    var text=document.getElementById('hashInput').value;var results=document.getElementById('hashResults');results.innerHTML='';
-    var algorithms=['SHA-1','SHA-256','SHA-384','SHA-512'];
-    for(var i=0;i<algorithms.length;i++){
-      var hash=await crypto.subtle.digest(algorithms[i],new TextEncoder().encode(text));
+    var text=document.getElementById('hashInput').value;
+    var results=document.getElementById('hashResults');results.innerHTML='';
+    var algos=['SHA-1','SHA-256','SHA-384','SHA-512'];
+    for(var i=0;i<algos.length;i++){
+      var hash=await crypto.subtle.digest(algos[i],new TextEncoder().encode(text));
       var hex=Array.from(new Uint8Array(hash)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
-      var div=document.createElement('div');div.style.cssText='background:var(--bg);padding:10px 12px;border-radius:6px;margin-bottom:8px;font-family:monospace;font-size:.8rem;word-break:break-all';
-      div.innerHTML='<strong>'+algorithms[i]+':</strong> '+hex;results.appendChild(div);
+      var div=document.createElement('div');div.className='hash-item';
+      div.innerHTML='<span class="hash-label">'+algos[i]+'</span><span class="hash-val">'+hex+'</span><span class="hash-copy" data-hash="'+hex+'">Copy</span>';
+      results.appendChild(div);
     }
+    results.querySelectorAll('.hash-copy').forEach(function(btn){
+      btn.addEventListener('click',function(){navigator.clipboard.writeText(this.dataset.hash);this.textContent='Copied!';var self=this;setTimeout(function(){self.textContent='Copy';},1000);});
+    });
   });
 
-  // Case Converter
-  document.querySelectorAll('.casebtn').forEach(function(btn){btn.addEventListener('click',function(){
+  document.querySelectorAll('.case-btns button').forEach(function(btn){btn.addEventListener('click',function(){
     var text=document.getElementById('caseInput').value;var out='';
     switch(btn.dataset.case){
-      case'upper':out=text.toUpperCase();break;case'lower':out=text.toLowerCase();break;
+      case'upper':out=text.toUpperCase();break;
+      case'lower':out=text.toLowerCase();break;
       case'title':out=text.replace(/\w\S*/g,function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();});break;
       case'sentence':out=text.replace(/(^\s*|[.!?]\s+)([a-z])/g,function(m,p,c){return p+c.toUpperCase();});break;
+      case'capitalize':out=text.replace(/\b\w/g,function(c){return c.toUpperCase();});break;
       case'reverse':out=text.split('').reverse().join('');break;
+      case'slug':out=text.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');break;
+      case'snake':out=text.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');break;
+      case'camel':out=text.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g,function(m,c){return c.toUpperCase();}).replace(/^[A-Z]/,function(c){return c.toLowerCase();});break;
+      case'pascal':out=text.toLowerCase().replace(/[^a-zA-Z0-9]+(.)/g,function(m,c){return c.toUpperCase();}).replace(/^(.)/,function(m,c){return c.toUpperCase();});break;
     }
     document.getElementById('caseOutput').value=out;
   });});
+
+  document.getElementById('regexBtn').addEventListener('click',function(){
+    var pattern=document.getElementById('regexPattern').value;
+    var flags=document.getElementById('regexFlags').value;
+    var text=document.getElementById('regexInput').value;
+    var result=document.getElementById('regexResult');
+    var status=document.getElementById('regexStatus');
+    if(!pattern){Tools.setStatus(status,'Enter a pattern','error');return;}
+    try{
+      var re=new RegExp(pattern,flags);
+      var matches=text.match(re);
+      if(matches){
+        Tools.setStatus(status,matches.length+' match(es) found','done');
+        var html='Matches:\n';
+        matches.forEach(function(m,i){html+=(i+1)+'. '+m+'\n';});
+        result.textContent=html;
+      }else{
+        Tools.setStatus(status,'No matches','done');
+        result.textContent='No matches found.';
+      }
+      result.style.display='block';
+    }catch(e){Tools.setStatus(status,'Invalid regex: '+e.message,'error');}
+  });
+
+  document.getElementById('diffBtn').addEventListener('click',function(){
+    var left=document.getElementById('diffLeft').value.split('\n');
+    var right=document.getElementById('diffRight').value.split('\n');
+    var result=document.getElementById('diffResult');
+    var html='';
+    var maxLen=Math.max(left.length,right.length);
+    for(var i=0;i<maxLen;i++){
+      var l=left[i]||'';
+      var r=right[i]||'';
+      if(l===r){html+='<div class="diff-line">  '+escHtml(l)+'</div>';}
+      else{
+        if(l)html+='<div class="diff-line diff-del">- '+escHtml(l)+'</div>';
+        if(r)html+='<div class="diff-line diff-add">+ '+escHtml(r)+'</div>';
+      }
+    }
+    result.innerHTML=html||'<div class="diff-line">No differences</div>';
+    result.style.display='block';
+  });
+
+  function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  var loremWords='lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim ad minim veniam quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur excepteur sint occaecat cupidatat non proident sunt in culpa qui officia deserunt mollit anim id est laborum'.split(' ');
+  function getLorem(type,count){
+    var result=[];
+    for(var i=0;i<count;i++){
+      if(type==='words'){
+        var len=10+Math.floor(Math.random()*20);
+        var w=[];for(var j=0;j<len;j++)w.push(loremWords[Math.floor(Math.random()*loremWords.length)]);
+        w[0]=w[0][0].toUpperCase()+w[0].slice(1);
+        result.push(w.join(' '));
+      }else if(type==='sentences'){
+        var len=5+Math.floor(Math.random()*10);
+        var s=[];for(var j=0;j<len;j++)s.push(loremWords[Math.floor(Math.random()*loremWords.length)]);
+        s[0]=s[0][0].toUpperCase()+s[0].slice(1);
+        result.push(s.join(' ')+'.');
+      }else{
+        var sentCount=4+Math.floor(Math.random()*6);
+        var sents=[];
+        for(var j=0;j<sentCount;j++){
+          var wLen=5+Math.floor(Math.random()*10);
+          var w=[];for(var k=0;k<wLen;k++)w.push(loremWords[Math.floor(Math.random()*loremWords.length)]);
+          w[0]=w[0][0].toUpperCase()+w[0].slice(1);
+          sents.push(w.join(' ')+'.');
+        }
+        result.push(sents.join(' '));
+      }
+    }
+    return type==='words'?result.join(' '):result.join(type==='sentences'?' ':'\n\n');
+  }
+  document.getElementById('loremBtn').addEventListener('click',function(){
+    var type=document.getElementById('loremType').value;
+    var count=parseInt(document.getElementById('loremCount').value)||3;
+    document.getElementById('loremResult').textContent=getLorem(type,count);
+  });
+  document.getElementById('loremCopyBtn').addEventListener('click',function(){navigator.clipboard.writeText(document.getElementById('loremResult').textContent);});
+
+  document.getElementById('pwLength').addEventListener('input',function(){document.getElementById('pwLengthVal').textContent=this.value;generatePassword();});
+  function generatePassword(){
+    var len=parseInt(document.getElementById('pwLength').value);
+    var chars='';
+    if(document.getElementById('pwUpper').checked)chars+='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    if(document.getElementById('pwLower').checked)chars+='abcdefghijklmnopqrstuvwxyz';
+    if(document.getElementById('pwDigits').checked)chars+='0123456789';
+    if(document.getElementById('pwSymbols').checked)chars+='!@#$%^&*()_+-=[]{}|;:,.<>?';
+    if(!chars)chars='abcdefghijklmnopqrstuvwxyz';
+    var pw='';
+    var arr=new Uint32Array(len);
+    crypto.getRandomValues(arr);
+    for(var i=0;i<len;i++)pw+=chars[arr[i]%chars.length];
+    document.getElementById('pwOutput').value=pw;
+    var strength=document.getElementById('pwStrength');
+    strength.className='pw-strength';
+    if(len>=16&&document.getElementById('pwUpper').checked&&document.getElementById('pwLower').checked&&document.getElementById('pwDigits').checked&&document.getElementById('pwSymbols').checked)strength.classList.add('strong');
+    else if(len>=10)strength.classList.add('medium');
+    else strength.classList.add('weak');
+  }
+  document.getElementById('pwBtn').addEventListener('click',generatePassword);
+  document.getElementById('pwCopyBtn').addEventListener('click',function(){navigator.clipboard.writeText(document.getElementById('pwOutput').value);});
+  generatePassword();
+
+  document.querySelectorAll('.slugtab').forEach(function(btn){btn.addEventListener('click',function(){
+    document.querySelectorAll('.slugtab').forEach(function(b){b.classList.remove('active');b.classList.add('btn-secondary');});
+    btn.classList.add('active');btn.classList.remove('btn-secondary');
+    document.getElementById('slugSection').style.display=btn.dataset.type==='slug'?'block':'none';
+    document.getElementById('uuidSection').style.display=btn.dataset.type==='uuid'?'block':'none';
+  });});
+
+  document.getElementById('slugBtn').addEventListener('click',function(){
+    var text=document.getElementById('slugInput').value;
+    var slug=text.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    document.getElementById('slugResult').textContent=slug;
+  });
+
+  function uuid(){return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){var r=Math.random()*16|0;return(c==='x'?r:r&0x3|0x8).toString(16);});}
+  document.getElementById('uuidBtn').addEventListener('click',function(){
+    var count=parseInt(document.getElementById('uuidCount').value)||5;
+    var uuids=[];for(var i=0;i<count;i++)uuids.push(uuid());
+    document.getElementById('uuidResult').textContent=uuids.join('\n');
+  });
+  document.getElementById('uuidCopyBtn').addEventListener('click',function(){navigator.clipboard.writeText(document.getElementById('uuidResult').textContent);});
 })();
 </script>
 </body>
