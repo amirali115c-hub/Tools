@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Compressor | Free, Private, Client-Side</title>
+  <meta name="description" content="Free image compressor. Reduce JPEG, PNG, WebP size up to 90%. Batch mode, target size, auto WebP. Everything runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+  <style>
+    .compare-wrap{position:relative;width:100%;overflow:hidden;border-radius:8px;user-select:none}
+    .compare-wrap img{display:block;width:100%}
+    .compare-slider{position:absolute;top:0;bottom:0;width:3px;background:#fff;cursor:ew-resize;z-index:2}
+    .compare-slider::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;background:#fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center}
+    .compare-clip{position:absolute;top:0;left:0;height:100%;overflow:hidden}
+    .compare-label{position:absolute;top:8px;padding:4px 10px;border-radius:6px;font-size:.75rem;font-weight:600;color:#fff;z-index:3}
+    .compare-label.before{left:8px;background:rgba(220,38,38,.8)}
+    .compare-label.after{right:8px;background:rgba(34,197,94,.8)}
+    .quality-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .quality-row input[type=range]{flex:1}
+    .quality-row .q-val{min-width:40px;text-align:center;font-weight:600;color:var(--accent)}
+    .target-size-row{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+    .target-size-row input[type=number]{flex:1}
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:12px 0}
+    .stat-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+    .stat-card .stat-val{font-size:1.3rem;font-weight:700;color:var(--accent)}
+    .stat-card .stat-label{font-size:.75rem;color:var(--text2);margin-top:4px}
+    .batch-list{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+    .batch-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.85rem}
+    .batch-item .batch-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .batch-item .batch-size{color:var(--text2);min-width:60px;text-align:right}
+    .batch-item .batch-ratio{color:#22c55e;font-weight:600;min-width:50px;text-align:right}
+    .batch-item .batch-remove{cursor:pointer;color:var(--red);padding:2px}
+    .batch-progress{width:100%;height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:4px}
+    .batch-progress-bar{height:100%;background:var(--accent);transition:width .3s}
+    .format-badges{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+    .format-badge{padding:4px 10px;border-radius:6px;font-size:.75rem;font-weight:600;background:var(--bg);border:1px solid var(--border);cursor:pointer;transition:.15s}
+    .format-badge.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .format-badge:hover{border-color:var(--accent)}
+    .preview-tabs{display:flex;gap:4px;margin-bottom:16px}
+    .preview-tabs button{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
+    .preview-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .preview-tabs button:hover:not(.active){border-color:var(--accent)}
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>Image Compressor</h1>
+    <p class="subtitle">Reduce image size without visible quality loss. Batch mode, target file size, auto WebP.</p>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="compress">Compress</button>
+      <button class="tab" data-tab="batch">Batch</button>
+      <button class="tab" data-tab="preview">Preview</button>
+    </div>
+
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop image(s) here</strong>
+        <p>or click to browse (JPG, PNG, WebP, GIF, BMP)</p>
+        <input type="file" id="fileInput" accept="image/*" multiple>
+      </div>
+
+      <div class="batch-list" id="batchList"></div>
+
+      <div class="controls" id="controls" style="display:none">
+        <div class="preview-tabs" id="modeTabs">
+          <button class="active" data-mode="quality">Quality Mode</button>
+          <button data-mode="target">Target Size</button>
+          <button data-mode="auto">Auto Optimize</button>
+        </div>
+
+        <div id="qualityMode">
+          <label>Quality</label>
+          <div class="quality-row">
+            <span style="font-size:.8rem;color:var(--text2)">10%</span>
+            <input type="range" id="quality" min="10" max="100" value="80">
+            <span class="q-val" id="qualityVal">80%</span>
+            <span style="font-size:.8rem;color:var(--text2)">100%</span>
+          </div>
+        </div>
+
+        <div id="targetMode" style="display:none">
+          <label>Target file size</label>
+          <div class="target-size-row">
+            <input type="number" id="targetSize" value="200" min="10" max="50000">
+            <select id="targetUnit" style="width:80px">
+              <option value="KB">KB</option>
+              <option value="MB">MB</option>
+            </select>
+          </div>
+          <div style="font-size:.8rem;color:var(--text2)">Binary search finds the best quality to hit your target.</div>
+        </div>
+
+        <div id="autoMode" style="display:none">
+          <div style="font-size:.85rem;color:var(--text2);margin-bottom:12px">Auto-converts to WebP and compresses to 80% quality. Best for web.</div>
+        </div>
+
+        <label>Output format</label>
+        <div class="format-badges" id="formatBadges">
+          <div class="format-badge active" data-format="auto">Auto</div>
+          <div class="format-badge" data-format="image/jpeg">JPEG</div>
+          <div class="format-badge" data-format="image/png">PNG</div>
+          <div class="format-badge" data-format="image/webp">WebP</div>
+        </div>
+
+        <label>Resize (optional)</label>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input type="number" id="maxWidth" placeholder="Max width" min="1" max="10000" style="flex:1">
+          <input type="number" id="maxHeight" placeholder="Max height" min="1" max="10000" style="flex:1">
+        </div>
+
+        <label style="display:flex;align-items:center;gap:8px;margin-bottom:16px;cursor:pointer">
+          <input type="checkbox" id="stripMeta" checked> Strip metadata (EXIF, ICC)
+        </label>
+
+        <button class="btn" id="compressBtn">Compress</button>
+      </div>
+
+      <div class="stat-grid" id="statGrid" style="display:none">
+        <div class="stat-card"><div class="stat-val" id="statOriginal">-</div><div class="stat-label">Original</div></div>
+        <div class="stat-card"><div class="stat-val" id="statCompressed">-</div><div class="stat-label">Compressed</div></div>
+        <div class="stat-card"><div class="stat-val" id="statSaved">-</div><div class="stat-label">Saved</div></div>
+        <div class="stat-card"><div class="stat-val" id="statRatio">-</div><div class="stat-label">Reduction</div></div>
+      </div>
+
+      <div id="resultArea" style="display:none">
+        <div class="compare-wrap" id="compareWrap">
+          <div class="compare-clip" id="compareClip">
+            <img id="afterImg">
+          </div>
+          <img id="beforeImg">
+          <div class="compare-slider" id="compareSlider"></div>
+          <div class="compare-label before">Before</div>
+          <div class="compare-label after">After</div>
+        </div>
+      </div>
+
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="downloadBtn">Download</button>
+        <button class="btn btn-secondary" id="downloadAllBtn" style="display:none">Download ZIP</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+
+      <div class="status" id="status"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="../../assets/tools.js"></script>
+<script>
+(function(){
+  var dropZone=document.getElementById('dropZone');
+  var fileInput=document.getElementById('fileInput');
+  var controls=document.getElementById('controls');
+  var actionRow=document.getElementById('actionRow');
+  var compressBtn=document.getElementById('compressBtn');
+  var downloadBtn=document.getElementById('downloadBtn');
+  var downloadAllBtn=document.getElementById('downloadAllBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var statusEl=document.getElementById('status');
+  var batchList=document.getElementById('batchList');
+  var statGrid=document.getElementById('statGrid');
+  var resultArea=document.getElementById('resultArea');
+  var beforeImg=document.getElementById('beforeImg');
+  var afterImg=document.getElementById('afterImg');
+  var compareClip=document.getElementById('compareClip');
+  var compareSlider=document.getElementById('compareSlider');
+  var compareWrap=document.getElementById('compareWrap');
+  var qualitySlider=document.getElementById('quality');
+  var qualityVal=document.getElementById('qualityVal');
+  var formatBadges=document.getElementById('formatBadges');
+  var modeTabs=document.getElementById('modeTabs');
+  var qualityMode=document.getElementById('qualityMode');
+  var targetMode=document.getElementById('targetMode');
+  var autoMode=document.getElementById('autoMode');
+
+  var files=[];
+  var results=[];
+  var mode='quality';
+  var outputFormat='auto';
+
+  Tools.setupDropZone(dropZone,function(f){addFiles(f)});
+  fileInput.addEventListener('change',function(e){for(var i=0;i<e.target.files.length;i++)addFiles(e.target.files[i]);});
+
+  modeTabs.addEventListener('click',function(e){
+    var btn=e.target.closest('button');if(!btn)return;
+    modeTabs.querySelectorAll('button').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    mode=btn.dataset.mode;
+    qualityMode.style.display=mode==='quality'?'block':'none';
+    targetMode.style.display=mode==='target'?'block':'none';
+    autoMode.style.display=mode==='auto'?'block':'none';
+  });
+
+  qualitySlider.addEventListener('input',function(){qualityVal.textContent=qualitySlider.value+'%';});
+
+  formatBadges.addEventListener('click',function(e){
+    var badge=e.target.closest('.format-badge');if(!badge)return;
+    formatBadges.querySelectorAll('.format-badge').forEach(function(b){b.classList.remove('active');});
+    badge.classList.add('active');
+    outputFormat=badge.dataset.format;
+  });
+
+  function addFiles(f){
+    if(!f||!f.type.startsWith('image/'))return;
+    files.push(f);
+    renderBatchList();
+    if(files.length===1){controls.style.display='block';}
+  }
+
+  function renderBatchList(){
+    batchList.innerHTML='';
+    if(files.length<=1){batchList.style.display='none';return;}
+    batchList.style.display='block';
+    files.forEach(function(f,i){
+      var r=results[i];
+      var item=document.createElement('div');
+      item.className='batch-item';
+      item.innerHTML='<span class="batch-name">'+f.name+'</span>'+
+        '<span class="batch-size">'+Tools.formatSize(f.size)+'</span>'+
+        (r?'<span class="batch-ratio">-'+Math.round((1-r.size/f.size)*100)+'%</span>':'<span class="batch-ratio">-</span>')+
+        '<span class="batch-remove" data-idx="'+i+'">✕</span>';
+      batchList.appendChild(item);
+    });
+    batchList.querySelectorAll('.batch-remove').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var idx=parseInt(btn.dataset.idx);
+        files.splice(idx,1);
+        results.splice(idx,1);
+        renderBatchList();
+        if(files.length===0){controls.style.display='none';actionRow.style.display='none';}
+      });
+    });
+  }
+
+  compressBtn.addEventListener('click',function(){
+    if(files.length===0)return;
+    compressBtn.disabled=true;
+    results=[];
+    var total=files.length;
+    var done=0;
+
+    try{
+    function compressOne(idx){
+      if(idx>=files.length){
+        compressBtn.disabled=false;
+        renderBatchList();
+        if(total===1&&results.length===1){
+          showSingleResult(results[0],files[0]);
+        }else if(results.length>0){
+          showBatchResult();
+        }
+        return;
+      }
+      Tools.setStatus(statusEl,'Compressing '+(idx+1)+' of '+total+'...','');
+      compressFile(files[idx],function(result){
+        results[idx]=result;
+        done++;
+        renderBatchList();
+        compressOne(idx+1);
+      });
+    }
+    compressOne(0);
+    }catch(e){Tools.setStatus(statusEl,'Error: '+e.message,'error');compressBtn.disabled=false;}
+  });
+
+  function compressFile(file,cb){
+    var img=new Image();
+    img.onerror=function(){Tools.setStatus(statusEl,'Error: Failed to load image','error');compressBtn.disabled=false;};
+    img.onload=function(){
+      try{
+      var c=document.createElement('canvas');
+      var w=img.naturalWidth,h=img.naturalHeight;
+      var mw=parseInt(document.getElementById('maxWidth').value)||0;
+      var mh=parseInt(document.getElementById('maxHeight').value)||0;
+      if(mw>0||mh>0){
+        var scale=Math.min(mw>0?mw/w:Infinity,mh>0?mh/h:Infinity,1);
+        w=Math.round(w*scale);
+        h=Math.round(h*scale);
+      }
+      c.width=w;c.height=h;
+      var ctx=c.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+
+      var outType=outputFormat==='auto'?(file.type||'image/jpeg'):outputFormat;
+      if(outType==='image/png'&&file.type==='image/jpeg')outType='image/jpeg';
+
+      if(mode==='auto'){
+        outType='image/webp';
+        doCompress(c,outType,0.8,cb,file);
+      }else if(mode==='target'){
+        var targetBytes=parseInt(document.getElementById('targetSize').value)*(
+          document.getElementById('targetUnit').value==='MB'?1048576:1024);
+        binarySearch(c,outType,targetBytes,cb,file);
+      }else{
+        var q=parseInt(qualitySlider.value)/100;
+        doCompress(c,outType,q,cb,file);
+      }
+      }catch(e){Tools.setStatus(statusEl,'Error: '+e.message,'error');compressBtn.disabled=false;}
+    };
+    img.src=URL.createObjectURL(file);
+  }
+
+  function doCompress(c,type,q,cb,file){
+    c.toBlob(function(blob){
+      cb({blob:blob,size:blob.size,url:URL.createObjectURL(blob),type:type,quality:q,width:c.width,height:c.height});
+    },type,q);
+  }
+
+  function binarySearch(c,type,target,cb,file){
+    var lo=0.05,hi=0.95,best=null;
+    function step(q){
+      c.toBlob(function(blob){
+        if(Math.abs(blob.size-target)<target*0.05||Math.abs(hi-lo)<0.01){
+          cb({blob:blob,size:blob.size,url:URL.createObjectURL(blob),type:type,quality:q,width:c.width,height:c.height});
+        }else{
+          if(blob.size>target){hi=q;}else{lo=q;}
+          step((lo+hi)/2);
+        }
+      },type,q);
+    }
+    step(0.5);
+  }
+
+  function showSingleResult(result,file){
+    statGrid.style.display='grid';
+    document.getElementById('statOriginal').textContent=Tools.formatSize(file.size);
+    document.getElementById('statCompressed').textContent=Tools.formatSize(result.size);
+    var saved=file.size-result.size;
+    document.getElementById('statSaved').textContent=Tools.formatSize(saved);
+    document.getElementById('statRatio').textContent=Math.round(saved/file.size*100)+'%';
+
+    beforeImg.src=URL.createObjectURL(file);
+    afterImg.src=result.url;
+    compareClip.style.width='50%';
+    compareSlider.style.left='50%';
+    resultArea.style.display='block';
+    actionRow.style.display='flex';
+    downloadBtn.style.display='inline-block';
+    downloadAllBtn.style.display='none';
+    Tools.setStatus(statusEl,'Done! '+Tools.formatSize(file.size)+' → '+Tools.formatSize(result.size),'done');
+  }
+
+  function showBatchResult(){
+    var totalOrig=0,totalComp=0;
+    results.forEach(function(r,i){totalOrig+=files[i].size;totalComp+=r.size;});
+    statGrid.style.display='grid';
+    document.getElementById('statOriginal').textContent=Tools.formatSize(totalOrig);
+    document.getElementById('statCompressed').textContent=Tools.formatSize(totalComp);
+    document.getElementById('statSaved').textContent=Tools.formatSize(totalOrig-totalComp);
+    document.getElementById('statRatio').textContent=Math.round((totalOrig-totalComp)/totalOrig*100)+'%';
+
+    resultArea.style.display='none';
+    actionRow.style.display='flex';
+    downloadBtn.style.display='none';
+    downloadAllBtn.style.display='inline-block';
+    Tools.setStatus(statusEl,'Done! '+results.length+' files compressed.','done');
+  }
+
+  downloadBtn.addEventListener('click',function(){
+    if(!results[0])return;
+    var ext=results[0].type.split('/')[1]||'jpg';
+    Tools.downloadBlob(results[0].blob,files[0].name.replace(/\.[^.]+$/,'.'+ext));
+  });
+
+  downloadAllBtn.addEventListener('click',function(){
+    if(results.length===0)return;
+    var zip=new JSZip();
+    results.forEach(function(r,i){
+      var ext=r.type.split('/')[1]||'jpg';
+      zip.file(files[i].name.replace(/\.[^.]+$/,'.'+ext),r.blob);
+    });
+    zip.generateAsync({type:'blob'}).then(function(blob){Tools.downloadBlob(blob,'compressed-images.zip');});
+  });
+
+  var compareDragging=false;
+  compareSlider.addEventListener('mousedown',function(e){e.preventDefault();compareDragging=true;});
+  document.addEventListener('mousemove',function(e){
+    if(!compareDragging)return;
+    var rect=compareWrap.getBoundingClientRect();
+    var x=Math.max(0,Math.min(e.clientX-rect.left,rect.width));
+    var pct=x/rect.width*100;
+    compareSlider.style.left=pct+'%';
+    compareClip.style.width=pct+'%';
+  });
+  document.addEventListener('mouseup',function(){compareDragging=false;});
+
+  compareWrap.addEventListener('touchstart',function(e){compareDragging=true;},{passive:true});
+  compareWrap.addEventListener('touchmove',function(e){
+    if(!compareDragging)return;
+    var rect=compareWrap.getBoundingClientRect();
+    var x=Math.max(0,Math.min(e.touches[0].clientX-rect.left,rect.width));
+    var pct=x/rect.width*100;
+    compareSlider.style.left=pct+'%';
+    compareClip.style.width=pct+'%';
+  });
+  compareWrap.addEventListener('touchend',function(){compareDragging=false;});
+
+  resetBtn.addEventListener('click',function(){
+    files=[];results=[];
+    batchList.innerHTML='';
+    controls.style.display='none';
+    actionRow.style.display='none';
+    statGrid.style.display='none';
+    resultArea.style.display='none';
+    statusEl.style.display='none';
+    dropZone.style.display='block';
+    fileInput.value='';
+  });
+})();
+</script>
+
+</body>
+</html>
