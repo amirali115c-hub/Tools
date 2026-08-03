@@ -177,7 +177,7 @@
         }, 'image/png');
       }
     };
-    img.src = currentFile;
+    img.src = URL.createObjectURL(currentFile);
   }
 
   function blurRegion(imageData, strength) {

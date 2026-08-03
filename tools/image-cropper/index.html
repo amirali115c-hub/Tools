@@ -105,7 +105,7 @@
       ctx.drawImage(img,sx,sy,sw,sh,0,0,outW,outH);
       var outputType=document.getElementById('format').value;
       c.toBlob(function(blob){resultBlob=blob;resultPreview.src=URL.createObjectURL(blob);resultInfo.textContent=Tools.formatSize(currentFile.size)+' → '+Tools.formatSize(blob.size)+' ('+outW+'x'+outH+')';resultArea.style.display='block';downloadBtn.style.display='inline-block';Tools.setStatus(statusEl,'Done!','done');cropBtn.disabled=false;},outputType,0.92);
-    };img.src=currentFile;
+    };img.src=URL.createObjectURL(currentFile);
   });
   downloadBtn.addEventListener('click',function(){if(!resultBlob||!currentFile)return;var ext=document.getElementById('format').value.split('/')[1];Tools.downloadBlob(resultBlob,currentFile.name.replace(/\.[^.]+$/,'.'+ext));});
 })();

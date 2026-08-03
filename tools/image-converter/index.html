@@ -173,7 +173,7 @@
         convertBtn.disabled = false;
       }, outputType, quality);
     };
-    img.src = currentFile;
+    img.src = URL.createObjectURL(currentFile);
   });
 
   downloadBtn.addEventListener('click', function() {
