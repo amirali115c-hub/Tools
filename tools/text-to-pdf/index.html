@@ -52,12 +52,13 @@
 (function(){
   if(typeof jspdf==='undefined'){Tools.setStatus(document.getElementById('status'),'Error: PDF library not loaded.','error');return;}
   var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),textInput=document.getElementById('textInput'),controls=document.getElementById('controls'),actionRow=document.getElementById('actionRow'),convertBtn=document.getElementById('convertBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status');
-  Tools.setupDropZone(dropZone,function(file){
+  function handleFile(file){
     var reader=new FileReader();reader.onload=function(){textInput.value=reader.result;};
     reader.readAsText(file);previewArea.style.display='block';controls.style.display='block';
     actionRow.style.display='flex';dropZone.style.display='none';
-  });
-  fileInput.addEventListener('change',function(e){if(e.target.files[0])Tools.setupDropZone.__handleFile(e.target.files[0]);});
+  }
+  Tools.setupDropZone(dropZone,handleFile);
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
   textInput.addEventListener('input',function(){if(textInput.value.length>0){controls.style.display='block';actionRow.style.display='flex';dropZone.style.display='none';}});
   resetBtn.addEventListener('click',function(){textInput.value='';dropZone.style.display='block';previewArea.style.display='none';controls.style.display='none';actionRow.style.display='none';statusEl.style.display='none';fileInput.value='';});
   convertBtn.addEventListener('click',function(){

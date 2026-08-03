@@ -42,11 +42,12 @@
 (function(){
   var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),csvTable=document.getElementById('csvTable'),searchInput=document.getElementById('searchInput'),fileInfo=document.getElementById('fileInfo'),actionRow=document.getElementById('actionRow'),downloadBtn=document.getElementById('downloadBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status');
   var allRows=[],headers=[];
-  Tools.setupDropZone(dropZone,function(file){
+  function handleFile(file){
     var reader=new FileReader();reader.onload=function(){parseCSV(reader.result);};
     reader.readAsText(file);dropZone.style.display='none';previewArea.style.display='block';actionRow.style.display='flex';
-  });
-  fileInput.addEventListener('change',function(e){if(e.target.files[0])Tools.setupDropZone.__handleFile(e.target.files[0]);});
+  }
+  Tools.setupDropZone(dropZone,handleFile);
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
   function parseCSV(text){
     var lines=text.split('\n').filter(function(l){return l.trim();});
     if(lines.length===0)return;

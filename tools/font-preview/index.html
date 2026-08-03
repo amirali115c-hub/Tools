@@ -45,20 +45,21 @@
 <script>
 (function(){
   var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),previewText=document.getElementById('previewText'),fontSize=document.getElementById('fontSize'),fontSizeVal=document.getElementById('fontSizeVal'),fontPreview=document.getElementById('fontPreview'),fontInfo=document.getElementById('fontInfo'),actionRow=document.getElementById('actionRow'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status');
-  var fontObj=null;fontFamily='preview_font_'+Date.now();
-  Tools.setupDropZone(dropZone,function(file){
+  var fontObj=null;var fontFamily='preview_font_'+Date.now();
+  function handleFile(file){
     var reader=new FileReader();reader.onload=function(){
       try{
-        fontObj=opentype.load(reader.result);
-        var fontFace=new FontFace(family,'url(data:font/opentype;base64,'+btoa(String.fromCharCode.apply(null,new Uint8Array(reader.result)))+')');
+        fontObj=opentype.parse(reader.result);
+        var fontFace=new FontFace(fontFamily,'url(data:font/opentype;base64,'+btoa(String.fromCharCode.apply(null,new Uint8Array(reader.result)))+')');
         fontFace.load().then(function(loaded){document.fonts.add(loaded);updatePreview();});
-        fontInfo.textContent='Font: '+fontObj.names.fontFamily.en+' | Glyphs: '+fontObj.numGlyphs;
+        fontInfo.textContent='Font: '+(fontObj.names.fontFamily?fontObj.names.fontFamily.en:'Unknown')+' | Glyphs: '+fontObj.numGlyphs;
         previewArea.style.display='block';actionRow.style.display='flex';dropZone.style.display='none';
         Tools.setStatus(statusEl,'Font loaded.','done');
       }catch(err){Tools.setStatus(statusEl,'Error: '+err.message,'error');}
     };reader.readAsArrayBuffer(file);
-  });
-  fileInput.addEventListener('change',function(e){if(e.target.files[0])Tools.setupDropZone.__handleFile(e.target.files[0]);});
+  }
+  Tools.setupDropZone(dropZone,handleFile);
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
   fontSize.addEventListener('input',function(){fontSizeVal.textContent=this.value+'px';updatePreview();});
   previewText.addEventListener('input',updatePreview);
   function updatePreview(){
