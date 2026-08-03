@@ -3,111 +3,518 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Cropper | Free, Private, Client-Side</title>
-  <meta name="description" content="Crop and resize images for free. Choose exact dimensions. Runs in your browser.">
+  <title>Advanced Image Cropper | Free, Private, Client-Side</title>
+  <meta name="description" content="Advanced image cropper with aspect ratio, rotate, flip, round crop, zoom. Free, private, runs in your browser.">
   <link rel="stylesheet" href="../../assets/style.css">
+  <style>
+    .cropper-layout{display:grid;grid-template-columns:1fr 320px;gap:20px;margin-top:16px}
+    .cropper-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+    .cropper-panel h3{font-size:.95rem;margin-bottom:12px;color:var(--text)}
+    .canvas-wrap{position:relative;background:#111;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:400px}
+    .canvas-wrap img{max-width:100%;max-height:500px;display:block;user-select:none;-webkit-user-drag:none}
+    .crop-overlay{position:absolute;border:2px dashed var(--accent);background:rgba(99,102,241,.15);cursor:move;box-shadow:0 0 0 9999px rgba(0,0,0,.5)}
+    .crop-overlay.round{border-radius:50%}
+    .crop-handle{position:absolute;width:12px;height:12px;background:#fff;border:2px solid var(--accent);border-radius:50%}
+    .crop-handle.tl{top:-6px;left:-6px;cursor:nw-resize}
+    .crop-handle.tr{top:-6px;right:-6px;cursor:ne-resize}
+    .crop-handle.bl{bottom:-6px;left:-6px;cursor:sw-resize}
+    .crop-handle.br{bottom:-6px;right:-6px;cursor:se-resize}
+    .crop-handle.tm{top:-6px;left:50%;transform:translateX(-50%);cursor:n-resize}
+    .crop-handle.bm{bottom:-6px;left:50%;transform:translateX(-50%);cursor:s-resize}
+    .crop-handle.ml{top:50%;left:-6px;transform:translateY(-50%);cursor:w-resize}
+    .crop-handle.mr{top:50%;right:-6px;transform:translateY(-50%);cursor:e-resize}
+    .aspect-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+    .aspect-btn{padding:8px;border:2px solid var(--border);border-radius:6px;text-align:center;cursor:pointer;font-size:.8rem;transition:all .15s}
+    .aspect-btn:hover{border-color:var(--accent)}
+    .aspect-btn.active{border-color:var(--accent);background:rgba(99,102,241,.1);color:var(--accent)}
+    .transform-row{display:flex;gap:6px;flex-wrap:wrap}
+    .transform-btn{flex:1;min-width:60px;padding:8px;border:1px solid var(--border);border-radius:6px;text-align:center;cursor:pointer;font-size:.8rem;background:var(--bg);color:var(--text2);transition:all .15s}
+    .transform-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .size-presets{display:flex;gap:6px;flex-wrap:wrap}
+    .size-preset{padding:4px 10px;border:1px solid var(--border);border-radius:6px;font-size:.75rem;cursor:pointer;background:var(--bg);color:var(--text2);transition:all .15s}
+    .size-preset:hover,.size-preset.active{border-color:var(--accent);color:var(--accent)}
+    .output-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    .output-row input{flex:1;padding:6px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8rem;text-align:center}
+    .output-row span{color:var(--text2);font-size:.75rem}
+    .tabs{display:flex;gap:4px;margin-bottom:16px}
+    .tab{padding:8px 16px;border-radius:6px;font-size:.85rem;cursor:pointer;background:var(--bg);color:var(--text2);border:1px solid var(--border);transition:all .15s}
+    .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+    .compare-container{position:relative;width:100%;aspect-ratio:16/10;background:#000;border-radius:8px;overflow:hidden;cursor:col-resize}
+    .compare-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain}
+    .compare-after{clip-path:polygon(50% 0,100% 0,100% 100%,50% 100%)}
+    .compare-slider{position:absolute;top:0;bottom:0;width:3px;background:#fff;left:50%;transform:translateX(-50%);pointer-events:none;z-index:2}
+    .compare-slider::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:32px;height:32px;background:#fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+    .compare-label{position:absolute;top:8px;padding:4px 10px;border-radius:4px;font-size:.7rem;font-weight:600;z-index:3;background:rgba(0,0,0,.7);color:#fff}
+    .compare-label.before{left:8px}
+    .compare-label.after{right:8px}
+    .info-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:.85rem}
+    .info-row:last-child{border-bottom:none}
+    .info-label{color:var(--text2)}
+    .info-value{color:var(--text);font-weight:500}
+    .zoom-row{display:flex;gap:8px;align-items:center}
+    .zoom-row input[type="range"]{flex:1}
+    .undo-row{display:flex;gap:6px}
+    .undo-btn{flex:1;padding:6px;border:1px solid var(--border);border-radius:6px;text-align:center;cursor:pointer;font-size:.8rem;background:var(--bg);color:var(--text2)}
+    .undo-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .undo-btn:disabled{opacity:.4;cursor:not-allowed}
+    @media(max-width:768px){.cropper-layout{grid-template-columns:1fr}}
+  </style>
 </head>
 <body>
 <div class="container">
   <div class="tool-page">
-    <a href="../../" class="back-link">← Back to Tools</a>
+    <a href="../../" class="back-link">&larr; Back to Tools</a>
     <h1>Image Cropper</h1>
-    <p class="subtitle">Crop and resize images. No uploads.</p>
+    <p class="subtitle">Crop, rotate, flip, zoom. Aspect ratios, round crop. No uploads.</p>
     <div class="tool-area">
+
       <div class="upload-zone" id="dropZone">
-        <div class="big-icon">📁</div>
+        <div class="big-icon">✂️</div>
         <strong>Drop an image here</strong>
         <p>or click to browse</p>
-        <input type="file" id="fileInput" accept="image/*">
+        <input type="file" id="fileInput" accept="image/*" style="display:none">
       </div>
-      <div class="preview-area" id="previewArea">
-        <div style="position:relative;display:inline-block;max-width:100%">
-          <img id="imagePreview" style="max-width:100%;border-radius:8px;display:block">
-          <div id="cropBox" style="display:none;position:absolute;border:2px dashed var(--accent);background:rgba(99,102,241,.1);cursor:move"></div>
+
+      <div id="mainArea" style="display:none">
+
+        <div class="tabs">
+          <div class="tab active" data-tab="crop">Crop</div>
+          <div class="tab" data-tab="transform">Transform</div>
+          <div class="tab" data-tab="preview">Preview</div>
         </div>
-        <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
-      </div>
-      <div class="controls" id="controls">
-        <label>Output Format</label>
-        <select id="format">
-          <option value="image/png">PNG</option>
-          <option value="image/jpeg">JPEG</option>
-          <option value="image/webp">WebP</option>
-        </select>
-        <label>Max Width (px, 0 = keep original)</label>
-        <input type="number" id="maxWidth" value="0" min="0" max="10000" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
-        <label>Max Height (px, 0 = keep original)</label>
-        <input type="number" id="maxHeight" value="0" min="0" max="10000" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
-        <p style="color:var(--text2);font-size:.85rem">Drag on the image to select crop area, or set dimensions above.</p>
-      </div>
-      <div class="status" id="status"></div>
-      <div id="resultArea" style="display:none;margin-top:16px">
-        <div id="resultInfo" style="color:var(--text2);margin-bottom:12px;font-size:.9rem"></div>
-        <img id="resultPreview" style="max-width:100%;border-radius:8px;border:1px solid var(--border)">
-      </div>
-      <div class="action-row" id="actionRow" style="display:none">
-        <button class="btn" id="cropBtn">Crop & Resize</button>
-        <button class="btn btn-secondary" id="downloadBtn" style="display:none">Download</button>
-        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+
+        <div class="tab-content active" id="tab-crop">
+          <div class="cropper-layout">
+            <div class="cropper-panel" style="padding:0;overflow:hidden">
+              <div class="canvas-wrap" id="canvasWrap">
+                <img id="imagePreview" draggable="false">
+                <div class="crop-overlay" id="cropOverlay" style="display:none">
+                  <div class="crop-handle tl" data-handle="tl"></div>
+                  <div class="crop-handle tr" data-handle="tr"></div>
+                  <div class="crop-handle bl" data-handle="bl"></div>
+                  <div class="crop-handle br" data-handle="br"></div>
+                  <div class="crop-handle tm" data-handle="tm"></div>
+                  <div class="crop-handle bm" data-handle="bm"></div>
+                  <div class="crop-handle ml" data-handle="ml"></div>
+                  <div class="crop-handle mr" data-handle="mr"></div>
+                </div>
+              </div>
+              <div style="padding:12px;display:flex;justify-content:space-between;align-items:center">
+                <div id="fileInfo" style="color:var(--text2);font-size:.85rem"></div>
+                <div id="cropInfo" style="color:var(--accent);font-size:.85rem;font-weight:600"></div>
+              </div>
+            </div>
+            <div class="cropper-panel">
+              <h3>Aspect Ratio</h3>
+              <div class="aspect-grid" id="aspectGrid">
+                <div class="aspect-btn active" data-ratio="0">Free</div>
+                <div class="aspect-btn" data-ratio="1">1:1</div>
+                <div class="aspect-btn" data-ratio="1.333">4:3</div>
+                <div class="aspect-btn" data-ratio="1.778">16:9</div>
+                <div class="aspect-btn" data-ratio="0.563">9:16</div>
+                <div class="aspect-btn" data-ratio="0.75">3:4</div>
+              </div>
+
+              <h3 style="margin-top:16px">Zoom</h3>
+              <div class="zoom-row">
+                <button class="transform-btn" id="zoomOut">-</button>
+                <input type="range" id="zoomSlider" min="50" max="300" value="100">
+                <button class="transform-btn" id="zoomIn">+</button>
+              </div>
+              <div style="text-align:center;font-size:.8rem;color:var(--text2);margin-top:4px"><span id="zoomVal">100%</span></div>
+
+              <h3 style="margin-top:16px">Quick Sizes</h3>
+              <div class="size-presets" id="sizePresets">
+                <div class="size-preset" data-w="400" data-h="400">400x400</div>
+                <div class="size-preset" data-w="800" data-h="600">800x600</div>
+                <div class="size-preset" data-w="1920" data-h="1080">1080p</div>
+                <div class="size-preset" data-w="1280" data-h="720">720p</div>
+                <div class="size-preset" data-w="1080" data-h="1080">IG Post</div>
+                <div class="size-preset" data-w="1080" data-h="1350">IG Portrait</div>
+                <div class="size-preset" data-w="1200" data-h="628">FB Cover</div>
+                <div class="size-preset" data-w="1500" data-h="500">Twitter</div>
+              </div>
+
+              <h3 style="margin-top:16px">Output</h3>
+              <div class="output-row">
+                <span>W</span><input type="number" id="outWidth" min="1" max="10000" placeholder="Auto">
+                <span>H</span><input type="number" id="outHeight" min="1" max="10000" placeholder="Auto">
+              </div>
+              <div class="undo-row" style="margin-top:8px">
+                <button class="undo-btn" id="undoBtn" disabled>Undo</button>
+                <button class="undo-btn" id="redoBtn" disabled>Redo</button>
+                <button class="undo-btn" id="resetCrop">Reset</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-transform">
+          <div class="cropper-layout">
+            <div class="cropper-panel">
+              <h3>Rotate & Flip</h3>
+              <div class="transform-row" style="margin-bottom:12px">
+                <button class="transform-btn" id="rotateLeft">↺ 90°</button>
+                <button class="transform-btn" id="rotateRight">↻ 90°</button>
+                <button class="transform-btn" id="rotate180">180°</button>
+              </div>
+              <div class="transform-row">
+                <button class="transform-btn" id="flipH">↔ Flip H</button>
+                <button class="transform-btn" id="flipV">↕ Flip V</button>
+              </div>
+
+              <h3 style="margin-top:20px">Round Crop</h3>
+              <label class="checkbox-label"><input type="checkbox" id="roundCrop"> Enable round crop</label>
+
+              <h3 style="margin-top:20px">Output Format</h3>
+              <div class="aspect-grid" id="formatGrid">
+                <div class="aspect-btn active" data-format="image/png">PNG</div>
+                <div class="aspect-btn" data-format="image/jpeg">JPEG</div>
+                <div class="aspect-btn" data-format="image/webp">WebP</div>
+              </div>
+              <div style="margin-top:12px">
+                <label style="font-size:.85rem;color:var(--text2)">Quality</label>
+                <input type="range" id="quality" min="10" max="100" value="92" style="width:100%">
+                <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--text2)">
+                  <span>Smallest</span><span id="qualityVal">92%</span><span>Best</span>
+                </div>
+              </div>
+            </div>
+            <div class="cropper-panel">
+              <h3>Image Info</h3>
+              <div class="info-row"><span class="info-label">Original</span><span class="info-value" id="infoOrig">-</span></div>
+              <div class="info-row"><span class="info-label">Cropped</span><span class="info-value" id="infoCrop">-</span></div>
+              <div class="info-row"><span class="info-label">Output</span><span class="info-value" id="infoOut">-</span></div>
+              <div class="info-row"><span class="info-label">File Size</span><span class="info-value" id="infoSize">-</span></div>
+              <div class="info-row"><span class="info-label">Rotation</span><span class="info-value" id="infoRotation">0°</span></div>
+              <div class="info-row"><span class="info-label">Flip</span><span class="info-value" id="infoFlip">None</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-preview">
+          <div class="cropper-panel">
+            <h3>Before / After</h3>
+            <div class="compare-container" id="compareContainer">
+              <img class="compare-img" id="compareOriginal">
+              <img class="compare-img compare-after" id="compareResult">
+              <div class="compare-slider" id="compareSlider"></div>
+              <span class="compare-label before">Original</span>
+              <span class="compare-label after">Cropped</span>
+            </div>
+            <div style="margin-top:12px;text-align:center">
+              <button class="btn btn-secondary" id="previewBtn">Generate Preview</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="status" class="status" style="display:none"></div>
+
+        <div class="action-row">
+          <button class="btn" id="cropBtn">Crop & Download</button>
+          <button class="btn btn-secondary" id="resetBtn">Reset</button>
+        </div>
+
       </div>
     </div>
   </div>
 </div>
-<script src="../../assets/tools.js"></script>
+
 <script>
 (function(){
-  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),imagePreview=document.getElementById('imagePreview'),cropBox=document.getElementById('cropBox'),controls=document.getElementById('controls'),actionRow=document.getElementById('actionRow'),cropBtn=document.getElementById('cropBtn'),downloadBtn=document.getElementById('downloadBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status'),fileInfo=document.getElementById('fileInfo'),resultArea=document.getElementById('resultArea'),resultInfo=document.getElementById('resultInfo'),resultPreview=document.getElementById('resultPreview');
-  var currentFile=null,resultBlob=null,imgW=0,imgH=0,cropX=0,cropY=0,cropW=0,cropH=0,dragging=false,dragStart={};
-  Tools.setupDropZone(dropZone,handleFile);
-  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
+  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput');
+  var mainArea=document.getElementById('mainArea'),canvasWrap=document.getElementById('canvasWrap');
+  var imagePreview=document.getElementById('imagePreview'),cropOverlay=document.getElementById('cropOverlay');
+  var aspectGrid=document.getElementById('aspectGrid'),formatGrid=document.getElementById('formatGrid');
+  var zoomSlider=document.getElementById('zoomSlider'),zoomVal=document.getElementById('zoomVal');
+  var zoomIn=document.getElementById('zoomIn'),zoomOut=document.getElementById('zoomOut');
+  var outWidth=document.getElementById('outWidth'),outHeight=document.getElementById('outHeight');
+  var undoBtn=document.getElementById('undoBtn'),redoBtn=document.getElementById('redoBtn'),resetCrop=document.getElementById('resetCrop');
+  var rotateLeft=document.getElementById('rotateLeft'),rotateRight=document.getElementById('rotateRight'),rotate180=document.getElementById('rotate180');
+  var flipH=document.getElementById('flipH'),flipV=document.getElementById('flipV'),roundCrop=document.getElementById('roundCrop');
+  var quality=document.getElementById('quality'),qualityVal=document.getElementById('qualityVal');
+  var cropBtn=document.getElementById('cropBtn'),resetBtn=document.getElementById('resetBtn');
+  var statusEl=document.getElementById('status'),fileInfo=document.getElementById('fileInfo'),cropInfo=document.getElementById('cropInfo');
+  var infoOrig=document.getElementById('infoOrig'),infoCrop=document.getElementById('infoCrop'),infoOut=document.getElementById('infoOut');
+  var infoSize=document.getElementById('infoSize'),infoRotation=document.getElementById('infoRotation'),infoFlip=document.getElementById('infoFlip');
+  var compareOriginal=document.getElementById('compareOriginal'),compareResult=document.getElementById('compareResult');
+  var compareSlider=document.getElementById('compareSlider'),compareContainer=document.getElementById('compareContainer');
+  var previewBtn=document.getElementById('previewBtn');
+
+  var currentFile=null;
+  var imgW=0,imgH=0;
+  var cropX=0,cropY=0,cropW=0,cropH=0;
+  var displayScale=1;
+  var rotation=0,flipX=false,flipY=false;
+  var aspectRatio=0;
+  var zoom=100;
+  var selectedFormat='image/png';
+  var outputQuality=0.92;
+  var undoStack=[];var redoStack=[];
+  var isDragging=false;var isResizing=false;var resizeHandle='';var dragStart={};var cropStart={};
+
+  function formatSize(bytes){
+    if(bytes===0)return '0 B';
+    var k=1024,sizes=['B','KB','MB','GB'];
+    var i=Math.floor(Math.log(bytes)/Math.log(k));
+    return (bytes/Math.pow(k,i)).toFixed(1)+' '+sizes[i];
+  }
+
+  function showStatus(msg,type){
+    statusEl.textContent=msg;statusEl.className='status '+(type||'');statusEl.style.display='block';
+  }
+
+  function saveState(){
+    undoStack.push({cropX:cropX,cropY:cropY,cropW:cropW,cropH:cropH,rotation:rotation,flipX:flipX,flipY:flipY});
+    if(undoStack.length>30)undoStack.shift();
+    redoStack=[];
+    undoBtn.disabled=false;redoBtn.disabled=true;
+  }
+
+  function updateCropInfo(){
+    if(cropW>0&&cropH>0){
+      cropInfo.textContent=cropW+' x '+cropH+' px';
+      outWidth.value=cropW;outHeight.value=cropH;
+    }
+  }
+
+  function updateInfo(){
+    infoOrig.textContent=imgW+' x '+imgH;
+    infoCrop.textContent=cropW>0?cropW+' x '+cropH:'Full';
+    infoRotation.textContent=rotation+'°';
+    infoFlip.textContent=flipX?'Horizontal':flipY?'Vertical':'None';
+    var ow=parseInt(outWidth.value)||imgW;
+    var oh=parseInt(outHeight.value)||imgH;
+    infoOut.textContent=ow+' x '+oh;
+  }
+
+  function applyTransform(){
+    var transform='scale('+(zoom/100)+')';
+    if(rotation!==0)transform+=' rotate('+rotation+'deg)';
+    if(flipX)transform+=' scaleX(-1)';
+    if(flipY)transform+=' scaleY(-1)';
+    imagePreview.style.transform=transform;
+    imagePreview.style.transformOrigin='center center';
+    updateInfo();
+  }
+
   function handleFile(file){
-    currentFile=file;imagePreview.src=URL.createObjectURL(file);
-    imagePreview.onload=function(){imgW=imagePreview.naturalWidth;imgH=imagePreview.naturalHeight;};
-    previewArea.style.display='block';controls.style.display='block';actionRow.style.display='flex';
-    dropZone.style.display='none';statusEl.style.display='none';resultArea.style.display='none';downloadBtn.style.display='none';
-    fileInfo.textContent='File: '+file.name+' ('+Tools.formatSize(file.size)+')';cropBox.style.display='none';
+    if(!file.type.startsWith('image/')){showStatus('Please select an image.','error');return;}
+    currentFile=file;rotation=0;flipX=false;flipY=false;zoom=100;undoStack=[];redoStack=[];
+    imagePreview.src=URL.createObjectURL(file);
+    imagePreview.onload=function(){
+      imgW=imagePreview.naturalWidth;imgH=imagePreview.naturalHeight;
+      cropX=0;cropY=0;cropW=imgW;cropH=imgH;
+      displayScale=imagePreview.clientWidth/imgW;
+      cropOverlay.style.display='block';
+      updateCropBox();updateInfo();applyTransform();
+    };
+    mainArea.style.display='block';dropZone.style.display='none';
+    statusEl.style.display='none';
+    fileInfo.textContent=file.name+' ('+formatSize(file.size)+')';
   }
-  resetBtn.addEventListener('click',function(){currentFile=null;dropZone.style.display='block';previewArea.style.display='none';controls.style.display='none';actionRow.style.display='none';statusEl.style.display='none';resultArea.style.display='none';downloadBtn.style.display='none';imagePreview.src='';fileInput.value='';});
-  imagePreview.addEventListener('mousedown',function(e){startDrag(e);});
-  imagePreview.addEventListener('touchstart',function(e){startDrag(e.touches[0]);},{passive:false});
-  function startDrag(e){
-    var rect=imagePreview.getBoundingClientRect();
-    dragStart.x=e.clientX-rect.left;dragStart.y=e.clientY-rect.top;dragging=true;
-    cropBox.style.display='block';
+
+  function updateCropBox(){
+    var left=cropX*displayScale;var top=cropY*displayScale;
+    var w=cropW*displayScale;var h=cropH*displayScale;
+    cropOverlay.style.left=left+'px';cropOverlay.style.top=top+'px';
+    cropOverlay.style.width=w+'px';cropOverlay.style.height=h+'px';
+    cropOverlay.classList.toggle('round',roundCrop.checked);
+    updateCropBoxInfo();
   }
-  document.addEventListener('mousemove',function(e){if(!dragging)return;moveDrag(e);});
-  document.addEventListener('touchmove',function(e){if(!dragging)return;moveDrag(e.touches[0]);},{passive:false});
-  function moveDrag(e){
-    var rect=imagePreview.getBoundingClientRect();
-    var x=Math.max(0,Math.min(e.clientX-rect.left,rect.width));
-    var y=Math.max(0,Math.min(e.clientY-rect.top,rect.height));
-    var left=Math.min(dragStart.x,x),top=Math.min(dragStart.y,y);
-    var w=Math.abs(x-dragStart.x),h=Math.abs(y-dragStart.y);
-    cropBox.style.left=left+'px';cropBox.style.top=top+'px';
-    cropBox.style.width=w+'px';cropBox.style.height=h+'px';
-    var scaleX=imgW/rect.width,scaleY=imgH/rect.height;
-    cropX=Math.round(left*scaleX);cropY=Math.round(top*scaleY);
-    cropW=Math.round(w*scaleX);cropH=Math.round(h*scaleY);
+
+  function updateCropBoxInfo(){
+    cropInfo.textContent=Math.round(cropW)+' x '+Math.round(cropH)+' px';
+    outWidth.value=Math.round(cropW);outHeight.value=Math.round(cropH);
+    updateInfo();
   }
-  document.addEventListener('mouseup',function(){dragging=false;});
+
+  cropOverlay.addEventListener('mousedown',function(e){
+    if(e.target.classList.contains('crop-handle')){
+      isResizing=true;resizeHandle=e.target.dataset.handle;
+    }else{
+      isDragging=true;
+    }
+    dragStart.x=e.clientX;dragStart.y=e.clientY;
+    cropStart={x:cropX,y:cropY,w:cropW,h:cropH};
+    saveState();
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove',function(e){
+    if(!isDragging&&!isResizing)return;
+    var dx=(e.clientX-dragStart.x)/displayScale;
+    var dy=(e.clientY-dragStart.y)/displayScale;
+
+    if(isDragging){
+      cropX=Math.max(0,Math.min(cropStart.x+dx,imgW-cropW));
+      cropY=Math.max(0,Math.min(cropStart.y+dy,imgH-cropH));
+    }else if(isResizing){
+      var sx=cropStart.x,sy=cropStart.y,sw=cropStart.w,sh=cropStart.h;
+      if(resizeHandle.includes('r')){sw=Math.max(20,Math.min(sw+dx,imgW-sx));}
+      if(resizeHandle.includes('l')){var newX=Math.max(0,sx+dx);sw=sw-(newX-sx);sx=newX;}
+      if(resizeHandle.includes('b')){sh=Math.max(20,Math.min(sh+dy,imgH-sy));}
+      if(resizeHandle.includes('t')){var newY=Math.max(0,sy+dy);sh=sh-(newY-sy);sy=newY;}
+      if(aspectRatio>0){
+        if(resizeHandle==='tr'||resizeHandle==='br'||resizeHandle==='mr'){sh=sw/aspectRatio;}
+        else if(resizeHandle==='tl'||resizeHandle==='bl'||resizeHandle==='ml'){sh=sw/aspectRatio;}
+        else{sw=sh*aspectRatio;}
+      }
+      cropX=sx;cropY=sy;cropW=Math.max(20,sw);cropH=Math.max(20,sh);
+    }
+    updateCropBox();
+  });
+
+  document.addEventListener('mouseup',function(){isDragging=false;isResizing=false;});
+
+  aspectGrid.querySelectorAll('.aspect-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      aspectGrid.querySelectorAll('.aspect-btn').forEach(function(b){b.classList.remove('active');});
+      btn.classList.add('active');
+      aspectRatio=parseFloat(btn.dataset.ratio);
+      if(aspectRatio>0){
+        cropH=cropW/aspectRatio;
+        if(cropY+cropH>imgH){cropH=imgH-cropY;cropW=cropH*aspectRatio;}
+        updateCropBox();
+      }
+    });
+  });
+
+  formatGrid.querySelectorAll('.aspect-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      formatGrid.querySelectorAll('.aspect-btn').forEach(function(b){b.classList.remove('active');});
+      btn.classList.add('active');selectedFormat=btn.dataset.format;
+    });
+  });
+
+  quality.addEventListener('input',function(){outputQuality=quality.value/100;qualityVal.textContent=quality.value+'%';});
+
+  zoomSlider.addEventListener('input',function(){zoom=parseInt(zoomSlider.value);zoomVal.textContent=zoom+'%';applyTransform();});
+  zoomIn.addEventListener('click',function(){zoom=Math.min(300,zoom+10);zoomSlider.value=zoom;zoomVal.textContent=zoom+'%';applyTransform();});
+  zoomOut.addEventListener('click',function(){zoom=Math.max(50,zoom-10);zoomSlider.value=zoom;zoomVal.textContent=zoom+'%';applyTransform();});
+
+  document.querySelectorAll('.size-preset').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      outWidth.value=btn.dataset.w;outHeight.value=btn.dataset.h;
+    });
+  });
+
+  rotateLeft.addEventListener('click',function(){saveState();rotation=(rotation-90)%360;applyTransform();});
+  rotateRight.addEventListener('click',function(){saveState();rotation=(rotation+90)%360;applyTransform();});
+  rotate180.addEventListener('click',function(){saveState();rotation=(rotation+180)%360;applyTransform();});
+  flipH.addEventListener('click',function(){saveState();flipX=!flipX;applyTransform();});
+  flipV.addEventListener('click',function(){saveState();flipY=!flipY;applyTransform();});
+
+  undoBtn.addEventListener('click',function(){
+    if(undoStack.length===0)return;
+    redoStack.push({cropX:cropX,cropY:cropY,cropW:cropW,cropH:cropH,rotation:rotation,flipX:flipX,flipY:flipY});
+    var state=undoStack.pop();
+    cropX=state.cropX;cropY=state.cropY;cropW=state.cropW;cropH=state.cropH;
+    rotation=state.rotation;flipX=state.flipX;flipY=state.flipY;
+    updateCropBox();applyTransform();
+    undoBtn.disabled=undoStack.length===0;redoBtn.disabled=false;
+  });
+
+  redoBtn.addEventListener('click',function(){
+    if(redoStack.length===0)return;
+    undoStack.push({cropX:cropX,cropY:cropY,cropW:cropW,cropH:cropH,rotation:rotation,flipX:flipX,flipY:flipY});
+    var state=redoStack.pop();
+    cropX=state.cropX;cropY=state.cropY;cropW=state.cropW;cropH=state.cropH;
+    rotation=state.rotation;flipX=state.flipX;flipY=state.flipY;
+    updateCropBox();applyTransform();
+    redoBtn.disabled=redoStack.length===0;undoBtn.disabled=false;
+  });
+
+  resetCrop.addEventListener('click',function(){
+    saveState();cropX=0;cropY=0;cropW=imgW;cropH=imgH;rotation=0;flipX=false;flipY=false;zoom=100;
+    zoomSlider.value=100;zoomVal.textContent='100%';
+    aspectGrid.querySelector('[data-ratio="0"]').click();
+    updateCropBox();applyTransform();
+  });
+
   cropBtn.addEventListener('click',function(){
-    if(!currentFile)return;cropBtn.disabled=true;Tools.setStatus(statusEl,'Processing...','');
+    if(!currentFile)return;
+    cropBtn.disabled=true;showStatus('Processing...','');
+
+    try{
+      var img=new Image();img.onload=function(){
+        try{
+          var ow=parseInt(outWidth.value)||cropW;
+          var oh=parseInt(outHeight.value)||cropH;
+          var c=document.createElement('canvas');c.width=ow;c.height=oh;
+          var ctx=c.getContext('2d');
+
+          if(roundCrop.checked){
+            ctx.beginPath();ctx.arc(ow/2,oh/2,Math.min(ow,oh)/2,0,Math.PI*2);ctx.clip();
+          }
+
+          var sx=cropX,sy=cropY,sw=cropW,sh=cropH;
+          if(rotation!==0||flipX||flipY){
+            ctx.translate(ow/2,oh/2);
+            if(rotation!==0)ctx.rotate(rotation*Math.PI/180);
+            if(flipX)ctx.scale(-1,1);
+            if(flipY)ctx.scale(1,-1);
+            ctx.translate(-ow/2,-oh/2);
+          }
+          ctx.drawImage(img,sx,sy,sw,sh,0,0,ow,oh);
+
+          c.toBlob(function(blob){
+            if(!blob){showStatus('Error: Failed to create blob','error');cropBtn.disabled=false;return;}
+            var ext=selectedFormat.split('/')[1];
+            var name=currentFile.name.replace(/\.[^.]+$/,'.'+ext);
+            Tools.downloadBlob(blob,name);
+            showStatus('Done! '+formatSize(blob.size)+' ('+ow+'x'+oh+')','done');
+            cropBtn.disabled=false;
+          },selectedFormat,outputQuality);
+        }catch(e){showStatus('Error: '+e.message,'error');cropBtn.disabled=false;}
+      };
+      img.onerror=function(){showStatus('Error: Failed to load image','error');cropBtn.disabled=false;};
+      img.src=URL.createObjectURL(currentFile);
+    }catch(e){showStatus('Error: '+e.message,'error');cropBtn.disabled=false;}
+  });
+
+  previewBtn.addEventListener('click',function(){
+    if(!currentFile)return;
     var img=new Image();img.onload=function(){
-      var c=document.createElement('canvas');
-      var outW=cropW>0?cropW:img.naturalWidth;var outH=cropH>0?cropH:img.naturalHeight;
-      var maxW=parseInt(document.getElementById('maxWidth').value)||0;
-      var maxH=parseInt(document.getElementById('maxHeight').value)||0;
-      if(maxW>0&&maxH>0){var s=Math.min(maxW/outW,maxH/outH,1);outW=Math.round(outW*s);outH=Math.round(outH*s);}
-      else if(maxW>0){outW=maxW;outH=Math.round(img.naturalHeight*(maxW/img.naturalWidth));}
-      else if(maxH>0){outH=maxH;outW=Math.round(img.naturalWidth*(maxH/img.naturalHeight));}
-      c.width=outW;c.height=outH;var ctx=c.getContext('2d');
-      var sx=cropW>0?cropX:0,sy=cropH>0?cropY:0,sw=cropW>0?cropW:img.naturalWidth,sh=cropH>0?cropH:img.naturalHeight;
-      ctx.drawImage(img,sx,sy,sw,sh,0,0,outW,outH);
-      var outputType=document.getElementById('format').value;
-      c.toBlob(function(blob){resultBlob=blob;resultPreview.src=URL.createObjectURL(blob);resultInfo.textContent=Tools.formatSize(currentFile.size)+' → '+Tools.formatSize(blob.size)+' ('+outW+'x'+outH+')';resultArea.style.display='block';downloadBtn.style.display='inline-block';Tools.setStatus(statusEl,'Done!','done');cropBtn.disabled=false;},outputType,0.92);
+      compareOriginal.src=img.src;
+      var ow=parseInt(outWidth.value)||cropW;
+      var oh=parseInt(outHeight.value)||cropH;
+      var c=document.createElement('canvas');c.width=ow;c.height=oh;
+      var ctx=c.getContext('2d');
+      ctx.drawImage(img,cropX,cropY,cropW,cropH,0,0,ow,oh);
+      compareResult.src=c.toDataURL(selectedFormat,outputQuality);
     };img.src=URL.createObjectURL(currentFile);
   });
-  downloadBtn.addEventListener('click',function(){if(!resultBlob||!currentFile)return;var ext=document.getElementById('format').value.split('/')[1];Tools.downloadBlob(resultBlob,currentFile.name.replace(/\.[^.]+$/,'.'+ext));});
+
+  var compareDragging=false;
+  compareContainer.addEventListener('mousedown',function(e){compareDragging=true;moveCompareSlider(e);});
+  document.addEventListener('mousemove',function(e){if(compareDragging)moveCompareSlider(e);});
+  document.addEventListener('mouseup',function(){compareDragging=false;});
+  function moveCompareSlider(e){
+    var rect=compareContainer.getBoundingClientRect();
+    var x=Math.max(0,Math.min(e.clientX-rect.left,rect.width));
+    var pct=x/rect.width*100;
+    compareSlider.style.left=pct+'%';
+    compareResult.style.clipPath='polygon('+pct+'% 0,100% 0,100% 100%,'+pct+'% 100%)';
+  }
+
+  document.querySelectorAll('.tab').forEach(function(tab){
+    tab.addEventListener('click',function(){
+      document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+      document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active');});
+      tab.classList.add('active');document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  Tools.setupDropZone(dropZone,handleFile);
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
+  resetBtn.addEventListener('click',function(){
+    currentFile=null;mainArea.style.display='none';dropZone.style.display='block';
+    statusEl.style.display='none';fileInput.value='';
+    cropOverlay.style.display='none';undoStack=[];redoStack=[];
+  });
 })();
 </script>
 </body>
