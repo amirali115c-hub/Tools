@@ -4,29 +4,164 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JSON to CSV | Free, Private, Client-Side</title>
-  <meta name="description" content="Convert JSON data to CSV format. Free, private, runs in your browser.">
+  <meta name="description" content="Convert JSON to CSV and CSV to JSON. Nested JSON flattening, column selection, delimiters. All in your browser.">
   <link rel="stylesheet" href="../../assets/style.css">
+  <style>
+    .tabs{display:flex;gap:4px;margin-bottom:16px}
+    .tab{padding:10px 20px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
+    .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .tab:hover:not(.active){border-color:var(--accent)}
+    .editor-wrap{display:flex;gap:12px;min-height:350px}
+    .editor-pane{flex:1;display:flex;flex-direction:column}
+    .editor-pane label{font-size:.8rem;color:var(--text2);margin-bottom:4px}
+    .editor-pane textarea{flex:1;min-height:300px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical}
+    .setting-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .setting-row label{min-width:120px;font-size:.85rem;color:var(--text2)}
+    .setting-row select,.setting-row input{flex:1}
+    .column-list{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+    .column-chip{display:flex;align-items:center;gap:4px;padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:.8rem;cursor:pointer;transition:.15s}
+    .column-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .column-chip:hover:not(.active){border-color:var(--accent)}
+    .preview-table{width:100%;border-collapse:collapse;font-size:.8rem;margin:12px 0;max-height:300px;overflow:auto;display:block}
+    .preview-table th{text-align:left;padding:8px;background:var(--surface);border-bottom:2px solid var(--border);font-weight:600;position:sticky;top:0}
+    .preview-table td{padding:8px;border-bottom:1px solid var(--border);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+    .stat-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+    .stat-value{font-size:1.5rem;font-weight:700;color:var(--accent)}
+    .stat-label{font-size:.8rem;color:var(--text2);margin-top:4px}
+    .error-box{background:#ef444410;border:1px solid #ef444430;border-radius:8px;padding:12px;color:#ef4444;font-size:.85rem;margin:12px 0}
+    select,input[type=text]{background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px}
+  </style>
 </head>
 <body>
 <div class="container">
   <div class="tool-page">
     <a href="../../" class="back-link">← Back to Tools</a>
     <h1>JSON to CSV</h1>
-    <p class="subtitle">Convert JSON arrays to CSV. No uploads.</p>
+    <p class="subtitle">Convert JSON to CSV and CSV to JSON. Nested flattening, column selection. All in your browser.</p>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="jsonToCsv">JSON → CSV</button>
+      <button class="tab" data-tab="csvToJson">CSV → JSON</button>
+      <button class="tab" data-tab="preview">Preview</button>
+    </div>
+
     <div class="tool-area">
-      <textarea id="jsonInput" style="width:100%;min-height:200px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical;margin-bottom:16px" placeholder='Paste JSON array here, e.g.:
+      <div id="jsonToCsvSection">
+        <div class="editor-wrap">
+          <div class="editor-pane">
+            <label>JSON Input</label>
+            <textarea id="jsonInput" placeholder='Paste JSON array, e.g.:
 [
   {"name":"John","age":30,"city":"NYC"},
   {"name":"Jane","age":25,"city":"LA"}
 ]'></textarea>
-      <div class="status" id="status"></div>
-      <div id="resultArea" style="display:none;margin-top:16px">
-        <textarea id="csvOutput" readonly style="width:100%;min-height:200px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical"></textarea>
+          </div>
+          <div class="editor-pane">
+            <label>CSV Output</label>
+            <textarea id="csvOutput" readonly placeholder="CSV output will appear here..."></textarea>
+          </div>
+        </div>
+
+        <div class="upload-zone" id="dropZone" style="margin-top:12px;padding:16px">
+          <strong>Drop JSON/CSV file here</strong>
+          <p>or click to browse</p>
+          <input type="file" id="fileInput" accept=".json,.csv,.txt">
+        </div>
+
+        <div id="jsonSettings" style="display:none">
+          <div class="stat-grid">
+            <div class="stat-card"><div class="stat-value" id="rowCount">0</div><div class="stat-label">Rows</div></div>
+            <div class="stat-card"><div class="stat-value" id="colCount">0</div><div class="stat-label">Columns</div></div>
+            <div class="stat-card"><div class="stat-value" id="nestLevel">0</div><div class="stat-label">Nesting Depth</div></div>
+          </div>
+
+          <div class="setting-row">
+            <label>Delimiter</label>
+            <select id="delimiter">
+              <option value=",">Comma (,)</option>
+              <option value=";">Semicolon (;)</option>
+              <option value="&#9;">Tab</option>
+              <option value="|">Pipe (|)</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <label>Flatten Nested</label>
+            <select id="flattenMode">
+              <option value="dot">Dot notation (a.b)</option>
+              <option value="bracket">Bracket notation (a[b])</option>
+              <option value="none">Don't flatten</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <label>Include Header</label>
+            <select id="includeHeader">
+              <option value="yes" selected>Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+
+          <h3 style="margin:16px 0 8px">Select Columns</h3>
+          <div class="column-list" id="columnList"></div>
+        </div>
       </div>
-      <div class="action-row">
-        <button class="btn" id="convertBtn">Convert to CSV</button>
+
+      <div id="csvToJsonSection" class="tool-section" style="display:none">
+        <div class="editor-wrap">
+          <div class="editor-pane">
+            <label>CSV Input</label>
+            <textarea id="csvInput" placeholder='Paste CSV data, e.g.:
+name,age,city
+John,30,NYC
+Jane,25,LA'></textarea>
+          </div>
+          <div class="editor-pane">
+            <label>JSON Output</label>
+            <textarea id="jsonOutput" readonly placeholder="JSON output will appear here..."></textarea>
+          </div>
+        </div>
+
+        <div class="upload-zone" id="dropZone2" style="margin-top:12px;padding:16px">
+          <strong>Drop CSV file here</strong>
+          <p>or click to browse</p>
+          <input type="file" id="fileInput2" accept=".csv,.txt">
+        </div>
+
+        <div id="csvSettings" style="display:none">
+          <div class="setting-row">
+            <label>Delimiter</label>
+            <select id="csvDelimiter">
+              <option value=",">Comma (,)</option>
+              <option value=";">Semicolon (;)</option>
+              <option value="&#9;">Tab</option>
+              <option value="|">Pipe (|)</option>
+              <option value="auto">Auto-detect</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <label>Output Format</label>
+            <select id="jsonFormat">
+              <option value="array">Array of objects</option>
+              <option value="nested">Nested (group by column)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="previewSection" class="tool-section" style="display:none">
+        <div id="previewTableWrap" style="max-height:400px;overflow:auto">
+          <p class="small">Convert data first to see preview.</p>
+        </div>
+      </div>
+
+      <div class="error-box" id="errorBox" style="display:none"></div>
+      <div class="status" id="status"></div>
+
+      <div class="action-row" id="actionRow">
+        <button class="btn" id="convertBtn">Convert</button>
         <button class="btn btn-secondary" id="copyBtn" style="display:none">Copy</button>
-        <button class="btn btn-secondary" id="downloadBtn" style="display:none">Download CSV</button>
+        <button class="btn btn-secondary" id="downloadBtn" style="display:none">Download</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
       </div>
     </div>
   </div>
@@ -34,21 +169,300 @@
 <script src="../../assets/tools.js"></script>
 <script>
 (function(){
-  var jsonInput=document.getElementById('jsonInput'),csvOutput=document.getElementById('csvOutput'),convertBtn=document.getElementById('convertBtn'),copyBtn=document.getElementById('copyBtn'),downloadBtn=document.getElementById('downloadBtn'),statusEl=document.getElementById('status'),resultArea=document.getElementById('resultArea');
-  var csvText='';
-  convertBtn.addEventListener('click',function(){
-    var text=jsonInput.value.trim();if(!text){Tools.setStatus(statusEl,'Paste JSON data first.','error');return;}
-    try{
-      var data=JSON.parse(text);if(!Array.isArray(data))data=[data];
-      if(data.length===0){Tools.setStatus(statusEl,'Empty array.','error');return;}
-      var headers=Object.keys(data[0]);var csv=headers.join(',')+'\n';
-      data.forEach(function(row){csv+=headers.map(function(h){var val=row[h]!==undefined?String(row[h]):'';return val.indexOf(',')!==-1||val.indexOf('"')!==-1||val.indexOf('\n')!==-1?'"'+val.replace(/"/g,'""')+'"':val;}).join(',')+'\n';});
-      csvText=csv;csvOutput.value=csv;resultArea.style.display='block';copyBtn.style.display='inline-block';downloadBtn.style.display='inline-block';
-      Tools.setStatus(statusEl,'Done! '+data.length+' rows converted.','done');
-    }catch(err){Tools.setStatus(statusEl,'Invalid JSON: '+err.message,'error');}
+  var jsonInput=document.getElementById('jsonInput');
+  var csvOutput=document.getElementById('csvOutput');
+  var csvInput=document.getElementById('csvInput');
+  var jsonOutput=document.getElementById('jsonOutput');
+  var convertBtn=document.getElementById('convertBtn');
+  var copyBtn=document.getElementById('copyBtn');
+  var downloadBtn=document.getElementById('downloadBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var statusEl=document.getElementById('status');
+  var errorBox=document.getElementById('errorBox');
+  var jsonSettings=document.getElementById('jsonSettings');
+  var csvSettings=document.getElementById('csvSettings');
+  var columnList=document.getElementById('columnList');
+  var previewTableWrap=document.getElementById('previewTableWrap');
+  var dropZone=document.getElementById('dropZone');
+  var fileInput=document.getElementById('fileInput');
+  var dropZone2=document.getElementById('dropZone2');
+  var fileInput2=document.getElementById('fileInput2');
+
+  var currentMode='jsonToCsv';
+  var lastOutput='';
+  var lastFilename='';
+  var parsedData=null;
+  var selectedColumns=[];
+
+  document.querySelectorAll('.tabs .tab').forEach(function(tab){
+    tab.addEventListener('click',function(){
+      document.querySelectorAll('.tabs .tab').forEach(function(t){t.classList.remove('active');});
+      tab.classList.add('active');
+      currentMode=tab.dataset.tab;
+      document.getElementById('jsonToCsvSection').style.display=currentMode==='jsonToCsv'?'block':'none';
+      document.getElementById('csvToJsonSection').style.display=currentMode==='csvToJson'?'block':'none';
+      document.getElementById('previewSection').style.display=currentMode==='preview'?'block':'none';
+      convertBtn.textContent=currentMode==='csvToJson'?'Convert to JSON':'Convert to CSV';
+    });
   });
-  copyBtn.addEventListener('click',function(){navigator.clipboard.writeText(csvText);Tools.setStatus(statusEl,'Copied!','done');});
-  downloadBtn.addEventListener('click',function(){Tools.downloadBlob(new Blob([csvText],{type:'text/csv'}),'data.csv');});
+
+  Tools.setupDropZone(dropZone,function(f){handleFile(f)});
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
+  Tools.setupDropZone(dropZone2,function(f){handleFile2(f)});
+  fileInput2.addEventListener('change',function(e){if(e.target.files[0])handleFile2(e.target.files[0]);});
+
+  function handleFile(f){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var text=e.target.result;
+      if(f.name.endsWith('.json')){jsonInput.value=text;}
+      else{jsonInput.value=text;}
+      convertBtn.click();
+    };
+    reader.readAsText(f);
+  }
+
+  function handleFile2(f){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      csvInput.value=e.target.result;
+      convertBtn.click();
+    };
+    reader.readAsText(f);
+  }
+
+  function detectDelimiter(text){
+    var firstLine=text.split('\n')[0];
+    var delimiters=[',',';','\t','|'];
+    var counts=delimiters.map(function(d){return{del:d,count:(firstLine.match(new RegExp(d==='|'?'\\|':'['+d+']','g'))||[]).length};});
+    counts.sort(function(a,b){return b.count-a.count;});
+    return counts[0].del;
+  }
+
+  function flattenObject(obj,prefix,depth){
+    var result={};
+    var maxDepth=depth||0;
+    Object.keys(obj).forEach(function(key){
+      var newKey=prefix?prefix+'.'+key:key;
+      if(typeof obj[key]==='object'&&obj[key]!==null&&!Array.isArray(obj[key])){
+        var nested=flattenObject(obj[key],newKey,depth+1);
+        Object.keys(nested).forEach(function(k){result[k]=nested[k];});
+        if(Object.keys(nested).length>maxDepth)maxDepth=Object.keys(nested).length;
+      }else if(Array.isArray(obj[key])){
+        result[newKey]=JSON.stringify(obj[key]);
+      }else{
+        result[newKey]=obj[key];
+      }
+    });
+    return result;
+  }
+
+  function getDepth(obj,depth){
+    if(typeof obj!=='object'||obj===null)return depth||0;
+    var max=depth||0;
+    Object.keys(obj).forEach(function(key){
+      var d=getDepth(obj[key],(depth||0)+1);
+      if(d>max)max=d;
+    });
+    return max;
+  }
+
+  function escapeCSV(val,delimiter){
+    var str=val===null||val===undefined?'':String(val);
+    if(str.indexOf(delimiter)!==-1||str.indexOf('"')!==-1||str.indexOf('\n')!==-1){
+      return '"'+str.replace(/"/g,'""')+'"';
+    }
+    return str;
+  }
+
+  function jsonToCsv(){
+    var text=jsonInput.value.trim();
+    if(!text){showError('Paste JSON data first.');return;}
+    try{
+      parsedData=JSON.parse(text);
+      if(!Array.isArray(parsedData))parsedData=[parsedData];
+      if(parsedData.length===0){showError('Empty array.');return;}
+
+      var delimiter=document.getElementById('delimiter').value;
+      var flattenMode=document.getElementById('flattenMode').value;
+      var includeHeader=document.getElementById('includeHeader').value==='yes';
+
+      var flatData=parsedData.map(function(item){
+        if(flattenMode==='none')return item;
+        return flattenObject(item,'',0);
+      });
+
+      var allHeaders={};
+      flatData.forEach(function(row){Object.keys(row).forEach(function(k){allHeaders[k]=true;});});
+      var headers=Object.keys(allHeaders);
+
+      document.getElementById('rowCount').textContent=flatData.length;
+      document.getElementById('colCount').textContent=headers.length;
+      document.getElementById('nestLevel').textContent=getDepth(parsedData);
+
+      columnList.innerHTML='';
+      selectedColumns=headers.slice();
+      headers.forEach(function(h){
+        var chip=document.createElement('span');
+        chip.className='column-chip active';
+        chip.textContent=h;
+        chip.dataset.col=h;
+        chip.addEventListener('click',function(){
+          chip.classList.toggle('active');
+          if(chip.classList.contains('active')){
+            if(selectedColumns.indexOf(h)===-1)selectedColumns.push(h);
+          }else{
+            selectedColumns=selectedColumns.filter(function(c){return c!==h;});
+          }
+        });
+        columnList.appendChild(chip);
+      });
+
+      jsonSettings.style.display='block';
+
+      var csv='';
+      if(includeHeader)csv=selectedColumns.map(function(h){return escapeCSV(h,delimiter);}).join(delimiter)+'\n';
+      flatData.forEach(function(row){
+        csv+=selectedColumns.map(function(h){return escapeCSV(row[h],delimiter);}).join(delimiter)+'\n';
+      });
+
+      lastOutput=csv;
+      lastFilename='data.csv';
+      csvOutput.value=csv;
+      copyBtn.style.display='inline-block';
+      downloadBtn.style.display='inline-block';
+      hideError();
+      Tools.setStatus(statusEl,'Done! '+flatData.length+' rows, '+selectedColumns.length+' columns.','done');
+    }catch(err){
+      showError('Invalid JSON: '+err.message);
+    }
+  }
+
+  function csvToJson(){
+    var text=csvInput.value.trim();
+    if(!text){showError('Paste CSV data first.');return;}
+    try{
+      var delimiter=document.getElementById('csvDelimiter').value;
+      if(delimiter==='auto')delimiter=detectDelimiter(text);
+      var format=document.getElementById('jsonFormat').value;
+
+      var lines=text.split('\n').filter(function(l){return l.trim();});
+      if(lines.length<2){showError('CSV needs at least a header and one data row.');return;}
+
+      var headers=parseCSVLine(lines[0],delimiter);
+      var data=[];
+
+      for(var i=1;i<lines.length;i++){
+        var values=parseCSVLine(lines[i],delimiter);
+        var row={};
+        headers.forEach(function(h,j){
+          var val=values[j]||'';
+          if(!isNaN(val)&&val.trim()!=='')val=Number(val);
+          else if(val==='true')val=true;
+          else if(val==='false')val=false;
+          else if(val==='null')val=null;
+          row[h]=val;
+        });
+        data.push(row);
+      }
+
+      if(format==='nested'){
+        var grouped={};
+        data.forEach(function(row){
+          var key=Object.values(row)[0]||'unknown';
+          if(!grouped[key])grouped[key]=[];
+          grouped[key].push(row);
+        });
+        data=grouped;
+      }
+
+      var json=JSON.stringify(data,null,2);
+      lastOutput=json;
+      lastFilename='data.json';
+      jsonOutput.value=json;
+      copyBtn.style.display='inline-block';
+      downloadBtn.style.display='inline-block';
+      csvSettings.style.display='block';
+      hideError();
+      Tools.setStatus(statusEl,'Done! '+lines.length+' rows converted.','done');
+    }catch(err){
+      showError('CSV parse error: '+err.message);
+    }
+  }
+
+  function parseCSVLine(line,delimiter){
+    var result=[];
+    var current='';
+    var inQuotes=false;
+    for(var i=0;i<line.length;i++){
+      var c=line[i];
+      if(inQuotes){
+        if(c==='"'){
+          if(i+1<line.length&&line[i+1]==='"'){current+='"';i++;}
+          else inQuotes=false;
+        }else{current+=c;}
+      }else{
+        if(c==='"')inQuotes=true;
+        else if(c===delimiter){result.push(current);current='';}
+        else current+=c;
+      }
+    }
+    result.push(current);
+    return result;
+  }
+
+  function renderPreview(data){
+    if(!data||!Array.isArray(data)||data.length===0){
+      previewTableWrap.innerHTML='<p class="small">No data to preview.</p>';
+      return;
+    }
+    var headers=Object.keys(data[0]);
+    var html='<table class="preview-table"><thead><tr>';
+    headers.forEach(function(h){html+='<th>'+h+'</th>';});
+    html+='</tr></thead><tbody>';
+    var rows=data.slice(0,50);
+    rows.forEach(function(row){
+      html+='<tr>';
+      headers.forEach(function(h){
+        var val=row[h];
+        if(val===null)val='null';
+        else if(typeof val==='object')val=JSON.stringify(val);
+        html+='<td title="'+String(val).replace(/"/g,'&quot;')+'">'+val+'</td>';
+      });
+      html+='</tr>';
+    });
+    html+='</tbody></table>';
+    if(data.length>50)html+='<p class="small">Showing 50 of '+data.length+' rows</p>';
+    previewTableWrap.innerHTML=html;
+  }
+
+  convertBtn.addEventListener('click',function(){
+    if(currentMode==='csvToJson')csvToJson();
+    else jsonToCsv();
+  });
+
+  copyBtn.addEventListener('click',function(){
+    navigator.clipboard.writeText(lastOutput);
+    Tools.setStatus(statusEl,'Copied!','done');
+  });
+
+  downloadBtn.addEventListener('click',function(){
+    var type=currentMode==='csvToJson'?'application/json':'text/csv';
+    Tools.downloadBlob(new Blob([lastOutput],{type:type}),lastFilename);
+  });
+
+  resetBtn.addEventListener('click',function(){
+    jsonInput.value='';csvOutput.value='';csvInput.value='';jsonOutput.value='';
+    jsonSettings.style.display='none';csvSettings.style.display='none';
+    columnList.innerHTML='';previewTableWrap.innerHTML='<p class="small">Convert data first to see preview.</p>';
+    copyBtn.style.display='none';downloadBtn.style.display='none';
+    statusEl.style.display='none';hideError();
+    parsedData=null;selectedColumns=[];lastOutput='';
+    fileInput.value='';fileInput2.value='';
+  });
+
+  function showError(msg){errorBox.textContent=msg;errorBox.style.display='block';}
+  function hideError(){errorBox.style.display='none';}
 })();
 </script>
 </body>
