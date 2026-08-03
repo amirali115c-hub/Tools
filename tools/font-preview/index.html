@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Font Preview | Free, Private, Client-Side</title>
+  <meta name="description" content="Preview TTF, OTF, WOFF fonts. Free, private, runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>Font Preview</h1>
+    <p class="subtitle">Preview fonts with custom text. No uploads.</p>
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">🔤</div>
+        <strong>Drop a font file here</strong>
+        <p>or click to browse (TTF, OTF, WOFF, WOFF2)</p>
+        <input type="file" id="fileInput" accept=".ttf,.otf,.woff,.woff2,.woff,.ttc">
+      </div>
+      <div class="preview-area" id="previewArea">
+        <div style="margin-bottom:16px">
+          <label style="color:var(--text2);font-size:.85rem;display:block;margin-bottom:6px">Preview Text</label>
+          <input type="text" id="previewText" value="The quick brown fox jumps over the lazy dog" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:10px 12px;border-radius:8px;font-size:1rem">
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="color:var(--text2);font-size:.85rem;display:block;margin-bottom:6px">Font Size</label>
+          <input type="range" id="fontSize" min="12" max="120" value="36" style="width:100%">
+          <div style="text-align:center;color:var(--text2);font-size:.85rem" id="fontSizeVal">36px</div>
+        </div>
+        <div id="fontPreview" style="padding:30px;background:var(--bg);border-radius:8px;min-height:100px;word-wrap:break-word;line-height:1.4"></div>
+        <div id="fontInfo" style="color:var(--text2);margin-top:12px;font-size:.85rem"></div>
+      </div>
+      <div class="status" id="status"></div>
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn btn-secondary" id="resetBtn">Load Another Font</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js"></script>
+<script src="../../assets/tools.js"></script>
+<script>
+(function(){
+  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),previewText=document.getElementById('previewText'),fontSize=document.getElementById('fontSize'),fontSizeVal=document.getElementById('fontSizeVal'),fontPreview=document.getElementById('fontPreview'),fontInfo=document.getElementById('fontInfo'),actionRow=document.getElementById('actionRow'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status');
+  var fontObj=null;fontFamily='preview_font_'+Date.now();
+  Tools.setupDropZone(dropZone,function(file){
+    var reader=new FileReader();reader.onload=function(){
+      try{
+        fontObj=opentype.load(reader.result);
+        var fontFace=new FontFace(family,'url(data:font/opentype;base64,'+btoa(String.fromCharCode.apply(null,new Uint8Array(reader.result)))+')');
+        fontFace.load().then(function(loaded){document.fonts.add(loaded);updatePreview();});
+        fontInfo.textContent='Font: '+fontObj.names.fontFamily.en+' | Glyphs: '+fontObj.numGlyphs;
+        previewArea.style.display='block';actionRow.style.display='flex';dropZone.style.display='none';
+        Tools.setStatus(statusEl,'Font loaded.','done');
+      }catch(err){Tools.setStatus(statusEl,'Error: '+err.message,'error');}
+    };reader.readAsArrayBuffer(file);
+  });
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])Tools.setupDropZone.__handleFile(e.target.files[0]);});
+  fontSize.addEventListener('input',function(){fontSizeVal.textContent=this.value+'px';updatePreview();});
+  previewText.addEventListener('input',updatePreview);
+  function updatePreview(){
+    fontPreview.style.fontFamily="'"+fontFamily+"'";fontPreview.style.fontSize=fontSize.value+'px';
+    fontPreview.textContent=previewText.value||'The quick brown fox jumps over the lazy dog';
+  }
+  resetBtn.addEventListener('click',function(){fontObj=null;dropZone.style.display='block';previewArea.style.display='none';actionRow.style.display='none';statusEl.style.display='none';fileInput.value='';});
+})();
+</script>
+</body>
+</html>

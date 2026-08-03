@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSV Viewer | Free, Private, Client-Side</title>
+  <meta name="description" content="View and edit CSV files in a table. Free, private, runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>CSV Viewer</h1>
+    <p class="subtitle">View, search, and filter CSV files. No uploads.</p>
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop a CSV file here</strong>
+        <p>or click to browse</p>
+        <input type="file" id="fileInput" accept=".csv,text/csv">
+      </div>
+      <div class="preview-area" id="previewArea">
+        <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+          <input type="text" id="searchInput" placeholder="Search..." style="flex:1;min-width:200px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px">
+          <div id="fileInfo" style="color:var(--text2);font-size:.9rem;display:flex;align-items:center"></div>
+        </div>
+        <div style="overflow-x:auto;max-height:500px;overflow-y:auto;border:1px solid var(--border);border-radius:8px">
+          <table id="csvTable" style="width:100%;border-collapse:collapse;font-size:.85rem"></table>
+        </div>
+      </div>
+      <div class="status" id="status"></div>
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn btn-secondary" id="downloadBtn">Download Filtered CSV</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../assets/tools.js"></script>
+<script>
+(function(){
+  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),csvTable=document.getElementById('csvTable'),searchInput=document.getElementById('searchInput'),fileInfo=document.getElementById('fileInfo'),actionRow=document.getElementById('actionRow'),downloadBtn=document.getElementById('downloadBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status');
+  var allRows=[],headers=[];
+  Tools.setupDropZone(dropZone,function(file){
+    var reader=new FileReader();reader.onload=function(){parseCSV(reader.result);};
+    reader.readAsText(file);dropZone.style.display='none';previewArea.style.display='block';actionRow.style.display='flex';
+  });
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])Tools.setupDropZone.__handleFile(e.target.files[0]);});
+  function parseCSV(text){
+    var lines=text.split('\n').filter(function(l){return l.trim();});
+    if(lines.length===0)return;
+    headers=parseLine(lines[0]);allRows=[];
+    for(var i=1;i<lines.length;i++){var row=parseLine(lines[i]);if(row.length>0)allRows.push(row);}
+    fileInfo.textContent=allRows.length+' rows, '+headers.length+' columns';
+    renderTable(allRows);
+    Tools.setStatus(statusEl,'CSV loaded.','done');
+  }
+  function parseLine(line){
+    var result=[];var current='';var inQuotes=false;
+    for(var i=0;i<line.length;i++){
+      var c=line[i];
+      if(inQuotes){if(c==='"'){if(i+1<line.length&&line[i+1]==='"'){current+='"';i++;}else inQuotes=false;}else current+=c;}
+      else{if(c==='"')inQuotes=true;else if(c===','){result.push(current.trim());current='';}else current+=c;}
+    }
+    result.push(current.trim());return result;
+  }
+  function renderTable(rows){
+    csvTable.innerHTML='';var thead=document.createElement('thead');var tbody=document.createElement('tbody');
+    var htr=document.createElement('tr');headers.forEach(function(h){var th=document.createElement('th');th.textContent=h;th.style.cssText='padding:10px 12px;background:var(--bg);border-bottom:1px solid var(--border);text-align:left;position:sticky;top:0;font-weight:600';htr.appendChild(th);});
+    thead.appendChild(htr);csvTable.appendChild(thead);
+    rows.forEach(function(row){var tr=document.createElement('tr');row.forEach(function(cell){var td=document.createElement('td');td.textContent=cell;td.style.cssText='padding:8px 12px;border-bottom:1px solid var(--border)';tr.appendChild(td);});tbody.appendChild(tr);});
+    csvTable.appendChild(tbody);
+  }
+  searchInput.addEventListener('input',function(){
+    var q=this.value.toLowerCase();
+    var filtered=allRows.filter(function(row){return row.some(function(cell){return cell.toLowerCase().indexOf(q)!==-1;});});
+    renderTable(filtered);fileInfo.textContent=filtered.length+'/'+allRows.length+' rows';
+  });
+  downloadBtn.addEventListener('click',function(){
+    var csv=headers.join(',')+'\n';allRows.forEach(function(r){csv+=r.join(',')+'\n';});
+    Tools.downloadBlob(new Blob([csv],{type:'text/csv'}),'filtered.csv');
+  });
+  resetBtn.addEventListener('click',function(){allRows=[];headers=[];dropZone.style.display='block';previewArea.style.display='none';actionRow.style.display='none';statusEl.style.display='none';fileInput.value='';searchInput.value='';});
+})();
+</script>
+</body>
+</html>

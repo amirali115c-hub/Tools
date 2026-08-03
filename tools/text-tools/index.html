@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text Tools | Word Counter, JSON Formatter, Encoders</title>
+  <meta name="description" content="Free text tools: word counter, JSON formatter, Base64 encoder, URL encoder, hash generator, case converter.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>Text Tools</h1>
+    <p class="subtitle">Word counter, JSON formatter, encoders, and more.</p>
+    <div class="tool-area" style="display:block">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px">
+        <button class="btn tool-tab active" data-tool="word-counter">Word Counter</button>
+        <button class="btn btn-secondary tool-tab" data-tool="json-formatter">JSON Formatter</button>
+        <button class="btn btn-secondary tool-tab" data-tool="base64">Base64</button>
+        <button class="btn btn-secondary tool-tab" data-tool="url-encoder">URL Encoder</button>
+        <button class="btn btn-secondary tool-tab" data-tool="hash-generator">Hash Generator</button>
+        <button class="btn btn-secondary tool-tab" data-tool="case-converter">Case Converter</button>
+      </div>
+
+      <div id="tool-word-counter" class="tool-section">
+        <textarea id="wcInput" style="width:100%;min-height:150px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-size:.9rem;resize:vertical;margin-bottom:16px" placeholder="Paste or type text here..."></textarea>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px">
+          <div style="background:var(--bg);padding:16px;border-radius:8px;text-align:center"><div style="font-size:1.5rem;font-weight:700" id="wcWords">0</div><div style="color:var(--text2);font-size:.8rem">Words</div></div>
+          <div style="background:var(--bg);padding:16px;border-radius:8px;text-align:center"><div style="font-size:1.5rem;font-weight:700" id="wcChars">0</div><div style="color:var(--text2);font-size:.8rem">Characters</div></div>
+          <div style="background:var(--bg);padding:16px;border-radius:8px;text-align:center"><div style="font-size:1.5rem;font-weight:700" id="wcSentences">0</div><div style="color:var(--text2);font-size:.8rem">Sentences</div></div>
+          <div style="background:var(--bg);padding:16px;border-radius:8px;text-align:center"><div style="font-size:1.5rem;font-weight:700" id="wcParagraphs">0</div><div style="color:var(--text2);font-size:.8rem">Paragraphs</div></div>
+          <div style="background:var(--bg);padding:16px;border-radius:8px;text-align:center"><div style="font-size:1.5rem;font-weight:700" id="wcReadTime">0m</div><div style="color:var(--text2);font-size:.8rem">Read Time</div></div>
+        </div>
+      </div>
+
+      <div id="tool-json-formatter" class="tool-section" style="display:none">
+        <textarea id="jsonInput" style="width:100%;min-height:200px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical;margin-bottom:16px" placeholder='Paste JSON here...'></textarea>
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <button class="btn" id="jsonFormatBtn">Format</button>
+          <button class="btn btn-secondary" id="jsonMinifyBtn">Minify</button>
+          <button class="btn btn-secondary" id="jsonCopyBtn">Copy</button>
+        </div>
+        <div class="status" id="jsonStatus"></div>
+      </div>
+
+      <div id="tool-base64" class="tool-section" style="display:none">
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <button class="btn b64dir active" data-dir="encode">Encode</button>
+          <button class="btn btn-secondary b64dir" data-dir="decode">Decode</button>
+        </div>
+        <textarea id="b64Input" style="width:100%;min-height:120px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical;margin-bottom:16px" placeholder="Enter text to encode..."></textarea>
+        <button class="btn" id="b64Btn" style="margin-bottom:16px">Process</button>
+        <textarea id="b64Output" readonly style="width:100%;min-height:120px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical" placeholder="Result..."></textarea>
+      </div>
+
+      <div id="tool-url-encoder" class="tool-section" style="display:none">
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <button class="btn urlenc active" data-dir="encode">Encode</button>
+          <button class="btn btn-secondary urlenc" data-dir="decode">Decode</button>
+        </div>
+        <textarea id="urlInput" style="width:100%;min-height:120px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical;margin-bottom:16px" placeholder="Enter URL or text..."></textarea>
+        <button class="btn" id="urlBtn" style="margin-bottom:16px">Process</button>
+        <textarea id="urlOutput" readonly style="width:100%;min-height:120px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical" placeholder="Result..."></textarea>
+      </div>
+
+      <div id="tool-hash-generator" class="tool-section" style="display:none">
+        <textarea id="hashInput" style="width:100%;min-height:120px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical;margin-bottom:16px" placeholder="Enter text to hash..."></textarea>
+        <button class="btn" id="hashBtn" style="margin-bottom:16px">Generate Hashes</button>
+        <div id="hashResults"></div>
+      </div>
+
+      <div id="tool-case-converter" class="tool-section" style="display:none">
+        <textarea id="caseInput" style="width:100%;min-height:150px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-size:.9rem;resize:vertical;margin-bottom:16px" placeholder="Enter text..."></textarea>
+        <div style="display:flex;flex-wrap:wrap;gap:8px">
+          <button class="btn casebtn" data-case="upper">UPPERCASE</button>
+          <button class="btn btn-secondary casebtn" data-case="lower">lowercase</button>
+          <button class="btn btn-secondary casebtn" data-case="title">Title Case</button>
+          <button class="btn btn-secondary casebtn" data-case="sentence">Sentence case</button>
+          <button class="btn btn-secondary casebtn" data-case="reverse">ReVeRsE</button>
+        </div>
+        <textarea id="caseOutput" readonly style="width:100%;min-height:150px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-size:.9rem;resize:vertical;margin-top:16px" placeholder="Result..."></textarea>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../assets/tools.js"></script>
+<script>
+(function(){
+  document.querySelectorAll('.tool-tab').forEach(function(tab){
+    tab.addEventListener('click',function(){
+      document.querySelectorAll('.tool-tab').forEach(function(t){t.classList.remove('active');t.classList.add('btn-secondary');});
+      tab.classList.add('active');tab.classList.remove('btn-secondary');
+      document.querySelectorAll('.tool-section').forEach(function(s){s.style.display='none';});
+      document.getElementById('tool-'+tab.dataset.tool).style.display='block';
+    });
+  });
+
+  // Word Counter
+  var wcInput=document.getElementById('wcInput');
+  wcInput.addEventListener('input',function(){
+    var t=wcInput.value;var words=t.trim()?t.trim().split(/\s+/).length:0;
+    document.getElementById('wcWords').textContent=words;
+    document.getElementById('wcChars').textContent=t.length;
+    document.getElementById('wcSentences').textContent=t.split(/[.!?]+/).filter(function(s){return s.trim();}).length;
+    document.getElementById('wcParagraphs').textContent=t.split(/\n\s*\n/).filter(function(s){return s.trim();}).length||t.trim()?1:0;
+    document.getElementById('wcReadTime').textContent=Math.ceil(words/200)+'m';
+  });
+
+  // JSON Formatter
+  document.getElementById('jsonFormatBtn').addEventListener('click',function(){
+    try{var d=JSON.parse(document.getElementById('jsonInput').value);document.getElementById('jsonInput').value=JSON.stringify(d,null,2);document.getElementById('jsonStatus').textContent='Formatted!';document.getElementById('jsonStatus').className='status done';}
+    catch(e){document.getElementById('jsonStatus').textContent='Invalid JSON: '+e.message;document.getElementById('jsonStatus').className='status error';}
+  });
+  document.getElementById('jsonMinifyBtn').addEventListener('click',function(){
+    try{var d=JSON.parse(document.getElementById('jsonInput').value);document.getElementById('jsonInput').value=JSON.stringify(d);document.getElementById('jsonStatus').textContent='Minified!';document.getElementById('jsonStatus').className='status done';}
+    catch(e){document.getElementById('jsonStatus').textContent='Invalid JSON: '+e.message;document.getElementById('jsonStatus').className='status error';}
+  });
+  document.getElementById('jsonCopyBtn').addEventListener('click',function(){navigator.clipboard.writeText(document.getElementById('jsonInput').value);});
+
+  // Base64
+  var b64Dir='encode';
+  document.querySelectorAll('.b64dir').forEach(function(btn){btn.addEventListener('click',function(){
+    document.querySelectorAll('.b64dir').forEach(function(b){b.classList.remove('active');b.classList.add('btn-secondary');});
+    btn.classList.add('active');btn.classList.remove('btn-secondary');b64Dir=btn.dataset.dir;
+    document.getElementById('b64Input').placeholder=b64Dir==='encode'?'Enter text to encode...':'Enter Base64 to decode...';
+  });});
+  document.getElementById('b64Btn').addEventListener('click',function(){
+    try{var r=b64Dir==='encode'?btoa(unescape(encodeURIComponent(document.getElementById('b64Input').value))):decodeURIComponent(escape(atob(document.getElementById('b64Input').value.trim())));document.getElementById('b64Output').value=r;}
+    catch(e){document.getElementById('b64Output').value='Error: '+e.message;}
+  });
+
+  // URL Encoder
+  var urlDir='encode';
+  document.querySelectorAll('.urlenc').forEach(function(btn){btn.addEventListener('click',function(){
+    document.querySelectorAll('.urlenc').forEach(function(b){b.classList.remove('active');b.classList.add('btn-secondary');});
+    btn.classList.add('active');btn.classList.remove('btn-secondary');urlDir=btn.dataset.dir;
+  });});
+  document.getElementById('urlBtn').addEventListener('click',function(){
+    try{var r=urlDir==='encode'?encodeURIComponent(document.getElementById('urlInput').value):decodeURIComponent(document.getElementById('urlInput').value);document.getElementById('urlOutput').value=r;}
+    catch(e){document.getElementById('urlOutput').value='Error: '+e.message;}
+  });
+
+  // Hash Generator
+  document.getElementById('hashBtn').addEventListener('click',async function(){
+    var text=document.getElementById('hashInput').value;var results=document.getElementById('hashResults');results.innerHTML='';
+    var algorithms=['SHA-1','SHA-256','SHA-384','SHA-512'];
+    for(var i=0;i<algorithms.length;i++){
+      var hash=await crypto.subtle.digest(algorithms[i],new TextEncoder().encode(text));
+      var hex=Array.from(new Uint8Array(hash)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+      var div=document.createElement('div');div.style.cssText='background:var(--bg);padding:10px 12px;border-radius:6px;margin-bottom:8px;font-family:monospace;font-size:.8rem;word-break:break-all';
+      div.innerHTML='<strong>'+algorithms[i]+':</strong> '+hex;results.appendChild(div);
+    }
+  });
+
+  // Case Converter
+  document.querySelectorAll('.casebtn').forEach(function(btn){btn.addEventListener('click',function(){
+    var text=document.getElementById('caseInput').value;var out='';
+    switch(btn.dataset.case){
+      case'upper':out=text.toUpperCase();break;case'lower':out=text.toLowerCase();break;
+      case'title':out=text.replace(/\w\S*/g,function(w){return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();});break;
+      case'sentence':out=text.replace(/(^\s*|[.!?]\s+)([a-z])/g,function(m,p,c){return p+c.toUpperCase();});break;
+      case'reverse':out=text.split('').reverse().join('');break;
+    }
+    document.getElementById('caseOutput').value=out;
+  });});
+})();
+</script>
+</body>
+</html>

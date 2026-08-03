@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Converter | Free, Private, Client-Side</title>
+  <meta name="description" content="Convert audio between MP3, WAV, OGG, M4A formats. Free, private, runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>Audio Converter</h1>
+    <p class="subtitle">Convert between audio formats. No uploads.</p>
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop an audio file here</strong>
+        <p>or click to browse (MP3, WAV, OGG, M4A)</p>
+        <input type="file" id="fileInput" accept="audio/*">
+      </div>
+      <div class="preview-area" id="previewArea">
+        <audio id="audioPreview" controls style="width:100%"></audio>
+        <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
+      </div>
+      <div class="controls" id="controls">
+        <label>Output Format</label>
+        <select id="format">
+          <option value="wav">WAV</option>
+          <option value="webm">WebM</option>
+        </select>
+      </div>
+      <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+      <div class="status" id="status"></div>
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="convertBtn">Convert</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../assets/tools.js"></script>
+<script>
+(function(){
+  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),audioPreview=document.getElementById('audioPreview'),controls=document.getElementById('controls'),actionRow=document.getElementById('actionRow'),convertBtn=document.getElementById('convertBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status'),fileInfo=document.getElementById('fileInfo'),progressBar=document.getElementById('progressBar'),progressFill=document.getElementById('progressFill');
+  var currentFile=null;
+  Tools.setupDropZone(dropZone,handleFile);
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
+  function handleFile(file){currentFile=file;audioPreview.src=URL.createObjectURL(file);previewArea.style.display='block';controls.style.display='block';actionRow.style.display='flex';dropZone.style.display='none';statusEl.style.display='none';progressBar.style.display='none';fileInfo.textContent='File: '+file.name+' ('+Tools.formatSize(file.size)+')';}
+  resetBtn.addEventListener('click',function(){currentFile=null;dropZone.style.display='block';previewArea.style.display='none';controls.style.display='none';actionRow.style.display='none';statusEl.style.display='none';progressBar.style.display='none';audioPreview.src='';fileInput.value='';});
+  convertBtn.addEventListener('click',async function(){
+    if(!currentFile)return;convertBtn.disabled=true;progressBar.style.display='block';
+    Tools.setStatus(statusEl,'Converting...','');progressFill.style.width='10%';
+    try{
+      var audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+      var arrayBuffer=await Tools.readAsArrayBuffer(currentFile);
+      var audioBuffer=await audioCtx.decodeAudioData(arrayBuffer);
+      var format=document.getElementById('format').value;
+      var mimeType=format==='wav'?'audio/wav':'audio/webm';
+      var offCanvas=document.createElement('canvas');offCanvas.width=1;offCanvas.height=1;
+      var stream=offCanvas.captureStream(0);
+      var audioDest=audioCtx.createMediaStreamDestination();
+      var source=audioCtx.createBufferSource();source.buffer=audioBuffer;source.connect(audioDest);
+      stream.addTrack(audioDest.stream.getAudioTracks()[0]);
+      var chunks=[];var recorder=new MediaRecorder(stream,{mimeType:mimeType});
+      recorder.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data);};
+      recorder.onstop=function(){var blob=new Blob(chunks,{type:mimeType});var name=currentFile.name.replace(/\.[^.]+$/,'.'+format);Tools.downloadBlob(blob,name);Tools.setStatus(statusEl,'Done! Converted to '+format.toUpperCase()+'.','done');progressFill.style.width='100%';convertBtn.disabled=false;audioCtx.close();};
+      source.start(0);recorder.start();
+      progressFill.style.width='50%';
+      source.onended=function(){recorder.stop();};
+    }catch(err){Tools.setStatus(statusEl,'Error: '+err.message,'error');convertBtn.disabled=false;}
+  });
+})();
+</script>
+</body>
+</html>

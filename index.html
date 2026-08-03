@@ -3,66 +3,239 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Free Tools Hub | Private, Client-Side, No Tracking</title>
-  <meta name="description" content="Free, private tools that run entirely in your browser. No uploads, no accounts, no tracking. Your files never leave your device.">
-  <meta name="keywords" content="free online tools, no upload tools, client-side tools, watermark remover, video compressor, PDF converter">
+  <title>Free Tools Hub | 30+ Free Private Client-Side Tools</title>
+  <meta name="description" content="30+ free tools that run entirely in your browser. No uploads, no accounts, no tracking. Convert, compress, edit files privately.">
+  <meta name="keywords" content="free online tools, file converter, image converter, video compressor, PDF tools, audio converter, no upload tools">
   <link rel="stylesheet" href="assets/style.css">
   <meta property="og:title" content="Free Tools Hub">
-  <meta property="og:description" content="Free, private tools that run in your browser. No uploads. No accounts.">
+  <meta property="og:description" content="30+ free tools. No uploads. No accounts. 100% private.">
   <meta property="og:type" content="website">
 </head>
 <body>
 
 <div class="container">
   <header class="hub-header">
-    <div class="badge">100% Private</div>
+    <div class="badge">30+ Tools | 100% Private</div>
     <h1>Free Tools Hub</h1>
     <p>Tools that run entirely in your browser. Your files never leave your device. No sign-ups, no watermarks, no limits.</p>
   </header>
 
-  <div class="tool-grid">
-
-    <div class="tool-card">
-      <div class="icon">🎬</div>
-      <h2>Watermark Remover</h2>
-      <p>Remove watermarks from videos and images. All processing happens in your browser.</p>
-      <a href="tools/watermark-remover/" class="btn">Open Tool</a>
-    </div>
-
-    <div class="tool-card">
-      <div class="icon">📦</div>
-      <h2>Video Compressor</h2>
-      <p>Compress video files without losing quality. Reduce file size for sharing and uploading.</p>
-      <a href="tools/video-compressor/" class="btn">Open Tool</a>
-    </div>
-
-    <div class="tool-card">
-      <div class="icon">🎞️</div>
-      <h2>Video to GIF</h2>
-      <p>Convert any video to a GIF. Choose start time, duration, and size.</p>
-      <a href="tools/video-to-gif/" class="btn">Open Tool</a>
-    </div>
-
-    <div class="tool-card">
-      <div class="icon">🖼️</div>
-      <h2>Image Tools</h2>
-      <p>Convert formats, resize, and compress images. Works with PNG, JPG, WebP, and more.</p>
-      <a href="tools/image-tools/" class="btn">Open Tool</a>
-    </div>
-
-    <div class="tool-card">
-      <div class="icon">📄</div>
-      <h2>PDF Tools</h2>
-      <p>Compress PDFs and convert PDF pages to images. No file uploads needed.</p>
-      <a href="tools/pdf-tools/" class="btn">Open Tool</a>
-    </div>
-
+  <div style="margin-bottom:30px">
+    <input type="text" id="search" placeholder="Search tools..." style="width:100%;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:1rem;outline:none">
   </div>
 
+  <section style="margin-bottom:40px">
+    <h2 style="font-size:1.3rem;margin-bottom:16px;color:var(--text2)">Image Tools</h2>
+    <div class="tool-grid" id="grid-image">
+      <div class="tool-card" data-name="image converter format">
+        <div class="icon">🖼️</div>
+        <h2>Image Converter</h2>
+        <p>Convert between PNG, JPG, WebP, GIF, BMP, ICO formats.</p>
+        <a href="tools/image-converter/" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="image cropper resize">
+        <div class="icon">✂️</div>
+        <h2>Image Cropper</h2>
+        <p>Crop, resize, and adjust image dimensions.</p>
+        <a href="tools/image-cropper/" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="image compressor reduce size">
+        <div class="icon">📦</div>
+        <h2>Image Compressor</h2>
+        <p>Reduce image file size without losing quality.</p>
+        <a href="tools/image-tools/" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="watermark remover">
+        <div class="icon">🎬</div>
+        <h2>Watermark Remover</h2>
+        <p>Remove watermarks from videos and images.</p>
+        <a href="tools/watermark-remover/" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="image base64 encoder">
+        <div class="icon">🔤</div>
+        <h2>Image to Base64</h2>
+        <p>Convert images to Base64 string for embedding.</p>
+        <a href="tools/image-converter/#base64" class="btn">Open Tool</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom:40px">
+    <h2 style="font-size:1.3rem;margin-bottom:16px;color:var(--text2)">Video Tools</h2>
+    <div class="tool-grid" id="grid-video">
+      <div class="tool-card" data-name="video compressor reduce size">
+        <div class="icon">📦</div>
+        <h2>Video Compressor</h2>
+        <p>Compress video files without losing quality.</p>
+        <a href="tools/video-compressor/" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="video to gif converter">
+        <div class="icon">🎞️</div>
+        <h2>Video to GIF</h2>
+        <p>Convert any video to an animated GIF.</p>
+        <a href="tools/video-to-gif/" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="video trimmer cutter">
+        <div class="icon">✂️</div>
+        <h2>Video Trimmer</h2>
+        <p>Trim and cut video clips to any length.</p>
+        <a href="tools/video-trimmer/" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="video to audio extractor mp3">
+        <div class="icon">🎵</div>
+        <h2>Video to Audio</h2>
+        <p>Extract audio from video files as MP3 or WAV.</p>
+        <a href="tools/video-to-audio/" class="btn">Open Tool</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom:40px">
+    <h2 style="font-size:1.3rem;margin-bottom:16px;color:var(--text2)">Audio Tools</h2>
+    <div class="tool-grid" id="grid-audio">
+      <div class="tool-card" data-name="audio converter mp3 wav ogg">
+        <div class="icon">🎵</div>
+        <h2>Audio Converter</h2>
+        <p>Convert between MP3, WAV, OGG, M4A, FLAC formats.</p>
+        <a href="tools/audio-converter/" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="audio trimmer cutter">
+        <div class="icon">✂️</div>
+        <h2>Audio Trimmer</h2>
+        <p>Trim and cut audio files to any length.</p>
+        <a href="tools/audio-trimmer/" class="btn">Open Tool</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom:40px">
+    <h2 style="font-size:1.3rem;margin-bottom:16px;color:var(--text2)">Document Tools</h2>
+    <div class="tool-grid" id="grid-document">
+      <div class="tool-card" data-name="pdf tools compressor extractor">
+        <div class="icon">📄</div>
+        <h2>PDF Tools</h2>
+        <p>Compress PDFs and extract pages as images.</p>
+        <a href="tools/pdf-tools/" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="pdf merger combine">
+        <div class="icon">📎</div>
+        <h2>PDF Merger</h2>
+        <p>Combine multiple PDF files into one.</p>
+        <a href="tools/pdf-merger/" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="pdf splitter split separate">
+        <div class="icon">📑</div>
+        <h2>PDF Splitter</h2>
+        <p>Split PDF into separate pages or ranges.</p>
+        <a href="tools/pdf-splitter/" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="text to pdf converter">
+        <div class="icon">📝</div>
+        <h2>Text to PDF</h2>
+        <p>Convert plain text files to PDF documents.</p>
+        <a href="tools/text-to-pdf/" class="btn">Open Tool</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom:40px">
+    <h2 style="font-size:1.3rem;margin-bottom:16px;color:var(--text2)">Archive Tools</h2>
+    <div class="tool-grid" id="grid-archive">
+      <div class="tool-card" data-name="zip creator extractor compressor">
+        <div class="icon">🗜️</div>
+        <h2>ZIP Tool</h2>
+        <p>Create and extract ZIP archives from files.</p>
+        <a href="tools/zip-tool/" class="btn">Open Tool</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom:40px">
+    <h2 style="font-size:1.3rem;margin-bottom:16px;color:var(--text2)">Spreadsheet Tools</h2>
+    <div class="tool-grid" id="grid-spreadsheet">
+      <div class="tool-card" data-name="csv viewer editor">
+        <div class="icon">📊</div>
+        <h2>CSV Viewer</h2>
+        <p>View, edit, and filter CSV files in a table.</p>
+        <a href="tools/csv-viewer/" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="json csv converter">
+        <div class="icon">🔄</div>
+        <h2>JSON to CSV</h2>
+        <p>Convert JSON data to CSV spreadsheet format.</p>
+        <a href="tools/json-csv/" class="btn">Open Tool</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom:40px">
+    <h2 style="font-size:1.3rem;margin-bottom:16px;color:var(--text2)">Font Tools</h2>
+    <div class="tool-grid" id="grid-font">
+      <div class="tool-card" data-name="font preview viewer">
+        <div class="icon">🔤</div>
+        <h2>Font Preview</h2>
+        <p>Preview TTF, OTF, WOFF fonts with custom text.</p>
+        <a href="tools/font-preview/" class="btn">Open Tool</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom:40px">
+    <h2 style="font-size:1.3rem;margin-bottom:16px;color:var(--text2)">Text Tools</h2>
+    <div class="tool-grid" id="grid-text">
+      <div class="tool-card" data-name="word counter character count">
+        <div class="icon">🔢</div>
+        <h2>Word Counter</h2>
+        <p>Count words, characters, sentences, and paragraphs.</p>
+        <a href="tools/text-tools/#word-counter" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="json formatter validator">
+        <div class="icon">{ }</div>
+        <h2>JSON Formatter</h2>
+        <p>Format, validate, and minify JSON data.</p>
+        <a href="tools/text-tools/#json-formatter" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="base64 encoder decoder">
+        <div class="icon">🔐</div>
+        <h2>Base64 Encoder</h2>
+        <p>Encode and decode Base64 strings.</p>
+        <a href="tools/text-tools/#base64" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="url encoder decoder">
+        <div class="icon">🔗</div>
+        <h2>URL Encoder</h2>
+        <p>Encode and decode URLs and query strings.</p>
+        <a href="tools/text-tools/#url-encoder" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="hash generator md5 sha">
+        <div class="icon">#️⃣</div>
+        <h2>Hash Generator</h2>
+        <p>Generate MD5, SHA-1, SHA-256 hashes from text.</p>
+        <a href="tools/text-tools/#hash-generator" class="btn">Open Tool</a>
+      </div>
+      <div class="tool-card" data-name="text case converter uppercase lowercase">
+        <div class="icon">Aa</div>
+        <h2>Case Converter</h2>
+        <p>Convert text to UPPERCASE, lowercase, Title Case.</p>
+        <a href="tools/text-tools/#case-converter" class="btn">Open Tool</a>
+      </div>
+    </div>
+  </section>
+
   <footer style="text-align:center;padding:30px 0;color:var(--text2);font-size:.85rem;border-top:1px solid var(--border)">
-    All tools run in your browser. Files are never uploaded.
+    All tools run in your browser. Files are never uploaded. 30+ tools, 100% free.
   </footer>
 </div>
+
+<script>
+document.getElementById('search').addEventListener('input', function() {
+  var q = this.value.toLowerCase();
+  document.querySelectorAll('.tool-card').forEach(function(card) {
+    var name = (card.getAttribute('data-name') || '') + ' ' + card.textContent.toLowerCase();
+    card.style.display = name.indexOf(q) !== -1 ? '' : 'none';
+  });
+});
+</script>
 
 </body>
 </html>

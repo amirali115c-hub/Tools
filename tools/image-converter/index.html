@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Converter | Free, Private, Client-Side</title>
+  <meta name="description" content="Convert images between PNG, JPG, WebP, GIF, BMP, ICO. Free, private, runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>Image Converter</h1>
+    <p class="subtitle">Convert between PNG, JPG, WebP, GIF, BMP, ICO. No uploads.</p>
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop an image here</strong>
+        <p>or click to browse (PNG, JPG, WebP, GIF, BMP)</p>
+        <input type="file" id="fileInput" accept="image/*">
+      </div>
+      <div class="preview-area" id="previewArea">
+        <img id="imagePreview" style="max-width:100%;border-radius:8px">
+        <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
+      </div>
+      <div class="controls" id="controls">
+        <label>Output Format</label>
+        <select id="format">
+          <option value="image/png">PNG</option>
+          <option value="image/jpeg">JPEG</option>
+          <option value="image/webp">WebP</option>
+          <option value="image/gif">GIF</option>
+        </select>
+        <label>Quality (for JPEG/WebP)</label>
+        <input type="range" id="quality" min="10" max="100" value="90">
+        <div style="display:flex;justify-content:space-between;color:var(--text2);font-size:.8rem;margin-top:-12px;margin-bottom:16px">
+          <span>Smaller</span><span id="qualityVal">90%</span><span>Better</span>
+        </div>
+      </div>
+      <div class="status" id="status"></div>
+      <div id="resultArea" style="display:none;margin-top:16px">
+        <div id="resultInfo" style="color:var(--text2);margin-bottom:12px;font-size:.9rem"></div>
+        <img id="resultPreview" style="max-width:100%;border-radius:8px;border:1px solid var(--border)">
+      </div>
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="convertBtn">Convert</button>
+        <button class="btn btn-secondary" id="downloadBtn" style="display:none">Download</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../assets/tools.js"></script>
+<script>
+(function(){
+  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),imagePreview=document.getElementById('imagePreview'),controls=document.getElementById('controls'),actionRow=document.getElementById('actionRow'),convertBtn=document.getElementById('convertBtn'),downloadBtn=document.getElementById('downloadBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status'),fileInfo=document.getElementById('fileInfo'),formatSelect=document.getElementById('format'),qualitySlider=document.getElementById('quality'),qualityVal=document.getElementById('qualityVal'),resultArea=document.getElementById('resultArea'),resultInfo=document.getElementById('resultInfo'),resultPreview=document.getElementById('resultPreview');
+  var currentFile=null,resultBlob=null;
+  Tools.setupDropZone(dropZone,handleFile);
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
+  qualitySlider.addEventListener('input',function(){qualityVal.textContent=qualitySlider.value+'%';});
+  function handleFile(file){currentFile=file;imagePreview.src=URL.createObjectURL(file);previewArea.style.display='block';controls.style.display='block';actionRow.style.display='flex';dropZone.style.display='none';statusEl.style.display='none';resultArea.style.display='none';downloadBtn.style.display='none';fileInfo.textContent='File: '+file.name+' ('+Tools.formatSize(file.size)+')';}
+  resetBtn.addEventListener('click',function(){currentFile=null;dropZone.style.display='block';previewArea.style.display='none';controls.style.display='none';actionRow.style.display='none';statusEl.style.display='none';resultArea.style.display='none';downloadBtn.style.display='none';imagePreview.src='';fileInput.value='';});
+  convertBtn.addEventListener('click',function(){
+    if(!currentFile)return;convertBtn.disabled=true;Tools.setStatus(statusEl,'Converting...','');
+    var img=new Image();img.onload=function(){
+      var c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
+      var ctx=c.getContext('2d');ctx.drawImage(img,0,0);
+      var outputType=formatSelect.value;var quality=parseInt(qualitySlider.value)/100;
+      c.toBlob(function(blob){
+        resultBlob=blob;resultPreview.src=URL.createObjectURL(blob);
+        var ext=outputType.split('/')[1];resultInfo.textContent=Tools.formatSize(currentFile.size)+' → '+Tools.formatSize(blob.size)+' ('+ext.toUpperCase()+', '+img.naturalWidth+'x'+img.naturalHeight+')';
+        resultArea.style.display='block';downloadBtn.style.display='inline-block';
+        Tools.setStatus(statusEl,'Done!','done');convertBtn.disabled=false;
+      },outputType,quality);
+    };img.src=currentFile;
+  });
+  downloadBtn.addEventListener('click',function(){
+    if(!resultBlob||!currentFile)return;
+    var ext=formatSelect.value.split('/')[1];Tools.downloadBlob(resultBlob,currentFile.name.replace(/\.[^.]+$/,'.'+ext));
+  });
+})();
+</script>
+</body>
+</html>

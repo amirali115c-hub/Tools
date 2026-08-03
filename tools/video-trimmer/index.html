@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Trimmer | Free, Private, Client-Side</title>
+  <meta name="description" content="Trim and cut video files for free. Choose start and end time. Runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>Video Trimmer</h1>
+    <p class="subtitle">Trim and cut video clips. No uploads.</p>
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop a video here</strong>
+        <p>or click to browse (MP4, WebM, MOV)</p>
+        <input type="file" id="fileInput" accept="video/*">
+      </div>
+      <div class="preview-area" id="previewArea">
+        <video id="videoPreview" controls style="max-width:100%;border-radius:8px"></video>
+        <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
+      </div>
+      <div class="controls" id="controls">
+        <label>Start Time (seconds)</label>
+        <input type="number" id="startTime" value="0" min="0" step="0.1" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
+        <label>End Time (seconds)</label>
+        <input type="number" id="endTime" value="5" min="0.1" step="0.1" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
+        <div style="display:flex;gap:12px">
+          <button class="btn btn-secondary" id="setStartBtn" style="flex:1">Set Start = Current</button>
+          <button class="btn btn-secondary" id="setEndBtn" style="flex:1">Set End = Current</button>
+        </div>
+      </div>
+      <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+      <div class="status" id="status"></div>
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="trimBtn">Trim Video</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../assets/tools.js"></script>
+<script>
+(function(){
+  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),videoPreview=document.getElementById('videoPreview'),controls=document.getElementById('controls'),actionRow=document.getElementById('actionRow'),trimBtn=document.getElementById('trimBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status'),fileInfo=document.getElementById('fileInfo'),progressBar=document.getElementById('progressBar'),progressFill=document.getElementById('progressFill');
+  var currentFile=null;
+  Tools.setupDropZone(dropZone,handleFile);
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
+  function handleFile(file){currentFile=file;videoPreview.src=URL.createObjectURL(file);previewArea.style.display='block';controls.style.display='block';actionRow.style.display='flex';dropZone.style.display='none';statusEl.style.display='none';progressBar.style.display='none';fileInfo.textContent='File: '+file.name+' ('+Tools.formatSize(file.size)+')';}
+  resetBtn.addEventListener('click',function(){currentFile=null;dropZone.style.display='block';previewArea.style.display='none';controls.style.display='none';actionRow.style.display='none';statusEl.style.display='none';progressBar.style.display='none';videoPreview.src='';fileInput.value='';});
+  document.getElementById('setStartBtn').addEventListener('click',function(){document.getElementById('startTime').value=videoPreview.currentTime.toFixed(1);});
+  document.getElementById('setEndBtn').addEventListener('click',function(){document.getElementById('endTime').value=videoPreview.currentTime.toFixed(1);});
+  function seekVideo(video,time){return new Promise(function(resolve){function onSeeked(){video.removeEventListener('seeked',onSeeked);resolve();}video.addEventListener('seeked',onSeeked);video.currentTime=time;});}
+  trimBtn.addEventListener('click',async function(){
+    if(!currentFile)return;trimBtn.disabled=true;progressBar.style.display='block';
+    Tools.setStatus(statusEl,'Loading video...','');progressFill.style.width='10%';
+    try{
+      var video=document.createElement('video');video.muted=true;video.preload='auto';video.src=videoPreview.src;
+      await new Promise(function(r,e){video.onloadeddata=r;video.onerror=e;});
+      var startTime=parseFloat(document.getElementById('startTime').value)||0;
+      var endTime=parseFloat(document.getElementById('endTime').value)||video.duration;
+      if(endTime<=startTime){endTime=Math.min(startTime+5,video.duration);}
+      var duration=endTime-startTime;
+      var offCanvas=document.createElement('canvas');offCanvas.width=video.videoWidth;offCanvas.height=video.videoHeight;
+      var offCtx=offCanvas.getContext('2d');
+      var stream=offCanvas.captureStream(30);
+      var mimeType='video/webm';if(MediaRecorder.isTypeSupported('video/webm;codecs=vp9'))mimeType='video/webm;codecs=vp9';
+      else if(MediaRecorder.isTypeSupported('video/webm;codecs=vp8'))mimeType='video/webm;codecs=vp8';
+      var chunks=[];var recorder=new MediaRecorder(stream,{mimeType:mimeType,videoBitsPerSecond:5000000});
+      recorder.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data);};
+      recorder.onstop=function(){var blob=new Blob(chunks,{type:'video/webm'});var name=currentFile.name.replace(/\.[^.]+$/,'_trimmed.webm');Tools.downloadBlob(blob,name);Tools.setStatus(statusEl,'Done! Trimmed '+duration.toFixed(1)+'s video.','done');progressFill.style.width='100%';trimBtn.disabled=false;};
+      await seekVideo(video,startTime);recorder.start();
+      var frameInterval=1/30;var framesProcessed=0;var totalFrames=Math.ceil(duration*30);
+      async function processFrame(){
+        if(video.currentTime>=endTime){recorder.stop();return;}
+        offCtx.drawImage(video,0,0);framesProcessed++;
+        var pct=Math.floor((framesProcessed/totalFrames)*90);progressFill.style.width=pct+'%';
+        if(framesProcessed%30===0)Tools.setStatus(statusEl,'Processing frame '+framesProcessed+'/'+totalFrames,'');
+        var nextTime=video.currentTime+frameInterval;if(nextTime>=endTime){recorder.stop();return;}
+        await seekVideo(video,nextTime);requestAnimationFrame(processFrame);
+      }
+      processFrame();
+    }catch(err){Tools.setStatus(statusEl,'Error: '+err.message,'error');trimBtn.disabled=false;}
+  });
+})();
+</script>
+</body>
+</html>

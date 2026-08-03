@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Trimmer | Free, Private, Client-Side</title>
+  <meta name="description" content="Trim and cut audio files for free. Choose start and end time. Runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>Audio Trimmer</h1>
+    <p class="subtitle">Trim and cut audio files. No uploads.</p>
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop an audio file here</strong>
+        <p>or click to browse (MP3, WAV, OGG, M4A)</p>
+        <input type="file" id="fileInput" accept="audio/*">
+      </div>
+      <div class="preview-area" id="previewArea">
+        <audio id="audioPreview" controls style="width:100%"></audio>
+        <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
+      </div>
+      <div class="controls" id="controls">
+        <label>Start Time (seconds)</label>
+        <input type="number" id="startTime" value="0" min="0" step="0.1" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
+        <label>End Time (seconds)</label>
+        <input type="number" id="endTime" value="10" min="0.1" step="0.1" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
+        <div style="display:flex;gap:12px">
+          <button class="btn btn-secondary" id="setStartBtn" style="flex:1">Set Start = Now</button>
+          <button class="btn btn-secondary" id="setEndBtn" style="flex:1">Set End = Now</button>
+        </div>
+      </div>
+      <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+      <div class="status" id="status"></div>
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="trimBtn">Trim Audio</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../assets/tools.js"></script>
+<script>
+(function(){
+  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),audioPreview=document.getElementById('audioPreview'),controls=document.getElementById('controls'),actionRow=document.getElementById('actionRow'),trimBtn=document.getElementById('trimBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status'),fileInfo=document.getElementById('fileInfo'),progressBar=document.getElementById('progressBar'),progressFill=document.getElementById('progressFill');
+  var currentFile=null;
+  Tools.setupDropZone(dropZone,handleFile);
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
+  function handleFile(file){currentFile=file;audioPreview.src=URL.createObjectURL(file);previewArea.style.display='block';controls.style.display='block';actionRow.style.display='flex';dropZone.style.display='none';statusEl.style.display='none';progressBar.style.display='none';fileInfo.textContent='File: '+file.name+' ('+Tools.formatSize(file.size)+')';}
+  resetBtn.addEventListener('click',function(){currentFile=null;dropZone.style.display='block';previewArea.style.display='none';controls.style.display='none';actionRow.style.display='none';statusEl.style.display='none';progressBar.style.display='none';audioPreview.src='';fileInput.value='';});
+  document.getElementById('setStartBtn').addEventListener('click',function(){document.getElementById('startTime').value=audioPreview.currentTime.toFixed(1);});
+  document.getElementById('setEndBtn').addEventListener('click',function(){document.getElementById('endTime').value=audioPreview.currentTime.toFixed(1);});
+  trimBtn.addEventListener('click',async function(){
+    if(!currentFile)return;trimBtn.disabled=true;progressBar.style.display='block';
+    Tools.setStatus(statusEl,'Loading audio...','');progressFill.style.width='10%';
+    try{
+      var audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+      var arrayBuffer=await Tools.readAsArrayBuffer(currentFile);
+      var audioBuffer=await audioCtx.decodeAudioData(arrayBuffer);
+      var startTime=parseFloat(document.getElementById('startTime').value)||0;
+      var endTime=parseFloat(document.getElementById('endTime').value)||audioBuffer.duration;
+      if(endTime<=startTime)endTime=Math.min(startTime+10,audioBuffer.duration);
+      var sampleRate=audioBuffer.sampleRate;
+      var channels=audioBuffer.numberOfChannels;
+      var startSample=Math.floor(startTime*sampleRate);
+      var endSample=Math.floor(endTime*sampleRate);
+      var newLength=endSample-startSample;
+      var newBuffer=audioCtx.createBuffer(channels,newLength,sampleRate);
+      for(var ch=0;ch<channels;ch++){
+        var oldData=audioBuffer.getChannelData(ch);
+        var newData=newBuffer.getChannelData(ch);
+        for(var i=0;i<newLength;i++)newData[i]=oldData[startSample+i];
+      }
+      var offlineCtx=new OfflineAudioContext(channels,newLength,sampleRate);
+      var source=offlineCtx.createBufferSource();source.buffer=newBuffer;source.connect(offlineCtx.destination);source.start(0);
+      var rendered=await offlineCtx.startRendering();
+      var wav=audioBufferToWav(rendered);
+      var blob=new Blob([wav],{type:'audio/wav'});
+      var name=currentFile.name.replace(/\.[^.]+$/,'_trimmed.wav');
+      Tools.downloadBlob(blob,name);
+      Tools.setStatus(statusEl,'Done! Trimmed audio downloaded.','done');
+      progressFill.style.width='100%';trimBtn.disabled=false;
+    }catch(err){Tools.setStatus(statusEl,'Error: '+err.message,'error');trimBtn.disabled=false;}
+  });
+  function audioBufferToWav(buffer){
+    var numChannels=buffer.numberOfChannels,sampleRate=buffer.sampleRate,format=1,bitsPerSample=16;
+    var bytesPerSample=bitsPerSample/8,blockAlign=numChannels*bytesPerSample;
+    var dataLength=buffer.length*blockAlign;
+    var headerLength=44;var totalLength=headerLength+dataLength;
+    var arrayBuffer=new ArrayBuffer(totalLength);var view=new DataView(arrayBuffer);
+    function writeString(offset,string){for(var i=0;i<string.length;i++)view.setUint8(offset+i,string.charCodeAt(i));}
+    writeString(0,'RIFF');view.setUint32(4,totalLength-8,true);writeString(8,'WAVE');
+    writeString(12,'fmt ');view.setUint32(16,16,true);view.setUint16(20,format,true);
+    view.setUint16(22,numChannels,true);view.setUint32(24,sampleRate,true);
+    view.setUint32(28,sampleRate*blockAlign,true);view.setUint16(32,blockAlign,true);
+    view.setUint16(34,bitsPerSample,true);writeString(36,'data');view.setUint32(40,dataLength,true);
+    var offset=44;var channels=[];for(var ch=0;ch<numChannels;ch++)channels.push(buffer.getChannelData(ch));
+    for(var i=0;i<buffer.length;i++){for(var ch=0;ch<numChannels;ch++){var sample=Math.max(-1,Math.min(1,channels[ch][i]));view.setInt16(offset,sample<0?sample*0x8000:sample*0x7FFF,true);offset+=2;}}
+    return arrayBuffer;
+  }
+})();
+</script>
+</body>
+</html>

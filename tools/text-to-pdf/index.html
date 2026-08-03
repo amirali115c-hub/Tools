@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Text to PDF | Free, Private, Client-Side</title>
+  <meta name="description" content="Convert plain text to PDF documents. Free, private, runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>Text to PDF</h1>
+    <p class="subtitle">Convert text to PDF. No uploads.</p>
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop a text file here</strong>
+        <p>or click to browse (.txt, .md, .csv)</p>
+        <input type="file" id="fileInput" accept=".txt,.md,.csv,text/*">
+      </div>
+      <div class="preview-area" id="previewArea">
+        <textarea id="textInput" style="width:100%;min-height:300px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.9rem;resize:vertical" placeholder="Or paste your text here..."></textarea>
+      </div>
+      <div class="controls" id="controls">
+        <label>Font Size</label>
+        <select id="fontSize">
+          <option value="10">10pt</option>
+          <option value="12" selected>12pt</option>
+          <option value="14">14pt</option>
+          <option value="16">16pt</option>
+        </select>
+        <label>Page Size</label>
+        <select id="pageSize">
+          <option value="a4" selected>A4</option>
+          <option value="letter">Letter</option>
+          <option value="legal">Legal</option>
+        </select>
+      </div>
+      <div class="status" id="status"></div>
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="convertBtn">Generate PDF</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="../../assets/tools.js"></script>
+<script>
+(function(){
+  if(typeof jspdf==='undefined'){Tools.setStatus(document.getElementById('status'),'Error: PDF library not loaded.','error');return;}
+  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),textInput=document.getElementById('textInput'),controls=document.getElementById('controls'),actionRow=document.getElementById('actionRow'),convertBtn=document.getElementById('convertBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status');
+  Tools.setupDropZone(dropZone,function(file){
+    var reader=new FileReader();reader.onload=function(){textInput.value=reader.result;};
+    reader.readAsText(file);previewArea.style.display='block';controls.style.display='block';
+    actionRow.style.display='flex';dropZone.style.display='none';
+  });
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])Tools.setupDropZone.__handleFile(e.target.files[0]);});
+  textInput.addEventListener('input',function(){if(textInput.value.length>0){controls.style.display='block';actionRow.style.display='flex';dropZone.style.display='none';}});
+  resetBtn.addEventListener('click',function(){textInput.value='';dropZone.style.display='block';previewArea.style.display='none';controls.style.display='none';actionRow.style.display='none';statusEl.style.display='none';fileInput.value='';});
+  convertBtn.addEventListener('click',function(){
+    var text=textInput.value;if(!text.trim()){Tools.setStatus(statusEl,'Enter or paste some text.','error');return;}
+    convertBtn.disabled=true;Tools.setStatus(statusEl,'Generating PDF...','');
+    try{
+      var {jsPDF}=jspdf;var fontSize=parseInt(document.getElementById('fontSize').value);
+      var pageSize=document.getElementById('pageSize').value;
+      var doc=new jsPDF({orientation:'portrait',unit:'pt',format:pageSize});
+      var pageWidth=doc.internal.pageSize.getWidth();var pageHeight=doc.internal.pageSize.getHeight();
+      var margin=40;var usableWidth=pageWidth-margin*2;var lineHeight=fontSize*1.5;
+      var y=margin;var lines=doc.splitTextToSize(text,usableWidth);
+      lines.forEach(function(line){
+        if(y+fontSize>pageHeight-margin){doc.addPage();y=margin;}
+        doc.setFont('courier','normal');doc.setFontSize(fontSize);doc.text(line,margin,y);y+=lineHeight;
+      });
+      doc.save('text_document.pdf');
+      Tools.setStatus(statusEl,'Done! PDF generated.','done');
+    }catch(err){Tools.setStatus(statusEl,'Error: '+err.message,'error');}
+    convertBtn.disabled=false;
+  });
+})();
+</script>
+</body>
+</html>

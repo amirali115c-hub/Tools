@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZIP Tool | Free, Private, Client-Side</title>
+  <meta name="description" content="Create and extract ZIP archives. Free, private, runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>ZIP Tool</h1>
+    <p class="subtitle">Create and extract ZIP files. No uploads.</p>
+    <div class="tool-area">
+      <div class="controls" id="controls" style="display:block">
+        <label>Mode</label>
+        <select id="mode">
+          <option value="create">Create ZIP from files</option>
+          <option value="extract">Extract ZIP file</option>
+        </select>
+      </div>
+      <div id="createMode">
+        <div class="upload-zone" id="dropZone">
+          <div class="big-icon">📁</div>
+          <strong>Drop files here</strong>
+          <p>or click to browse (multiple files)</p>
+          <input type="file" id="fileInput" multiple>
+        </div>
+        <div class="preview-area" id="previewArea">
+          <div id="fileList"></div>
+        </div>
+      </div>
+      <div id="extractMode" style="display:none">
+        <div class="upload-zone" id="dropZone2">
+          <div class="big-icon">📦</div>
+          <strong>Drop a ZIP file here</strong>
+          <p>or click to browse</p>
+          <input type="file" id="fileInput2" accept=".zip,application/zip">
+        </div>
+        <div class="preview-area" id="extractPreview">
+          <div id="extractList"></div>
+        </div>
+      </div>
+      <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+      <div class="status" id="status"></div>
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="processBtn">Process</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="../../assets/tools.js"></script>
+<script>
+(function(){
+  if(typeof JSZip==='undefined'){Tools.setStatus(document.getElementById('status'),'Error: JSZip not loaded.','error');return;}
+  var modeSelect=document.getElementById('mode'),createMode=document.getElementById('createMode'),extractMode=document.getElementById('extractMode');
+  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),fileList=document.getElementById('fileList');
+  var dropZone2=document.getElementById('dropZone2'),fileInput2=document.getElementById('fileInput2'),extractPreview=document.getElementById('extractPreview'),extractList=document.getElementById('extractList');
+  var actionRow=document.getElementById('actionRow'),processBtn=document.getElementById('processBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status'),progressBar=document.getElementById('progressBar'),progressFill=document.getElementById('progressFill');
+  var files=[];
+  modeSelect.addEventListener('change',function(){
+    createMode.style.display=modeSelect.value==='create'?'block':'none';
+    extractMode.style.display=modeSelect.value==='extract'?'block':'none';
+    actionRow.style.display='none';statusEl.style.display='none';
+  });
+  function setupDrop(zone,input,onFile){
+    zone.addEventListener('drop',function(e){e.preventDefault();zone.classList.remove('dragover');if(e.dataTransfer.files.length)onFile(e.dataTransfer.files);});
+    ['dragenter','dragover'].forEach(function(ev){zone.addEventListener(ev,function(e){e.preventDefault();zone.classList.add('dragover');});});
+    ['dragleave','drop'].forEach(function(ev){zone.addEventListener(ev,function(e){e.preventDefault();zone.classList.remove('dragover');});});
+    zone.addEventListener('click',function(){input.click();});
+    input.addEventListener('change',function(){if(input.files.length)onFile(input.files);});
+  }
+  setupDrop(dropZone,fileInput,function(fileListInput){
+    for(var i=0;i<fileListInput.length;i++)files.push(fileListInput[i]);
+    renderFiles();previewArea.style.display='block';actionRow.style.display='flex';dropZone.style.display='none';
+  });
+  function renderFiles(){
+    fileList.innerHTML='';files.forEach(function(f,i){
+      var div=document.createElement('div');div.style.cssText='background:var(--bg);padding:8px 12px;border-radius:6px;margin-bottom:6px;font-size:.9rem;display:flex;justify-content:space-between';
+      div.innerHTML='<span>'+f.name+' ('+Tools.formatSize(f.size)+')</span><button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--text2);cursor:pointer">x</button>';
+      fileList.appendChild(div);
+    });
+  }
+  var extractZipFile=null;
+  setupDrop(dropZone2,fileInput2,function(fl){extractZipFile=fl[0];extractPreview.style.display='block';actionRow.style.display='flex';dropZone2.style.display='none';
+    Tools.setStatus(statusEl,'ZIP loaded: '+extractZipFile.name,'done');
+  });
+  resetBtn.addEventListener('click',function(){files=[];extractZipFile=null;dropZone.style.display='block';dropZone2.style.display='block';previewArea.style.display='none';extractPreview.style.display='none';actionRow.style.display='none';statusEl.style.display='none';progressBar.style.display='none';fileInput.value='';fileInput2.value='';});
+  processBtn.addEventListener('click',async function(){
+    processBtn.disabled=true;progressBar.style.display='block';
+    if(modeSelect.value==='create')await createZip();else await extractZip();
+    processBtn.disabled=false;
+  });
+  async function createZip(){
+    if(files.length===0){Tools.setStatus(statusEl,'Add files first.','error');return;}
+    Tools.setStatus(statusEl,'Creating ZIP...','');progressFill.style.width='10%';
+    try{
+      var zip=new JSZip();files.forEach(function(f){zip.file(f.name,f);});
+      var blob=await zip.generateAsync({type:'blob',compression:'DEFLATE',compressionOptions:{level:6}},function(meta){progressFill.style.width=Math.floor(meta.percent)+'%';});
+      Tools.downloadBlob(blob,'archive.zip');
+      Tools.setStatus(statusEl,'Done! ZIP created.','done');progressFill.style.width='100%';
+    }catch(err){Tools.setStatus(statusEl,'Error: '+err.message,'error');}
+  }
+  async function extractZip(){
+    if(!extractZipFile){Tools.setStatus(statusEl,'Select a ZIP file.','error');return;}
+    Tools.setStatus(statusEl,'Extracting...','');progressFill.style.width='10%';
+    try{
+      var data=await Tools.readAsArrayBuffer(extractZipFile);
+      var zip=await JSZip.loadAsync(data);
+      var files=Object.keys(zip.files);var count=0;
+      for(var i=0;i<files.length;i++){
+        var entry=zip.files[files[i]];if(entry.dir)continue;
+        var blob=await entry.async('blob');Tools.downloadBlob(blob,files[i]);count++;
+        progressFill.style.width=Math.floor(((i+1)/files.length)*100)+'%';
+      }
+      Tools.setStatus(statusEl,'Done! Extracted '+count+' files.','done');progressFill.style.width='100%';
+    }catch(err){Tools.setStatus(statusEl,'Error: '+err.message,'error');}
+  }
+})();
+</script>
+</body>
+</html>

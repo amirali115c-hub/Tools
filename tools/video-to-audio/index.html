@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video to Audio | Free, Private, Client-Side</title>
+  <meta name="description" content="Extract audio from video files as MP3 or WAV. Free, private, runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>Video to Audio</h1>
+    <p class="subtitle">Extract audio from video files. No uploads.</p>
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop a video here</strong>
+        <p>or click to browse (MP4, WebM, MOV)</p>
+        <input type="file" id="fileInput" accept="video/*">
+      </div>
+      <div class="preview-area" id="previewArea">
+        <video id="videoPreview" controls style="max-width:100%;border-radius:8px"></video>
+        <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
+      </div>
+      <div class="controls" id="controls">
+        <label>Output Format</label>
+        <select id="format">
+          <option value="wav">WAV (uncompressed, larger)</option>
+          <option value="webm">WebM Audio (compressed)</option>
+        </select>
+      </div>
+      <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+      <div class="status" id="status"></div>
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="extractBtn">Extract Audio</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../assets/tools.js"></script>
+<script>
+(function(){
+  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),videoPreview=document.getElementById('videoPreview'),controls=document.getElementById('controls'),actionRow=document.getElementById('actionRow'),extractBtn=document.getElementById('extractBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status'),fileInfo=document.getElementById('fileInfo'),progressBar=document.getElementById('progressBar'),progressFill=document.getElementById('progressFill');
+  var currentFile=null;
+  Tools.setupDropZone(dropZone,handleFile);
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
+  function handleFile(file){currentFile=file;videoPreview.src=URL.createObjectURL(file);previewArea.style.display='block';controls.style.display='block';actionRow.style.display='flex';dropZone.style.display='none';statusEl.style.display='none';progressBar.style.display='none';fileInfo.textContent='File: '+file.name+' ('+Tools.formatSize(file.size)+')';}
+  resetBtn.addEventListener('click',function(){currentFile=null;dropZone.style.display='block';previewArea.style.display='none';controls.style.display='none';actionRow.style.display='none';statusEl.style.display='none';progressBar.style.display='none';videoPreview.src='';fileInput.value='';});
+  function seekVideo(video,time){return new Promise(function(resolve){function onSeeked(){video.removeEventListener('seeked',onSeeked);resolve();}video.addEventListener('seeked',onSeeked);video.currentTime=time;});}
+  extractBtn.addEventListener('click',async function(){
+    if(!currentFile)return;extractBtn.disabled=true;progressBar.style.display='block';
+    Tools.setStatus(statusEl,'Loading video...','');progressFill.style.width='10%';
+    try{
+      var video=document.createElement('video');video.preload='auto';video.src=videoPreview.src;
+      await new Promise(function(r,e){video.onloadeddata=r;video.onerror=e;});
+      var duration=video.duration;
+      var offCanvas=document.createElement('canvas');offCanvas.width=1;offCanvas.height=1;
+      var stream=offCanvas.captureStream(0);
+      var format=document.getElementById('format').value;
+      var mimeType=format==='wav'?'audio/wav':'audio/webm';
+      var audioStream=new MediaStream(stream.getAudioTracks());
+      var chunks=[];var recorder=new MediaRecorder(audioStream,{mimeType:mimeType});
+      recorder.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data);};
+      recorder.onstop=function(){var blob=new Blob(chunks,{type:mimeType});var ext=format;var name=currentFile.name.replace(/\.[^.]+$/,'_audio.'+ext);Tools.downloadBlob(blob,name);Tools.setStatus(statusEl,'Done! Audio extracted.','done');progressFill.style.width='100%';extractBtn.disabled=false;};
+      await seekVideo(video,0);recorder.start();
+      var frameInterval=1/30;var framesProcessed=0;var totalFrames=Math.ceil(duration*30);
+      async function processFrame(){
+        if(video.currentTime>=duration){recorder.stop();return;}
+        framesProcessed++;var pct=Math.floor((framesProcessed/totalFrames)*90);progressFill.style.width=pct+'%';
+        if(framesProcessed%100===0)Tools.setStatus(statusEl,'Extracting... frame '+framesProcessed+'/'+totalFrames,'');
+        var nextTime=video.currentTime+frameInterval;if(nextTime>=duration){recorder.stop();return;}
+        await seekVideo(video,nextTime);requestAnimationFrame(processFrame);
+      }
+      processFrame();
+    }catch(err){Tools.setStatus(statusEl,'Error: '+err.message,'error');extractBtn.disabled=false;}
+  });
+})();
+</script>
+</body>
+</html>

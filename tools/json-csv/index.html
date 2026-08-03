@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON to CSV | Free, Private, Client-Side</title>
+  <meta name="description" content="Convert JSON data to CSV format. Free, private, runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>JSON to CSV</h1>
+    <p class="subtitle">Convert JSON arrays to CSV. No uploads.</p>
+    <div class="tool-area">
+      <textarea id="jsonInput" style="width:100%;min-height:200px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical;margin-bottom:16px" placeholder='Paste JSON array here, e.g.:
+[
+  {"name":"John","age":30,"city":"NYC"},
+  {"name":"Jane","age":25,"city":"LA"}
+]'></textarea>
+      <div class="status" id="status"></div>
+      <div id="resultArea" style="display:none;margin-top:16px">
+        <textarea id="csvOutput" readonly style="width:100%;min-height:200px;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:12px;border-radius:8px;font-family:monospace;font-size:.85rem;resize:vertical"></textarea>
+      </div>
+      <div class="action-row">
+        <button class="btn" id="convertBtn">Convert to CSV</button>
+        <button class="btn btn-secondary" id="copyBtn" style="display:none">Copy</button>
+        <button class="btn btn-secondary" id="downloadBtn" style="display:none">Download CSV</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../assets/tools.js"></script>
+<script>
+(function(){
+  var jsonInput=document.getElementById('jsonInput'),csvOutput=document.getElementById('csvOutput'),convertBtn=document.getElementById('convertBtn'),copyBtn=document.getElementById('copyBtn'),downloadBtn=document.getElementById('downloadBtn'),statusEl=document.getElementById('status'),resultArea=document.getElementById('resultArea');
+  var csvText='';
+  convertBtn.addEventListener('click',function(){
+    var text=jsonInput.value.trim();if(!text){Tools.setStatus(statusEl,'Paste JSON data first.','error');return;}
+    try{
+      var data=JSON.parse(text);if(!Array.isArray(data))data=[data];
+      if(data.length===0){Tools.setStatus(statusEl,'Empty array.','error');return;}
+      var headers=Object.keys(data[0]);var csv=headers.join(',')+'\n';
+      data.forEach(function(row){csv+=headers.map(function(h){var val=row[h]!==undefined?String(row[h]):'';return val.indexOf(',')!==-1||val.indexOf('"')!==-1||val.indexOf('\n')!==-1?'"'+val.replace(/"/g,'""')+'"':val;}).join(',')+'\n';});
+      csvText=csv;csvOutput.value=csv;resultArea.style.display='block';copyBtn.style.display='inline-block';downloadBtn.style.display='inline-block';
+      Tools.setStatus(statusEl,'Done! '+data.length+' rows converted.','done');
+    }catch(err){Tools.setStatus(statusEl,'Invalid JSON: '+err.message,'error');}
+  });
+  copyBtn.addEventListener('click',function(){navigator.clipboard.writeText(csvText);Tools.setStatus(statusEl,'Copied!','done');});
+  downloadBtn.addEventListener('click',function(){Tools.downloadBlob(new Blob([csvText],{type:'text/csv'}),'data.csv');});
+})();
+</script>
+</body>
+</html>

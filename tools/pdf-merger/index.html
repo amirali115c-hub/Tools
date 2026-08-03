@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Merger | Free, Private, Client-Side</title>
+  <meta name="description" content="Merge multiple PDF files into one. Free, private, runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>PDF Merger</h1>
+    <p class="subtitle">Combine multiple PDFs into one. No uploads.</p>
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop PDF files here</strong>
+        <p>or click to browse (select multiple PDFs)</p>
+        <input type="file" id="fileInput" accept=".pdf,application/pdf" multiple>
+      </div>
+      <div class="preview-area" id="previewArea">
+        <div id="fileList" style="margin-bottom:16px"></div>
+        <p style="color:var(--text2);font-size:.85rem">Drag to reorder files before merging.</p>
+      </div>
+      <div class="progress-bar" id="progressBar"><div class="fill" id="progressFill"></div></div>
+      <div class="status" id="status"></div>
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="mergeBtn">Merge PDFs</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="../../assets/tools.js"></script>
+<script>
+(function(){
+  if(typeof pdfjsLib==='undefined'||typeof jspdf==='undefined'){Tools.setStatus(document.getElementById('status'),'Error: Libraries not loaded. Check internet.','error');return;}
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),fileList=document.getElementById('fileList'),actionRow=document.getElementById('actionRow'),mergeBtn=document.getElementById('mergeBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status'),progressBar=document.getElementById('progressBar'),progressFill=document.getElementById('progressFill');
+  var files=[];
+  dropZone.addEventListener('drop',function(e){e.preventDefault();dropZone.classList.remove('dragover');addFiles(e.dataTransfer.files);});
+  ['dragenter','dragover'].forEach(function(ev){dropZone.addEventListener(ev,function(e){e.preventDefault();dropZone.classList.add('dragover');});});
+  ['dragleave','drop'].forEach(function(ev){dropZone.addEventListener(ev,function(e){e.preventDefault();dropZone.classList.remove('dragover');});});
+  dropZone.addEventListener('click',function(){fileInput.click();});
+  fileInput.addEventListener('change',function(){if(fileInput.files.length)addFiles(fileInput.files);});
+  function addFiles(fileListInput){
+    for(var i=0;i<fileListInput.length;i++){if(fileListInput[i].type==='application/pdf')files.push(fileListInput[i]);}
+    if(files.length>0){renderFileList();previewArea.style.display='block';actionRow.style.display='flex';dropZone.style.display='none';}
+  }
+  function renderFileList(){
+    fileList.innerHTML='';
+    files.forEach(function(f,i){
+      var div=document.createElement('div');div.style.cssText='background:var(--bg);padding:10px 14px;border-radius:8px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;cursor:grab';
+      div.draggable=true;div.dataset.index=i;
+      div.innerHTML='<span>'+(i+1)+'. '+f.name+' ('+Tools.formatSize(f.size)+')</span><button class="btn btn-secondary" style="padding:4px 10px;font-size:.8rem" data-remove="'+i+'">Remove</button>';
+      fileList.appendChild(div);
+    });
+    fileList.querySelectorAll('[data-remove]').forEach(function(btn){
+      btn.addEventListener('click',function(e){e.stopPropagation();files.splice(parseInt(btn.dataset.remove),1);if(files.length===0){previewArea.style.display='none';actionRow.style.display='none';dropZone.style.display='block';}else renderFileList();});
+    });
+    var dragItem=null;
+    fileList.querySelectorAll('[draggable]').forEach(function(item){
+      item.addEventListener('dragstart',function(e){dragItem=item;e.dataTransfer.effectAllowed='move';});
+      item.addEventListener('dragover',function(e){e.preventDefault();e.dataTransfer.dropEffect='move';});
+      item.addEventListener('drop',function(e){
+        e.preventDefault();if(dragItem===item)return;
+        var fromIdx=parseInt(dragItem.dataset.index),toIdx=parseInt(item.dataset.index);
+        var moved=files.splice(fromIdx,1)[0];files.splice(toIdx,0,moved);renderFileList();
+      });
+    });
+  }
+  resetBtn.addEventListener('click',function(){files=[];dropZone.style.display='block';previewArea.style.display='none';actionRow.style.display='none';statusEl.style.display='none';progressBar.style.display='none';fileInput.value='';});
+  mergeBtn.addEventListener('click',async function(){
+    if(files.length<2){Tools.setStatus(statusEl,'Add at least 2 PDF files.','error');return;}
+    mergeBtn.disabled=true;progressBar.style.display='block';
+    Tools.setStatus(statusEl,'Loading PDFs...','');progressFill.style.width='10%';
+    try{
+      var {jsPDF}=jspdf;var merged=new jsPDF({orientation:'portrait',unit:'pt',format:'a4'});
+      var totalPages=0;
+      for(var i=0;i<files.length;i++){
+        var data=await Tools.readAsArrayBuffer(files[i]);
+        var pdf=await pdfjsLib.getDocument({data:data}).promise;
+        for(var p=1;p<=pdf.numPages;p++){
+          var page=await pdf.getPage(p);
+          var viewport=page.getViewport({scale:2});
+          var canvas=document.createElement('canvas');canvas.width=viewport.width;canvas.height=viewport.height;
+          await page.render({canvasContext:canvas.getContext('2d'),viewport:viewport}).promise;
+          var imgData=canvas.toDataURL('image/jpeg',0.95);
+          if(totalPages>0)merged.addPage();
+          var pageWidth=merged.internal.pageSize.getWidth();var pageHeight=merged.internal.pageSize.getHeight();
+          var ratio=Math.min(pageWidth/canvas.width,pageHeight/canvas.height);
+          var w=canvas.width*ratio;var h=canvas.height*ratio;
+          merged.addImage(imgData,'JPEG',(pageWidth-w)/2,(pageHeight-h)/2,w,h);
+          totalPages++;
+        }
+        var pct=Math.floor(((i+1)/files.length)*90);progressFill.style.width=pct+'%';
+        Tools.setStatus(statusEl,'Processed '+(i+1)+'/'+files.length+' files ('+totalPages+' pages)...','');
+      }
+      merged.save('merged.pdf');
+      Tools.setStatus(statusEl,'Done! '+totalPages+' pages merged.','done');progressFill.style.width='100%';
+    }catch(err){Tools.setStatus(statusEl,'Error: '+err.message,'error');}
+    mergeBtn.disabled=false;
+  });
+})();
+</script>
+</body>
+</html>

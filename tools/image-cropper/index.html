@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Cropper | Free, Private, Client-Side</title>
+  <meta name="description" content="Crop and resize images for free. Choose exact dimensions. Runs in your browser.">
+  <link rel="stylesheet" href="../../assets/style.css">
+</head>
+<body>
+<div class="container">
+  <div class="tool-page">
+    <a href="../../" class="back-link">← Back to Tools</a>
+    <h1>Image Cropper</h1>
+    <p class="subtitle">Crop and resize images. No uploads.</p>
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop an image here</strong>
+        <p>or click to browse</p>
+        <input type="file" id="fileInput" accept="image/*">
+      </div>
+      <div class="preview-area" id="previewArea">
+        <div style="position:relative;display:inline-block;max-width:100%">
+          <img id="imagePreview" style="max-width:100%;border-radius:8px;display:block">
+          <div id="cropBox" style="display:none;position:absolute;border:2px dashed var(--accent);background:rgba(99,102,241,.1);cursor:move"></div>
+        </div>
+        <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
+      </div>
+      <div class="controls" id="controls">
+        <label>Output Format</label>
+        <select id="format">
+          <option value="image/png">PNG</option>
+          <option value="image/jpeg">JPEG</option>
+          <option value="image/webp">WebP</option>
+        </select>
+        <label>Max Width (px, 0 = keep original)</label>
+        <input type="number" id="maxWidth" value="0" min="0" max="10000" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
+        <label>Max Height (px, 0 = keep original)</label>
+        <input type="number" id="maxHeight" value="0" min="0" max="10000" style="width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;margin-bottom:16px">
+        <p style="color:var(--text2);font-size:.85rem">Drag on the image to select crop area, or set dimensions above.</p>
+      </div>
+      <div class="status" id="status"></div>
+      <div id="resultArea" style="display:none;margin-top:16px">
+        <div id="resultInfo" style="color:var(--text2);margin-bottom:12px;font-size:.9rem"></div>
+        <img id="resultPreview" style="max-width:100%;border-radius:8px;border:1px solid var(--border)">
+      </div>
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="cropBtn">Crop & Resize</button>
+        <button class="btn btn-secondary" id="downloadBtn" style="display:none">Download</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="../../assets/tools.js"></script>
+<script>
+(function(){
+  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),previewArea=document.getElementById('previewArea'),imagePreview=document.getElementById('imagePreview'),cropBox=document.getElementById('cropBox'),controls=document.getElementById('controls'),actionRow=document.getElementById('actionRow'),cropBtn=document.getElementById('cropBtn'),downloadBtn=document.getElementById('downloadBtn'),resetBtn=document.getElementById('resetBtn'),statusEl=document.getElementById('status'),fileInfo=document.getElementById('fileInfo'),resultArea=document.getElementById('resultArea'),resultInfo=document.getElementById('resultInfo'),resultPreview=document.getElementById('resultPreview');
+  var currentFile=null,resultBlob=null,imgW=0,imgH=0,cropX=0,cropY=0,cropW=0,cropH=0,dragging=false,dragStart={};
+  Tools.setupDropZone(dropZone,handleFile);
+  fileInput.addEventListener('change',function(e){if(e.target.files[0])handleFile(e.target.files[0]);});
+  function handleFile(file){
+    currentFile=file;imagePreview.src=URL.createObjectURL(file);
+    imagePreview.onload=function(){imgW=imagePreview.naturalWidth;imgH=imagePreview.naturalHeight;};
+    previewArea.style.display='block';controls.style.display='block';actionRow.style.display='flex';
+    dropZone.style.display='none';statusEl.style.display='none';resultArea.style.display='none';downloadBtn.style.display='none';
+    fileInfo.textContent='File: '+file.name+' ('+Tools.formatSize(file.size)+')';cropBox.style.display='none';
+  }
+  resetBtn.addEventListener('click',function(){currentFile=null;dropZone.style.display='block';previewArea.style.display='none';controls.style.display='none';actionRow.style.display='none';statusEl.style.display='none';resultArea.style.display='none';downloadBtn.style.display='none';imagePreview.src='';fileInput.value='';});
+  imagePreview.addEventListener('mousedown',function(e){startDrag(e);});
+  imagePreview.addEventListener('touchstart',function(e){startDrag(e.touches[0]);},{passive:false});
+  function startDrag(e){
+    var rect=imagePreview.getBoundingClientRect();
+    dragStart.x=e.clientX-rect.left;dragStart.y=e.clientY-rect.top;dragging=true;
+    cropBox.style.display='block';
+  }
+  document.addEventListener('mousemove',function(e){if(!dragging)return;moveDrag(e);});
+  document.addEventListener('touchmove',function(e){if(!dragging)return;moveDrag(e.touches[0]);},{passive:false});
+  function moveDrag(e){
+    var rect=imagePreview.getBoundingClientRect();
+    var x=Math.max(0,Math.min(e.clientX-rect.left,rect.width));
+    var y=Math.max(0,Math.min(e.clientY-rect.top,rect.height));
+    var left=Math.min(dragStart.x,x),top=Math.min(dragStart.y,y);
+    var w=Math.abs(x-dragStart.x),h=Math.abs(y-dragStart.y);
+    cropBox.style.left=left+'px';cropBox.style.top=top+'px';
+    cropBox.style.width=w+'px';cropBox.style.height=h+'px';
+    var scaleX=imgW/rect.width,scaleY=imgH/rect.height;
+    cropX=Math.round(left*scaleX);cropY=Math.round(top*scaleY);
+    cropW=Math.round(w*scaleX);cropH=Math.round(h*scaleY);
+  }
+  document.addEventListener('mouseup',function(){dragging=false;});
+  cropBtn.addEventListener('click',function(){
+    if(!currentFile)return;cropBtn.disabled=true;Tools.setStatus(statusEl,'Processing...','');
+    var img=new Image();img.onload=function(){
+      var c=document.createElement('canvas');
+      var outW=cropW>0?cropW:img.naturalWidth;var outH=cropH>0?cropH:img.naturalHeight;
+      var maxW=parseInt(document.getElementById('maxWidth').value)||0;
+      var maxH=parseInt(document.getElementById('maxHeight').value)||0;
+      if(maxW>0&&maxH>0){var s=Math.min(maxW/outW,maxH/outH,1);outW=Math.round(outW*s);outH=Math.round(outH*s);}
+      else if(maxW>0){outW=maxW;outH=Math.round(img.naturalHeight*(maxW/img.naturalWidth));}
+      else if(maxH>0){outH=maxH;outW=Math.round(img.naturalWidth*(maxH/img.naturalHeight));}
+      c.width=outW;c.height=outH;var ctx=c.getContext('2d');
+      var sx=cropW>0?cropX:0,sy=cropH>0?cropY:0,sw=cropW>0?cropW:img.naturalWidth,sh=cropH>0?cropH:img.naturalHeight;
+      ctx.drawImage(img,sx,sy,sw,sh,0,0,outW,outH);
+      var outputType=document.getElementById('format').value;
+      c.toBlob(function(blob){resultBlob=blob;resultPreview.src=URL.createObjectURL(blob);resultInfo.textContent=Tools.formatSize(currentFile.size)+' → '+Tools.formatSize(blob.size)+' ('+outW+'x'+outH+')';resultArea.style.display='block';downloadBtn.style.display='inline-block';Tools.setStatus(statusEl,'Done!','done');cropBtn.disabled=false;},outputType,0.92);
+    };img.src=currentFile;
+  });
+  downloadBtn.addEventListener('click',function(){if(!resultBlob||!currentFile)return;var ext=document.getElementById('format').value.split('/')[1];Tools.downloadBlob(resultBlob,currentFile.name.replace(/\.[^.]+$/,'.'+ext));});
+})();
+</script>
+</body>
+</html>
