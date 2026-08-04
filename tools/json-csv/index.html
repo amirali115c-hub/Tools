@@ -3,13 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JSON to CSV | Free, Private, Client-Side</title>
-  <meta name="description" content="Convert JSON to CSV and CSV to JSON. Nested JSON flattening, column selection, delimiters. All in your browser.">
+  <title>JSON to CSV Converter - Free Online | No Upload | 100% Private</title>
+  <meta name="description" content="Convert JSON to CSV and CSV to JSON online for free. Nested JSON flattening, column selection, custom delimiters. No uploads, 100% private.">
+  <meta name="keywords" content="json to csv, csv to json, json converter, csv converter, json to excel, flatten nested json, convert json to csv online, json csv tool">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://amirali115c-hub.github.io/Tools/tools/json-csv/">
   <link rel="stylesheet" href="../../assets/style.css">
-  <style>
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="JSON to CSV Converter - Free Online | No Upload | 100% Private">
+  <meta property="og:description" content="Convert JSON to CSV and CSV to JSON online for free. Nested JSON flattening, column selection, custom delimiters. No uploads, 100% private.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://amirali115c-hub.github.io/Tools/tools/json-csv/">
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Free Online JSON to CSV Converter - Free Online Tool",
+  "operatingSystem": "Any",
+  "applicationCategory": "UtilitiesApplication",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Convert JSON to CSV and CSV to JSON online for free. Nested JSON flattening, column selection, custom delimiters. No uploads, 100% private."
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://amirali115c-hub.github.io/Tools/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Spreadsheet Tools",
+      "item": "https://amirali115c-hub.github.io/Tools/#spreadsheet"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Free Online JSON to CSV Converter"
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do I convert JSON to CSV?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Paste your JSON or drop a file, and the tool converts it to a table. Nested objects are flattened into columns automatically."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I convert CSV back to JSON?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, the reverse conversion is built in. Load a CSV and it produces valid JSON with your chosen structure."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my data uploaded to a server?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No, all conversion happens locally in your browser. Your data never leaves your device."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it handle nested JSON?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, nested objects and arrays are flattened into columns so the data fits a spreadsheet format."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I choose which columns to export?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, you can select the specific fields to include and choose the delimiter (comma, semicolon, tab, pipe)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use this in Excel or Google Sheets?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Absolutely. The exported CSV opens directly in Excel, Google Sheets, and any other spreadsheet application."
+      }
+    }
+  ]
+}
+  </script>
+<style>
     .tabs{display:flex;gap:4px;margin-bottom:16px}
     .tab{padding:10px 20px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
-    .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .tab.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
     .tab:hover:not(.active){border-color:var(--accent)}
     .editor-wrap{display:flex;gap:12px;min-height:350px}
     .editor-pane{flex:1;display:flex;flex-direction:column}
@@ -20,7 +126,7 @@
     .setting-row select,.setting-row input{flex:1}
     .column-list{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
     .column-chip{display:flex;align-items:center;gap:4px;padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:.8rem;cursor:pointer;transition:.15s}
-    .column-chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .column-chip.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
     .column-chip:hover:not(.active){border-color:var(--accent)}
     .preview-table{width:100%;border-collapse:collapse;font-size:.8rem;margin:12px 0;max-height:300px;overflow:auto;display:block}
     .preview-table th{text-align:left;padding:8px;background:var(--surface);border-bottom:2px solid var(--border);font-weight:600;position:sticky;top:0}
@@ -32,15 +138,40 @@
     .error-box{background:#ef444410;border:1px solid #ef444430;border-radius:8px;padding:12px;color:#ef4444;font-size:.85rem;margin:12px 0}
     select,input[type=text]{background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px}
   </style>
-</head>
+  <style>
+    .seo-tool-frame{width:100%;border:1px solid var(--border);border-radius:var(--radius);background:#f8fafc;min-height:900px}
+  </style>
+</head></head>
 <body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="header-logo" href="../../">Free Tools<span class="dot">.</span></a>
+    <nav class="header-nav">
+      <a href="../../">Home</a>
+      <a href="../../#seo">SEO</a>
+      <a href="https://clienvora.com">Clienvora</a>
+    </nav>
+  </div>
+</header>
 <div class="container">
   <div class="tool-page">
-    <a href="../../" class="back-link">← Back to Tools</a>
-    <h1>JSON to CSV</h1>
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb">
+      <a href="../../">Home</a> &gt; <a href="../../#spreadsheet">Spreadsheet Tools</a> &gt; Free Online JSON to CSV Converter
+    </nav>
+
+    <h1>Free Online JSON to CSV Converter</h1>
     <p class="subtitle">Convert JSON to CSV and CSV to JSON. Nested flattening, column selection. All in your browser.</p>
 
-    <div class="tabs" id="tabs">
+    <!-- Trust Badges -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;font-size:.9rem;color:var(--text2)">
+      <span>✓ No uploads</span>
+      <span>✓ No sign-ups</span>
+      <span>✓ 100% private</span>
+      <span>✓ Works offline</span>
+    </div>
+
+<div class="tabs" id="tabs">
       <button class="tab active" data-tab="jsonToCsv">JSON → CSV</button>
       <button class="tab" data-tab="csvToJson">CSV → JSON</button>
       <button class="tab" data-tab="preview">Preview</button>
@@ -163,6 +294,91 @@ Jane,25,LA'></textarea>
         <button class="btn btn-secondary" id="downloadBtn" style="display:none">Download</button>
         <button class="btn btn-secondary" id="resetBtn">Reset</button>
       </div>
+    </div>
+
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+      <h2>How to Convert JSON to CSV</h2>
+      <p>Follow these simple steps to use the free online json to csv converter tool:</p>
+      <ol style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li style="margin-bottom:8px"><strong>Paste or upload JSON</strong> - Drop a JSON file or paste raw JSON into the editor.</li>
+        <li style="margin-bottom:8px"><strong>Flatten nested data</strong> - Nested objects are flattened into columns automatically, so arrays and deep structures become tabular.</li>
+        <li style="margin-bottom:8px"><strong>Select columns</strong> - Choose which fields to include in the output and set the delimiter.</li>
+        <li style="margin-bottom:8px"><strong>Preview and export</strong> - Check the live preview, then download the CSV or copy it to your clipboard.</li>
+      </ol>
+
+      <h2>Features</h2>
+      <ul style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li><strong>Convert JSON to CSV and CSV back to JSON</strong></li>
+        <li><strong>Automatic flattening of nested JSON objects</strong></li>
+        <li><strong>Column selection and custom delimiters</strong></li>
+        <li><strong>Live preview before export</strong></li>
+        <li><strong>Handles arrays of objects and large datasets</strong></li>
+      </ul>
+
+      <h2>Why Choose This Tool?</h2>
+      <p>Moving data between APIs (JSON) and spreadsheets (CSV) is a constant chore. Our converter flattens nested JSON automatically, lets you pick your columns, and produces clean CSV you can open in Excel or Google Sheets — all locally in your browser.</p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+
+      <details class="faq-item">
+        <summary>How do I convert JSON to CSV?</summary>
+        <p>Paste your JSON or drop a file, and the tool converts it to a table. Nested objects are flattened into columns automatically.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I convert CSV back to JSON?</summary>
+        <p>Yes, the reverse conversion is built in. Load a CSV and it produces valid JSON with your chosen structure.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is my data uploaded to a server?</summary>
+        <p>No, all conversion happens locally in your browser. Your data never leaves your device.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does it handle nested JSON?</summary>
+        <p>Yes, nested objects and arrays are flattened into columns so the data fits a spreadsheet format.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I choose which columns to export?</summary>
+        <p>Yes, you can select the specific fields to include and choose the delimiter (comma, semicolon, tab, pipe).</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I use this in Excel or Google Sheets?</summary>
+        <p>Absolutely. The exported CSV opens directly in Excel, Google Sheets, and any other spreadsheet application.</p>
+      </details>
+    </section>
+
+    <!-- Related Tools Section -->
+    <section class="related-tools">
+      <h2>Related Tools</h2>
+      <div class="related-grid">
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">📊</div>
+          <h3>CSV Viewer</h3>
+          <p>View CSV files with sort, filter, search and export. All in your browser.</p>
+          <a href="../csv-viewer/">Open CSV Viewer →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🔤</div>
+          <h3>Text Tools</h3>
+          <p>JSON formatter, word counter, Base64, hash, regex and more.</p>
+          <a href="../text-tools/">Open Text Tools →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">📄</div>
+          <h3>Text to PDF</h3>
+          <p>Convert text to PDF with font, margins, and layout control.</p>
+          <a href="../text-to-pdf/">Open Text to PDF →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <p>Need custom web tools or automation for your business?</p>
+      <a href="https://clienvora.com">Learn more about Clienvora - Custom Web Development →</a>
     </div>
   </div>
 </div>
@@ -465,5 +681,36 @@ Jane,25,LA'></textarea>
   function hideError(){errorBox.style.display='none';}
 })();
 </script>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h4>Free Online Tools</h4>
+        <p>32+ free, private, browser-based tools. No uploads, no accounts. Your files never leave your device.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Popular Tools</h4>
+        <a href="../../tools/image-converter/">Image Converter</a>
+        <a href="../../tools/pdf-tools/">PDF Tools</a>
+        <a href="../../tools/zip-tool/">ZIP Tool</a>
+        <a href="../../tools/text-tools/">Text Tools</a>
+      </div>
+      <div class="footer-col">
+        <h4>SEO Tools</h4>
+        <a href="../../tools/canonical-tag-checker/">Canonical Checker</a>
+        <a href="../../tools/robots-txt-checker/">Robots.txt Checker</a>
+        <a href="../../tools/redirect-chain-checker/">Redirect Chain Checker</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://clienvora.com">Clienvora</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>All tools run in your browser. Files are never uploaded. 32+ tools, 100% free, 100% private.</p>
+      <p>Built by <a href="https://clienvora.com">Clienvora</a> &middot; <a href="../../">Free Online Tools</a></p>
+    </div>
+  </div>
+</footer>
 </body>
 </html>

@@ -1,0 +1,6 @@
+{
+  "name": "Image Processor Suite",
+  "description": "All-in-one client-side image compressor, converter, cropper, and editor. 100% private, no uploads, works offline.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

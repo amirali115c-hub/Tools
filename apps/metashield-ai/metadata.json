@@ -1,0 +1,6 @@
+{
+  "name": "MetaShield AI - Image Metadata & Privacy Studio",
+  "description": "Inspect, analyze, and remove EXIF metadata, AI generator prompts, GPS tags, and visual artifacts with AI privacy auditing and forensics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

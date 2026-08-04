@@ -3,13 +3,140 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Text Tools | Word Counter, JSON Formatter, Encoders</title>
-  <meta name="description" content="Free text tools: word counter, JSON formatter, Base64, URL encoder, hash, case converter, regex, diff, password generator. All in browser.">
+  <title>Text Tools - Free Online Text Utilities | No Upload | 100% Private</title>
+  <meta name="description" content="Free text tools: word counter, JSON formatter, Base64, URL encoder, hash, case converter, regex, diff, password generator. No uploads, 100% private.">
+  <meta name="keywords" content="text tools, word counter, json formatter, base64 encoder, url encoder, case converter, regex tester, diff checker, password generator">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://amirali115c-hub.github.io/Tools/tools/text-tools/">
   <link rel="stylesheet" href="../../assets/style.css">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Text Tools - Free Online Text Utilities">
+  <meta property="og:description" content="Free text tools: word counter, JSON formatter, Base64, URL encoder, hash, case converter, regex, diff, password generator.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://amirali115c-hub.github.io/Tools/tools/text-tools/">
+
+  <!-- Schema.org SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Text Tools - Free Online Tool",
+    "operatingSystem": "Any",
+    "applicationCategory": "UtilitiesApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Free text tools: word counter, JSON formatter, Base64, URL encoder, hash, case converter, regex, diff, password generator. No uploads, 100% private."
+  }
+  </script>
+
+  <!-- Schema.org BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://amirali115c-hub.github.io/Tools/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Text Tools",
+        "item": "https://amirali115c-hub.github.io/Tools/#text"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Text Tools"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Schema.org FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What text tools are available?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Our Text Tools include: Word Counter, JSON Formatter, Base64 Encoder/Decoder, URL Encoder/Decoder, MD5/SHA256 Hash, Case Converter, Regex Tester, Diff Checker, and Password Generator."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my text data uploaded to any server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, your text never leaves your device. All processing happens locally in your browser using client-side JavaScript. Your privacy is 100% guaranteed."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the JSON formatter work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Paste your JSON string and click Format. The tool will pretty-print it with proper indentation and syntax highlighting. You can also minify JSON back to a single line."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is Base64 encoding?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Base64 encodes binary data as ASCII text. It's commonly used for embedding images in HTML/CSS, email attachments, and data URLs. Our tool can encode and decode Base64."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How does the password generator work?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Set the desired length and character types (uppercase, lowercase, numbers, symbols) and the tool generates a cryptographically secure random password using the Web Crypto API."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I count words and characters?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our Word Counter shows character count, word count, sentence count, paragraph count, and reading time in real-time as you type or paste text."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the diff checker for?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The Diff Checker compares two text blocks and highlights the differences. Useful for comparing code versions, proofreading, or checking changes between documents."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does the regex tester work with all patterns?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our Regex Tester supports all standard JavaScript regular expressions. Enter a pattern and test string to see matches highlighted in real-time."
+        }
+      }
+    ]
+  }
+  </script>
   <style>
     .tool-tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px}
     .tool-tabs button{padding:8px 14px;border-radius:8px;font-size:.85rem;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;transition:.15s}
-    .tool-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .tool-tabs button.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
     .tool-tabs button:hover:not(.active){border-color:var(--accent)}
     .tool-section{display:none}
     .tool-section.active{display:block}
@@ -45,14 +172,63 @@
     .pw-strength.weak{background:#ef4444;width:33%}
     .pw-strength.medium{background:#f59e0b;width:66%}
     .pw-strength.strong{background:#22c55e;width:100%}
+    .breadcrumb{font-size:.85rem;color:var(--text2);margin-bottom:16px}
+    .breadcrumb a{color:var(--accent);text-decoration:none}
+    .breadcrumb a:hover{text-decoration:underline}
+    .seo-content{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .seo-content h2{font-size:1.3rem;margin:24px 0 12px;color:var(--text)}
+    .seo-content p{color:var(--text2);line-height:1.7;margin-bottom:12px}
+    .seo-content ul{color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px}
+    .seo-content li{margin-bottom:8px}
+    .seo-content a{color:var(--accent);text-decoration:none}
+    .seo-content a:hover{text-decoration:underline}
+    .faq-section{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .faq-section h2{font-size:1.3rem;margin-bottom:16px}
+    .faq-item{margin-bottom:8px;padding:16px;background:var(--surface);border-radius:8px;cursor:pointer}
+    .faq-item summary{font-weight:600;font-size:1rem}
+    .faq-item p{margin-top:12px;color:var(--text2);line-height:1.6}
+    .related-tools{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .related-tools h2{font-size:1.3rem;margin-bottom:16px}
+    .related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+    .related-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+    .related-card h3{font-size:1rem;margin:8px 0}
+    .related-card p{font-size:.85rem;color:var(--text2);margin-bottom:12px}
+    .related-card a{color:var(--accent);text-decoration:none;font-weight:600}
+    .related-card a:hover{text-decoration:underline}
+    .footer-cta{margin-top:40px;padding:30px;background:var(--surface);border-radius:12px;text-align:center}
+    .footer-cta p{margin-bottom:8px;color:var(--text2)}
+    .footer-cta a{color:var(--accent);font-weight:600;text-decoration:none}
+    .footer-cta a:hover{text-decoration:underline}
   </style>
 </head>
 <body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="header-logo" href="../../">Free Tools<span class="dot">.</span></a>
+    <nav class="header-nav">
+      <a href="../../">Home</a>
+      <a href="../../#seo">SEO</a>
+      <a href="https://clienvora.com">Clienvora</a>
+    </nav>
+  </div>
+</header>
 <div class="container">
   <div class="tool-page">
-    <a href="../../" class="back-link">← Back to Tools</a>
-    <h1>Text Tools</h1>
-    <p class="subtitle">Word counter, JSON formatter, encoders, regex, diff, password generator. All in browser.</p>
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb">
+      <a href="../../">Home</a> &gt; <a href="../../#text">Text Tools</a> &gt; Text Tools
+    </nav>
+
+    <h1>Free Online Text Tools - Word Counter, JSON Formatter, Encoders</h1>
+    <p class="subtitle">Free text tools: word counter, JSON formatter, Base64, URL encoder, hash, case converter, regex, diff, password generator. No uploads, 100% private.</p>
+
+    <!-- Trust Badges -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;font-size:.9rem;color:var(--text2)">
+      <span>✓ No uploads</span>
+      <span>✓ No sign-ups</span>
+      <span>✓ 100% private</span>
+      <span>✓ Works offline</span>
+    </div>
 
     <div class="tool-tabs" id="toolTabs">
       <button class="active" data-tool="word-counter">Word Counter</button>
@@ -219,6 +395,106 @@
         </div>
       </div>
 
+    </div>
+
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+      <h2>How to Use the Text Tools</h2>
+      <p>Pick any tool from the tabs above and start working with your text instantly. All tools run locally in your browser:</p>
+      <ol style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li style="margin-bottom:8px"><strong>Word Counter</strong> - Type or paste text to see word, character, sentence, and paragraph counts plus reading time in real time.</li>
+        <li style="margin-bottom:8px"><strong>JSON Formatter</strong> - Paste JSON, then Format, Minify, or Validate it with syntax highlighting.</li>
+        <li style="margin-bottom:8px"><strong>Base64 & URL Encoders</strong> - Encode or decode Base64 and URL-encoded strings.</li>
+        <li style="margin-bottom:8px"><strong>Hash, Case, Regex & Diff</strong> - Generate MD5/SHA256 hashes, convert case, test regular expressions, and compare two blocks of text.</li>
+        <li style="margin-bottom:8px"><strong>Password Generator</strong> - Create cryptographically secure passwords with configurable length and character sets.</li>
+      </ol>
+
+      <h2>Features</h2>
+      <ul style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li><strong>9+ utilities in one page</strong> - Word counter, JSON formatter, Base64, URL encoder, hash, case converter, regex, diff, password generator</li>
+        <li><strong>Real-time results</strong> - Counts and conversions update as you type</li>
+        <li><strong>Secure password generation</strong> - Uses the Web Crypto API</li>
+        <li><strong>100% Private</strong> - Text never leaves your browser</li>
+      </ul>
+
+      <h2>Why Choose Our Text Tools?</h2>
+      <p>Instead of juggling a dozen bookmarklets and tabs, our Text Tools give you the everyday utilities you need in one page. Everything runs entirely in your browser, so your sensitive text — passwords, API keys, JSON payloads — is never transmitted anywhere.</p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+
+      <details class="faq-item">
+        <summary>What text tools are available?</summary>
+        <p>Our Text Tools include: Word Counter, JSON Formatter, Base64 Encoder/Decoder, URL Encoder/Decoder, MD5/SHA256 Hash, Case Converter, Regex Tester, Diff Checker, and Password Generator.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Is my text data uploaded to any server?</summary>
+        <p>No, your text never leaves your device. All processing happens locally in your browser using client-side JavaScript. Your privacy is 100% guaranteed.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>How does the JSON formatter work?</summary>
+        <p>Paste your JSON string and click Format. The tool will pretty-print it with proper indentation and syntax highlighting. You can also minify JSON back to a single line.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What is Base64 encoding?</summary>
+        <p>Base64 encodes binary data as ASCII text. It's commonly used for embedding images in HTML/CSS, email attachments, and data URLs. Our tool can encode and decode Base64.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>How does the password generator work?</summary>
+        <p>Set the desired length and character types (uppercase, lowercase, numbers, symbols) and the tool generates a cryptographically secure random password using the Web Crypto API.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I count words and characters?</summary>
+        <p>Yes, our Word Counter shows character count, word count, sentence count, paragraph count, and reading time in real-time as you type or paste text.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What is the diff checker for?</summary>
+        <p>The Diff Checker compares two text blocks and highlights the differences. Useful for comparing code versions, proofreading, or checking changes between documents.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does the regex tester work with all patterns?</summary>
+        <p>Yes, our Regex Tester supports all standard JavaScript regular expressions. Enter a pattern and test string to see matches highlighted in real-time.</p>
+      </details>
+    </section>
+
+    <!-- Related Tools Section -->
+    <section class="related-tools">
+      <h2>Related Tools</h2>
+      <div class="related-grid">
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🔄</div>
+          <h3>JSON to CSV</h3>
+          <p>Convert JSON to CSV and CSV to JSON. Nested flattening, column selection.</p>
+          <a href="../json-csv/">Open JSON to CSV →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">📊</div>
+          <h3>CSV Viewer</h3>
+          <p>View CSV files with sort, filter, search and export. All in your browser.</p>
+          <a href="../csv-viewer/">Open CSV Viewer →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">📄</div>
+          <h3>Text to PDF</h3>
+          <p>Convert text to PDF with font, margins, and layout control.</p>
+          <a href="../text-to-pdf/">Open Text to PDF →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <p>Need custom web tools or automation for your business?</p>
+      <a href="https://clienvora.com">Learn more about Clienvora - Custom Web Development →</a>
     </div>
   </div>
 </div>
@@ -446,5 +722,36 @@
   document.getElementById('uuidCopyBtn').addEventListener('click',function(){navigator.clipboard.writeText(document.getElementById('uuidResult').textContent);});
 })();
 </script>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h4>Free Online Tools</h4>
+        <p>32+ free, private, browser-based tools. No uploads, no accounts. Your files never leave your device.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Popular Tools</h4>
+        <a href="../../tools/image-converter/">Image Converter</a>
+        <a href="../../tools/pdf-tools/">PDF Tools</a>
+        <a href="../../tools/zip-tool/">ZIP Tool</a>
+        <a href="../../tools/text-tools/">Text Tools</a>
+      </div>
+      <div class="footer-col">
+        <h4>SEO Tools</h4>
+        <a href="../../tools/canonical-tag-checker/">Canonical Checker</a>
+        <a href="../../tools/robots-txt-checker/">Robots.txt Checker</a>
+        <a href="../../tools/redirect-chain-checker/">Redirect Chain Checker</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://clienvora.com">Clienvora</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>All tools run in your browser. Files are never uploaded. 32+ tools, 100% free, 100% private.</p>
+      <p>Built by <a href="https://clienvora.com">Clienvora</a> &middot; <a href="../../">Free Online Tools</a></p>
+    </div>
+  </div>
+</footer>
 </body>
 </html>

@@ -3,10 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Text to PDF | Free, Private, Client-Side</title>
-  <meta name="description" content="Free text to PDF converter. Font, margins, header/footer, page numbers. All in your browser.">
+  <title>Text to PDF Converter - Free Online | No Upload | 100% Private</title>
+  <meta name="description" content="Convert text to PDF online for free. Choose font, margins, header/footer and page numbers. No uploads, 100% private.">
+  <meta name="keywords" content="text to pdf, txt to pdf, convert text to pdf, make pdf from text, text to pdf converter free, pdf generator from text, online pdf creator">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://amirali115c-hub.github.io/Tools/tools/text-to-pdf/">
   <link rel="stylesheet" href="../../assets/style.css">
-  <style>
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Text to PDF Converter - Free Online | No Upload | 100% Private">
+  <meta property="og:description" content="Convert text to PDF online for free. Choose font, margins, header/footer and page numbers. No uploads, 100% private.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://amirali115c-hub.github.io/Tools/tools/text-to-pdf/">
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Free Online Text to PDF Converter - Free Online Tool",
+  "operatingSystem": "Any",
+  "applicationCategory": "UtilitiesApplication",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Convert text to PDF online for free. Choose font, margins, header/footer and page numbers. No uploads, 100% private."
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://amirali115c-hub.github.io/Tools/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Document Tools",
+      "item": "https://amirali115c-hub.github.io/Tools/#document"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Free Online Text to PDF Converter"
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do I convert text to PDF?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Paste your text, choose the font and margins, then click Generate. The PDF downloads instantly."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I choose the font and size?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, the settings let you select the font family, size, margins, and line spacing for the output PDF."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my text uploaded to a server?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The PDF is generated entirely in your browser with jsPDF. Your text never leaves your device."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I add page numbers?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, you can enable an optional header, footer, and automatic page numbers."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the output quality?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The converter produces standard, print-ready PDF files that open in any PDF reader."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is this tool free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, it is completely free with no watermarks, no sign-ups, and no limits."
+      }
+    }
+  ]
+}
+  </script>
+<style>
     .editor-wrap{display:flex;gap:12px;min-height:400px}
     .editor-pane{flex:1;display:flex;flex-direction:column}
     .editor-pane label{font-size:.8rem;color:var(--text2);margin-bottom:4px}
@@ -17,7 +123,7 @@
     .setting-row select,.setting-row input[type=number]{flex:1}
     .preview-tabs{display:flex;gap:4px;margin-bottom:16px}
     .preview-tabs button{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
-    .preview-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .preview-tabs button.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
     .preview-tabs button:hover:not(.active){border-color:var(--accent)}
     .format-btns{display:flex;gap:6px;margin-bottom:12px}
     .format-btns button{padding:6px 12px;border-radius:6px;font-size:.8rem;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;font-weight:700}
@@ -28,15 +134,40 @@
     .template-btns button:hover{border-color:var(--accent);background:var(--surface)}
     select,input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px}
   </style>
-</head>
+  <style>
+    .seo-tool-frame{width:100%;border:1px solid var(--border);border-radius:var(--radius);background:#f8fafc;min-height:900px}
+  </style>
+</head></head>
 <body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="header-logo" href="../../">Free Tools<span class="dot">.</span></a>
+    <nav class="header-nav">
+      <a href="../../">Home</a>
+      <a href="../../#seo">SEO</a>
+      <a href="https://clienvora.com">Clienvora</a>
+    </nav>
+  </div>
+</header>
 <div class="container">
   <div class="tool-page">
-    <a href="../../" class="back-link">← Back to Tools</a>
-    <h1>Text to PDF</h1>
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb">
+      <a href="../../">Home</a> &gt; <a href="../../#document">Document Tools</a> &gt; Free Online Text to PDF Converter
+    </nav>
+
+    <h1>Free Online Text to PDF Converter</h1>
     <p class="subtitle">Convert text to PDF. Font, margins, header/footer. All in your browser.</p>
 
-    <div class="tabs" id="tabs">
+    <!-- Trust Badges -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;font-size:.9rem;color:var(--text2)">
+      <span>✓ No uploads</span>
+      <span>✓ No sign-ups</span>
+      <span>✓ 100% private</span>
+      <span>✓ Works offline</span>
+    </div>
+
+<div class="tabs" id="tabs">
       <button class="tab active" data-tab="editor">Editor</button>
       <button class="tab" data-tab="settings">Settings</button>
       <button class="tab" data-tab="header">Header/Footer</button>
@@ -171,6 +302,91 @@
         <button class="btn btn-secondary" id="downloadTextBtn">Download TXT</button>
         <button class="btn btn-secondary" id="resetBtn">Reset</button>
       </div>
+    </div>
+
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+      <h2>How to Convert Text to PDF</h2>
+      <p>Follow these simple steps to use the free online text to pdf converter tool:</p>
+      <ol style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li style="margin-bottom:8px"><strong>Paste or type your text</strong> - Add the content you want to turn into a PDF document.</li>
+        <li style="margin-bottom:8px"><strong>Configure the layout</strong> - Choose the font, font size, margins, and line spacing.</li>
+        <li style="margin-bottom:8px"><strong>Add header/footer</strong> - Optional page numbers and a header or footer line.</li>
+        <li style="margin-bottom:8px"><strong>Generate and download</strong> - Preview the result and download your PDF instantly.</li>
+      </ol>
+
+      <h2>Features</h2>
+      <ul style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li><strong>Convert plain text into a formatted PDF</strong></li>
+        <li><strong>Choose font, size, margins, and line spacing</strong></li>
+        <li><strong>Optional header, footer, and page numbers</strong></li>
+        <li><strong>Live preview before downloading</strong></li>
+        <li><strong>100% client-side using jsPDF</strong></li>
+      </ul>
+
+      <h2>Why Choose This Tool?</h2>
+      <p>Turn plain notes, scripts, or documents into clean, printable PDFs without installing software. Set your own typography and layout, add page numbers, and download a professional-looking PDF — all processed locally in your browser.</p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+
+      <details class="faq-item">
+        <summary>How do I convert text to PDF?</summary>
+        <p>Paste your text, choose the font and margins, then click Generate. The PDF downloads instantly.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I choose the font and size?</summary>
+        <p>Yes, the settings let you select the font family, size, margins, and line spacing for the output PDF.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is my text uploaded to a server?</summary>
+        <p>No. The PDF is generated entirely in your browser with jsPDF. Your text never leaves your device.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I add page numbers?</summary>
+        <p>Yes, you can enable an optional header, footer, and automatic page numbers.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the output quality?</summary>
+        <p>The converter produces standard, print-ready PDF files that open in any PDF reader.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is this tool free?</summary>
+        <p>Yes, it is completely free with no watermarks, no sign-ups, and no limits.</p>
+      </details>
+    </section>
+
+    <!-- Related Tools Section -->
+    <section class="related-tools">
+      <h2>Related Tools</h2>
+      <div class="related-grid">
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">📑</div>
+          <h3>PDF Merger</h3>
+          <p>Combine PDF files into one. Reorder pages, merge without quality loss.</p>
+          <a href="../pdf-merger/">Open PDF Merger →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🔤</div>
+          <h3>Font Preview</h3>
+          <p>Preview fonts, character sets and metrics before you print.</p>
+          <a href="../font-preview/">Open Font Preview →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🔤</div>
+          <h3>Text Tools</h3>
+          <p>Word counter, JSON formatter, Base64, hash, case converter and more.</p>
+          <a href="../text-tools/">Open Text Tools →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <p>Need custom web tools or automation for your business?</p>
+      <a href="https://clienvora.com">Learn more about Clienvora - Custom Web Development →</a>
     </div>
   </div>
 </div>
@@ -368,5 +584,36 @@
   });
 })();
 </script>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h4>Free Online Tools</h4>
+        <p>32+ free, private, browser-based tools. No uploads, no accounts. Your files never leave your device.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Popular Tools</h4>
+        <a href="../../tools/image-converter/">Image Converter</a>
+        <a href="../../tools/pdf-tools/">PDF Tools</a>
+        <a href="../../tools/zip-tool/">ZIP Tool</a>
+        <a href="../../tools/text-tools/">Text Tools</a>
+      </div>
+      <div class="footer-col">
+        <h4>SEO Tools</h4>
+        <a href="../../tools/canonical-tag-checker/">Canonical Checker</a>
+        <a href="../../tools/robots-txt-checker/">Robots.txt Checker</a>
+        <a href="../../tools/redirect-chain-checker/">Redirect Chain Checker</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://clienvora.com">Clienvora</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>All tools run in your browser. Files are never uploaded. 32+ tools, 100% free, 100% private.</p>
+      <p>Built by <a href="https://clienvora.com">Clienvora</a> &middot; <a href="../../">Free Online Tools</a></p>
+    </div>
+  </div>
+</footer>
 </body>
 </html>

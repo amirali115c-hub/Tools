@@ -1,0 +1,6 @@
+{
+  "name": "SEO Keyword Gap & Targeting Planner",
+  "description": "Client-side SEO competitive analysis, page classification, TF-IDF keyword targeting, and placement planner.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

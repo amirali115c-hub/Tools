@@ -1,0 +1,6 @@
+{
+  "name": "Robots.txt Checker & Generator",
+  "description": "An advanced RFC 9309 and Googlebot-compliant robots.txt parser, URL tester, diagnostic auditor, and visual generator.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

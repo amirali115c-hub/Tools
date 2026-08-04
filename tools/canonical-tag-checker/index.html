@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canonical Tag Checker - Free Online SEO Tool | No Upload | 100% Private</title>
+  <meta name="description" content="Check rel=canonical tags online for free. Audit single pages or bulk URLs, detect duplicate canonicals, missing tags and misconfigurations. No uploads, 100% private.">
+  <meta name="keywords" content="canonical tag checker, rel canonical checker, canonical audit, duplicate content checker, seo canonical tool, canonical tag audit">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://amirali115c-hub.github.io/Tools/tools/canonical-tag-checker/">
+  <link rel="stylesheet" href="../../assets/style.css">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Canonical Tag Checker - Free Online SEO Tool">
+  <meta property="og:description" content="Check rel=canonical tags online for free. Audit single pages or bulk URLs, detect duplicate canonicals and misconfigurations.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://amirali115c-hub.github.io/Tools/tools/canonical-tag-checker/">
+
+  <!-- Schema.org SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Canonical Tag Checker - Free Online Tool",
+    "operatingSystem": "Any",
+    "applicationCategory": "UtilitiesApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Check rel=canonical tags online for free. Audit single pages or bulk URLs, detect duplicate canonicals, missing tags and misconfigurations."
+  }
+  </script>
+
+  <!-- Schema.org BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://amirali115c-hub.github.io/Tools/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "SEO Tools",
+        "item": "https://amirali115c-hub.github.io/Tools/#seo"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Canonical Tag Checker"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Schema.org FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a canonical tag checker?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A canonical tag checker is a tool that audits the rel=canonical tag on a webpage to verify it points to the correct canonical URL. It helps SEOs detect duplicate content, missing canonicals, and misconfigured tags that can split link equity."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Why is the canonical tag important for SEO?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The canonical tag tells search engines which version of a URL is the preferred one when duplicate content exists. Without a correct canonical, search engines may index the wrong URL, dilute ranking signals, and cause duplicate content issues."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my website data uploaded to a server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, the Canonical Tag Checker runs entirely in your browser. Paste raw HTML or a URL and the audit happens locally. Your pages, headers, and data never leave your device."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I check canonical tags for multiple URLs at once?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, the tool includes a bulk audit mode where you can paste multiple URLs or HTML blocks and check all their canonical tags at once, then export the results as CSV."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What canonical tag issues does the tool detect?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The checker detects missing canonical tags, self-referencing vs cross-referencing canonicals, conflicting or multiple canonical tags, lowercasing and trailing slash mismatches, HTTP vs HTTPS canonical mismatches, and non-indexable canonical targets."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    .seo-tool-frame{width:100%;border:1px solid var(--border);border-radius:var(--radius);background:#f8fafc;min-height:900px}
+    .seo-content{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .seo-content h2{font-size:1.3rem;margin:24px 0 12px;color:var(--text)}
+    .seo-content p{color:var(--text2);line-height:1.7;margin-bottom:12px}
+    .seo-content ul{color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px}
+    .seo-content li{margin-bottom:8px}
+    .seo-content a{color:var(--accent);text-decoration:none}
+    .seo-content a:hover{text-decoration:underline}
+    .faq-section{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .faq-section h2{font-size:1.3rem;margin-bottom:16px}
+    .faq-item{margin-bottom:8px;padding:16px;background:var(--surface);border-radius:8px;cursor:pointer}
+    .faq-item summary{font-weight:600;font-size:1rem}
+    .faq-item p{margin-top:12px;color:var(--text2);line-height:1.6}
+    .related-tools{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .related-tools h2{font-size:1.3rem;margin-bottom:16px}
+    .related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+    .related-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+    .related-card h3{font-size:1rem;margin:8px 0}
+    .related-card p{font-size:.85rem;color:var(--text2);margin-bottom:12px}
+    .related-card a{color:var(--accent);text-decoration:none;font-weight:600}
+    .related-card a:hover{text-decoration:underline}
+    .footer-cta{margin-top:40px;padding:30px;background:var(--surface);border-radius:12px;text-align:center}
+    .footer-cta p{margin-bottom:8px;color:var(--text2)}
+    .footer-cta a{color:var(--accent);font-weight:600;text-decoration:none}
+    .footer-cta a:hover{text-decoration:underline}
+    .breadcrumb{font-size:.85rem;color:var(--text2);margin-bottom:16px}
+    .breadcrumb a{color:var(--accent);text-decoration:none}
+    .breadcrumb a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="header-logo" href="../../">Free Tools<span class="dot">.</span></a>
+    <nav class="header-nav">
+      <a href="../../">Home</a>
+      <a href="../../#seo">SEO</a>
+      <a href="https://clienvora.com">Clienvora</a>
+    </nav>
+  </div>
+</header>
+<div class="container">
+  <div class="tool-page">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb">
+      <a href="../../">Home</a> &gt; <a href="../../#seo">SEO Tools</a> &gt; Canonical Tag Checker
+    </nav>
+
+    <h1>Free Online Canonical Tag Checker</h1>
+    <p class="subtitle">Audit rel=canonical tags on single pages or bulk URLs. Detect missing, duplicate, and conflicting canonical tags. No uploads, 100% private.</p>
+
+    <!-- Trust Badges -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;font-size:.9rem;color:var(--text2)">
+      <span>✓ No uploads</span>
+      <span>✓ No sign-ups</span>
+      <span>✓ 100% private</span>
+      <span>✓ Free forever</span>
+    </div>
+
+    <div class="tool-area">
+      <iframe class="seo-tool-frame" id="toolFrame" src="app/index.html" title="Canonical Tag Checker Tool" loading="lazy"></iframe>
+    </div>
+
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+      <h2>How to Check Canonical Tags</h2>
+      <p>Checking your rel=canonical tags is essential for a healthy technical SEO setup. Our free Canonical Tag Checker lets you verify that every page points to the correct canonical URL in seconds:</p>
+      <ol style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li style="margin-bottom:8px"><strong>Paste raw HTML or a URL</strong> - Drop the page HTML or enter a URL to begin a single-page audit.</li>
+        <li style="margin-bottom:8px"><strong>Review the audit</strong> - The tool analyzes the canonical tag, pagination links, and HTTP headers, flagging any issue.</li>
+        <li style="margin-bottom:8px"><strong>Run bulk checks</strong> - Use bulk mode to validate many URLs or HTML blocks at once.</li>
+        <li style="margin-bottom:8px"><strong>Export results</strong> - Download the full audit as CSV for your SEO tracking workflow.</li>
+      </ol>
+
+      <h2>Features of the Canonical Tag Checker</h2>
+      <ul style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li><strong>Single Page Audit</strong> - Deep inspection of one URL or HTML block</li>
+        <li><strong>Bulk Audit</strong> - Check multiple URLs and HTML blocks at once</li>
+        <li><strong>Header Analysis</strong> - Verifies rel=canonical in HTTP headers</li>
+        <li><strong>Issue Detection</strong> - Missing, duplicate, conflicting, and invalid canonicals</li>
+        <li><strong>CSV Export</strong> - Download audit results for reporting</li>
+        <li><strong>100% Client-Side</strong> - All analysis runs in your browser</li>
+      </ul>
+
+      <h2>Why Use Our Canonical Tag Checker?</h2>
+      <p>Unlike other canonical checkers that send your pages to their servers, this tool works entirely in your browser. Your HTML, headers, and URLs never leave your device. There are no limits on how many pages you audit, no sign-ups, and no data collection.</p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+
+      <details class="faq-item">
+        <summary>What is a canonical tag checker?</summary>
+        <p>A canonical tag checker is a tool that audits the rel=canonical tag on a webpage to verify it points to the correct canonical URL. It helps SEOs detect duplicate content, missing canonicals, and misconfigured tags that can split link equity.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Why is the canonical tag important for SEO?</summary>
+        <p>The canonical tag tells search engines which version of a URL is the preferred one when duplicate content exists. Without a correct canonical, search engines may index the wrong URL, dilute ranking signals, and cause duplicate content issues.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Is my website data uploaded to a server?</summary>
+        <p>No, the Canonical Tag Checker runs entirely in your browser. Paste raw HTML or a URL and the audit happens locally. Your pages, headers, and data never leave your device.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I check canonical tags for multiple URLs at once?</summary>
+        <p>Yes, the tool includes a bulk audit mode where you can paste multiple URLs or HTML blocks and check all their canonical tags at once, then export the results as CSV.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What canonical tag issues does the tool detect?</summary>
+        <p>The checker detects missing canonical tags, self-referencing vs cross-referencing canonicals, conflicting or multiple canonical tags, lowercasing and trailing slash mismatches, HTTP vs HTTPS canonical mismatches, and non-indexable canonical targets.</p>
+      </details>
+    </section>
+
+    <!-- Related Tools Section -->
+    <section class="related-tools">
+      <h2>Related SEO Tools</h2>
+      <div class="related-grid">
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🤖</div>
+          <h3>Robots.txt Checker</h3>
+          <p>Validate and generate robots.txt files. Test URLs against rules, RFC 9309 compliant.</p>
+          <a href="../robots-txt-checker/">Open Robots.txt Checker →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🔀</div>
+          <h3>Redirect Chain Checker</h3>
+          <p>Analyze redirect chains, detect loops and long chains that waste crawl budget.</p>
+          <a href="../redirect-chain-checker/">Open Redirect Chain Checker →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🔎</div>
+          <h3>SEO Keyword Gap</h3>
+          <p>Analyze keyword gaps, build topic clusters, and plan on-page targeting.</p>
+          <a href="../seo-keyword-gap/">Open Keyword Gap Planner →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <p>Need custom web tools or automation for your business?</p>
+      <a href="https://clienvora.com">Learn more about Clienvora - Custom Web Development →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var f=document.getElementById('toolFrame');
+  function resize(){
+    try{
+      var h=f.contentWindow.document.documentElement.scrollHeight;
+      if(h>200)f.style.height=(h+40)+'px';
+    }catch(e){}
+  }
+  f.addEventListener('load',resize);
+  window.addEventListener('resize',resize);
+  setTimeout(resize,1000);
+})();
+</script>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h4>Free Online Tools</h4>
+        <p>32+ free, private, browser-based tools. No uploads, no accounts. Your files never leave your device.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Popular Tools</h4>
+        <a href="../../tools/image-converter/">Image Converter</a>
+        <a href="../../tools/pdf-tools/">PDF Tools</a>
+        <a href="../../tools/zip-tool/">ZIP Tool</a>
+        <a href="../../tools/text-tools/">Text Tools</a>
+      </div>
+      <div class="footer-col">
+        <h4>SEO Tools</h4>
+        <a href="../../tools/canonical-tag-checker/">Canonical Checker</a>
+        <a href="../../tools/robots-txt-checker/">Robots.txt Checker</a>
+        <a href="../../tools/redirect-chain-checker/">Redirect Chain Checker</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://clienvora.com">Clienvora</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>All tools run in your browser. Files are never uploaded. 32+ tools, 100% free, 100% private.</p>
+      <p>Built by <a href="https://clienvora.com">Clienvora</a> &middot; <a href="../../">Free Online Tools</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

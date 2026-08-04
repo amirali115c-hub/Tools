@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg: #E4E3E0;
+    --ink: #141414;
+    --line: #141414;
+    --accent-orange: #F27D26;
+    --accent-red: #FF4444;
+  }
+
+  body {
+    background-color: #E4E3E0;
+    color: #141414;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  }
+}
+
+.mono {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.tech-shadow {
+  box-shadow: 4px 4px 0px #141414;
+}
+
+.tech-shadow-sm {
+  box-shadow: 2px 2px 0px #141414;
+}
+
+.tech-shadow-orange {
+  box-shadow: 4px 4px 0px #F27D26;
+}
+
+.col-header {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  font-size: 11px;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #141414;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #555;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #F27D26;
+}
+

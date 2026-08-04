@@ -3,10 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Video Trimmer | Free, Private, Client-Side</title>
-  <meta name="description" content="Free video trimmer. Cut MP4, WebM, MOV with frame preview. Batch mode, segments. All in your browser.">
+  <title>Video Trimmer - Free Online Video Cutter | No Upload | 100% Private</title>
+  <meta name="description" content="Trim video online for free. Cut MP4, WebM, MOV with frame preview. Batch mode, segments. No uploads, 100% private.">
+  <meta name="keywords" content="video trimmer, trim video online, video cutter, cut video free, trim mp4, video clip editor, batch video trim, online video cutter">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://amirali115c-hub.github.io/Tools/tools/video-trimmer/">
   <link rel="stylesheet" href="../../assets/style.css">
-  <style>
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Video Trimmer - Free Online Video Cutter | No Upload | 100% Private">
+  <meta property="og:description" content="Trim video online for free. Cut MP4, WebM, MOV with frame preview. Batch mode, segments. No uploads, 100% private.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://amirali115c-hub.github.io/Tools/tools/video-trimmer/">
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Free Online Video Trimmer - Free Online Tool",
+  "operatingSystem": "Any",
+  "applicationCategory": "UtilitiesApplication",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Trim video online for free. Cut MP4, WebM, MOV with frame preview. Batch mode, segments. No uploads, 100% private."
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://amirali115c-hub.github.io/Tools/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Video Tools",
+      "item": "https://amirali115c-hub.github.io/Tools/#video"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Free Online Video Trimmer"
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "How do I trim a video?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Drop your video, set the start and end points, preview the segment, then export the trimmed clip."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What video formats are supported?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The trimmer works with browser-supported formats including MP4, WebM, and MOV."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my video uploaded to a server?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. All trimming is done locally in your browser using MediaRecorder and canvas. Your video stays on your device."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I make precise cuts?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, the frame preview lets you scrub to exact frames so your cuts are pixel-perfect."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I trim multiple videos at once?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, batch mode lets you trim several videos with the same settings in one pass."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I create multiple segments?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, you can cut a video into multiple segments and export them separately."
+      }
+    }
+  ]
+}
+  </script>
+<style>
     .timeline-wrap{position:relative;width:100%;height:80px;background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer}
     .frame-strip{display:flex;height:100%;gap:1px}
     .frame-strip canvas{height:100%;flex-shrink:0;object-fit:cover}
@@ -34,7 +140,7 @@
     .segment-item .seg-remove{cursor:pointer;color:var(--red);padding:2px}
     .preview-tabs{display:flex;gap:4px;margin-bottom:16px}
     .preview-tabs button{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
-    .preview-tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .preview-tabs button.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
     .preview-tabs button:hover:not(.active){border-color:var(--accent)}
     .batch-list{display:flex;flex-direction:column;gap:6px;margin:12px 0}
     .batch-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.85rem}
@@ -43,21 +149,46 @@
     .batch-item .batch-remove{cursor:pointer;color:var(--red);padding:2px}
     .format-select{display:flex;gap:8px;margin-bottom:12px}
     .format-select button{padding:8px 16px;border-radius:6px;font-size:.85rem;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;transition:.15s}
-    .format-select button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .format-select button.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
     .stat-row{display:flex;gap:8px;margin:12px 0}
     .stat-box{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
     .stat-box .stat-val{font-size:1.1rem;font-weight:700;color:var(--accent)}
     .stat-box .stat-label{font-size:.7rem;color:var(--text2);margin-top:4px}
   </style>
-</head>
+  <style>
+    .seo-tool-frame{width:100%;border:1px solid var(--border);border-radius:var(--radius);background:#f8fafc;min-height:900px}
+  </style>
+</head></head>
 <body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="header-logo" href="../../">Free Tools<span class="dot">.</span></a>
+    <nav class="header-nav">
+      <a href="../../">Home</a>
+      <a href="../../#seo">SEO</a>
+      <a href="https://clienvora.com">Clienvora</a>
+    </nav>
+  </div>
+</header>
 <div class="container">
   <div class="tool-page">
-    <a href="../../" class="back-link">← Back to Tools</a>
-    <h1>Video Trimmer</h1>
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb">
+      <a href="../../">Home</a> &gt; <a href="../../#video">Video Tools</a> &gt; Free Online Video Trimmer
+    </nav>
+
+    <h1>Free Online Video Trimmer</h1>
     <p class="subtitle">Trim video with frame preview. Batch mode, segments. All in your browser.</p>
 
-    <div class="tabs" id="tabs">
+    <!-- Trust Badges -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;font-size:.9rem;color:var(--text2)">
+      <span>✓ No uploads</span>
+      <span>✓ No sign-ups</span>
+      <span>✓ 100% private</span>
+      <span>✓ Works offline</span>
+    </div>
+
+<div class="tabs" id="tabs">
       <button class="tab active" data-tab="trim">Trim</button>
       <button class="tab" data-tab="batch">Batch</button>
       <button class="tab" data-tab="preview">Preview</button>
@@ -163,6 +294,91 @@
 
       <div class="progress-bar" id="progressBar" style="display:none"><div class="fill" id="progressFill"></div></div>
       <div class="status" id="status"></div>
+    </div>
+
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+      <h2>How to Trim a Video Online</h2>
+      <p>Follow these simple steps to use the free online video trimmer tool:</p>
+      <ol style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li style="margin-bottom:8px"><strong>Drop your video</strong> - Drag and drop an MP4, WebM, or MOV file into the trimmer.</li>
+        <li style="margin-bottom:8px"><strong>Set trim points</strong> - Use the frame preview and time controls to mark your start and end points.</li>
+        <li style="margin-bottom:8px"><strong>Preview the segment</strong> - Play back the selected region to confirm the cut is exactly where you want it.</li>
+        <li style="margin-bottom:8px"><strong>Export and download</strong> - Trim the video and download the clipped segment, or process a batch of files.</li>
+      </ol>
+
+      <h2>Features</h2>
+      <ul style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li><strong>Trim MP4, WebM, and MOV videos</strong></li>
+        <li><strong>Frame-by-frame preview for precise cuts</strong></li>
+        <li><strong>Create multiple segments from one video</strong></li>
+        <li><strong>Batch mode for trimming several files</strong></li>
+        <li><strong>100% client-side with MediaRecorder</strong></li>
+      </ul>
+
+      <h2>Why Choose This Tool?</h2>
+      <p>Cutting a video down to the good part shouldn't require a heavy editor. Our Video Trimmer gives you frame-level control with a live preview, supports multiple segments and batch trimming, and runs completely in your browser — so your footage is never uploaded.</p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+
+      <details class="faq-item">
+        <summary>How do I trim a video?</summary>
+        <p>Drop your video, set the start and end points, preview the segment, then export the trimmed clip.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What video formats are supported?</summary>
+        <p>The trimmer works with browser-supported formats including MP4, WebM, and MOV.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is my video uploaded to a server?</summary>
+        <p>No. All trimming is done locally in your browser using MediaRecorder and canvas. Your video stays on your device.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I make precise cuts?</summary>
+        <p>Yes, the frame preview lets you scrub to exact frames so your cuts are pixel-perfect.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I trim multiple videos at once?</summary>
+        <p>Yes, batch mode lets you trim several videos with the same settings in one pass.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I create multiple segments?</summary>
+        <p>Yes, you can cut a video into multiple segments and export them separately.</p>
+      </details>
+    </section>
+
+    <!-- Related Tools Section -->
+    <section class="related-tools">
+      <h2>Related Tools</h2>
+      <div class="related-grid">
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🎵</div>
+          <h3>Video to Audio</h3>
+          <p>Extract audio from video as WAV, WebM, or OGG. Trim, fade, batch mode.</p>
+          <a href="../video-to-audio/">Open Video to Audio →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🎞️</div>
+          <h3>Video to GIF</h3>
+          <p>Turn video clips into animated GIFs. Batch mode, frame rate control.</p>
+          <a href="../video-to-gif/">Open Video to GIF →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">📉</div>
+          <h3>Video Compressor</h3>
+          <p>Reduce video size for Discord, web, and email. VP8, VP9, H264.</p>
+          <a href="../video-compressor/">Open Video Compressor →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <p>Need custom web tools or automation for your business?</p>
+      <a href="https://clienvora.com">Learn more about Clienvora - Custom Web Development →</a>
     </div>
   </div>
 </div>
@@ -523,5 +739,36 @@
   resetBtn.addEventListener('click',resetAll);
 })();
 </script>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h4>Free Online Tools</h4>
+        <p>32+ free, private, browser-based tools. No uploads, no accounts. Your files never leave your device.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Popular Tools</h4>
+        <a href="../../tools/image-converter/">Image Converter</a>
+        <a href="../../tools/pdf-tools/">PDF Tools</a>
+        <a href="../../tools/zip-tool/">ZIP Tool</a>
+        <a href="../../tools/text-tools/">Text Tools</a>
+      </div>
+      <div class="footer-col">
+        <h4>SEO Tools</h4>
+        <a href="../../tools/canonical-tag-checker/">Canonical Checker</a>
+        <a href="../../tools/robots-txt-checker/">Robots.txt Checker</a>
+        <a href="../../tools/redirect-chain-checker/">Redirect Chain Checker</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://clienvora.com">Clienvora</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>All tools run in your browser. Files are never uploaded. 32+ tools, 100% free, 100% private.</p>
+      <p>Built by <a href="https://clienvora.com">Clienvora</a> &middot; <a href="../../">Free Online Tools</a></p>
+    </div>
+  </div>
+</footer>
 </body>
 </html>

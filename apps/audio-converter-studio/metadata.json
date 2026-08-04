@@ -1,0 +1,6 @@
+{
+  "name": "Audio Converter & Trimmer Studio",
+  "description": "Premium client-side audio converter and trimmer studio with waveform visualization, batch conversion, audio effects, and zero upload privacy.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

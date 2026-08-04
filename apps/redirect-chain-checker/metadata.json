@@ -1,0 +1,6 @@
+{
+  "name": "Redirect Chain Checker",
+  "description": "Client-side redirect chain analyzer and visualizer supporting manual input, curl header parsing, and CORS automated detection.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

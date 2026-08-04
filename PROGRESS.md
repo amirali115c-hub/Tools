@@ -40,6 +40,36 @@ Each tool upgraded with tabbed interface, batch support, progress indicators, er
 | 19 | JSON to CSV | `f7f7803` | Bidirectional, flatten, column select, auto-detect, tabs |
 | 20 | Font Preview | `dc15eb1` | Character sets, metrics, compare, info, tabs |
 
+### Phase 2.5: SEO Tools Added (New - 5 tools)
+
+5 new AI Studio React tools added as static builds, wrapped in site design (breadcrumb, trust badges, SEO content, FAQ, schema, Clienvora CTA).
+
+| # | Tool | Folder | Build Source | Notes |
+|---|------|--------|--------------|-------|
+| 21 | Canonical Tag Checker | `tools/canonical-tag-checker/` | `apps/canonical-tag-checker/` | Client-side, paste HTML/URL, bulk, CSV export |
+| 22 | Robots.txt Checker & Generator | `tools/robots-txt-checker/` | `apps/robots-txt-checker/` | Client-side, RFC 9309, URL tester, generator |
+| 23 | Redirect Chain Checker | `tools/redirect-chain-checker/` | `apps/redirect-chain-checker/` | Client-side, curl paste, loops, bulk |
+| 24 | SEO Keyword Gap & Targeting Planner | `tools/seo-keyword-gap/` | `apps/seo-keyword-gap/` | Client-side, TF-IDF, clusters, CSV |
+| 25 | MetaShield AI - Image Metadata & Privacy Studio | `tools/metashield-ai/` | `apps/metashield-ai/` | Client-side audit, EXIF/GPS/AI prompt scrub |
+
+**Build workflow:** Each React app lives in `apps/<name>/`, built with `npm run build` (Vite, `base: './'` for relative paths), output copied to `tools/<name>/app/`. The tool page wrapper at `tools/<name>/index.html` embeds the built app in an iframe with site design + SEO content.
+
+**Not deployed:** `llms.txt-generator` zip requires a backend server (Express crawl pipeline) - cannot run on static GitHub Pages. Source zips retained in `tools/*.zip`.
+
+### Phase 2.6: Engine Upgrades (Option A - 5 pages upgraded)
+
+The combined `image-processor-suite.zip` and `audio-converter-studio.zip` apps were used to UPGRADE the 5 existing separate keyword pages, keeping each keyword page intact. Approach: one React build per suite + `?tool`/`?mode` URL routing — each page embeds the same app via iframe and auto-selects the right studio.
+
+| Existing Page | Embedded Engine (param) |
+|---------------|-------------------------|
+| `image-compressor/` | CompressStudio (`?tool=compress`) |
+| `image-converter/` | ConvertStudio (`?tool=convert`) |
+| `image-cropper/` | CropStudio (`?tool=crop`) |
+| `audio-converter/` | ConverterStudio (`?mode=converter`) |
+| `audio-trimmer/` | TrimmerStudio (`?mode=trimmer`) |
+
+**Build sources:** `apps/image-processor-suite/`, `apps/audio-converter-studio/`. Each page keeps its existing SEO wrapper (title/meta/FAQ/schema) — only the inline tool area was swapped for the iframe. Old inline engines removed. **Not creating** separate pages for enhance/batch/recorder (keeping page count focused on existing keywords).
+
 ---
 
 ## KEYWORD STRATEGY (from Tools Keywords.docx)
@@ -295,13 +325,13 @@ Homepage
 ## NEXT STEPS
 
 ### Phase 3: SEO Optimization (Current)
-1. [ ] Create comprehensive progress document
-2. [ ] Redesign homepage with SEO content
-3. [ ] Create tool page template
-4. [ ] Add schema markup to all pages
-5. [ ] Add FAQ content to all tool pages
-6. [ ] Implement internal linking
-7. [ ] Integrate Clienvora.com links
+1. [x] Create comprehensive progress document
+2. [x] Redesign homepage with SEO content
+3. [x] Create tool page template
+4. [ ] Add schema markup to all pages (done for 20 upgraded + 5 new SEO tools)
+5. [ ] Add FAQ content to all tool pages (done for 20 upgraded + 5 new SEO tools)
+6. [x] Implement internal linking
+7. [x] Integrate Clienvora.com links
 
 ### Phase 4: Content Creation
 1. [ ] Write SEO content for each tool (800+ words)

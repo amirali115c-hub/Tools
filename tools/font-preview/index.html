@@ -3,13 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Font Preview | Free, Private, Client-Side</title>
-  <meta name="description" content="Preview TTF, OTF, WOFF fonts. Character sets, metrics, comparison. All in your browser.">
+  <title>Font Preview - Free Online Font Viewer & Tester | No Upload | 100% Private</title>
+  <meta name="description" content="Preview fonts online for free. Test TTF, OTF, WOFF with custom text, character sets, metrics and side-by-side comparison. No uploads, 100% private.">
+  <meta name="keywords" content="font preview, font viewer, preview font online, font tester, ttf viewer, otf preview, font metrics, compare fonts, font character map">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://amirali115c-hub.github.io/Tools/tools/font-preview/">
   <link rel="stylesheet" href="../../assets/style.css">
-  <style>
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Font Preview - Free Online Font Viewer & Tester | No Upload | 100% Private">
+  <meta property="og:description" content="Preview fonts online for free. Test TTF, OTF, WOFF with custom text, character sets, metrics and side-by-side comparison. No uploads, 100% private.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://amirali115c-hub.github.io/Tools/tools/font-preview/">
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Free Online Font Preview - Free Online Tool",
+  "operatingSystem": "Any",
+  "applicationCategory": "UtilitiesApplication",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Preview fonts online for free. Test TTF, OTF, WOFF with custom text, character sets, metrics and side-by-side comparison. No uploads, 100% private."
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://amirali115c-hub.github.io/Tools/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Font Tools",
+      "item": "https://amirali115c-hub.github.io/Tools/#font"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Free Online Font Preview"
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What font formats are supported?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The preview tool accepts TTF, OTF, and WOFF font files and renders them in your browser using the OpenType parser."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I preview a font with my own text?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, type any text into the preview box and it renders instantly in the loaded font, at multiple sizes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my font file uploaded to a server?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No, font files are parsed locally in your browser. Nothing is uploaded, so your commercial fonts stay private."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I compare two fonts?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, load multiple fonts and use the Compare tab to view them side by side with the same sample text."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What font metrics can I see?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The Metrics tab shows line height, units per em, ascender, descender, and glyph spacing information."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I check which characters a font supports?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, the Characters tab shows the complete glyph map so you can verify coverage for symbols and languages."
+      }
+    }
+  ]
+}
+  </script>
+<style>
     .tabs{display:flex;gap:4px;margin-bottom:16px}
     .tab{padding:10px 20px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
-    .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .tab.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
     .tab:hover:not(.active){border-color:var(--accent)}
     .font-preview-box{padding:30px;background:var(--bg);border-radius:8px;min-height:80px;word-wrap:break-word;line-height:1.4;margin-bottom:12px;border:1px solid var(--border)}
     .size-preview{display:flex;flex-direction:column;gap:8px}
@@ -44,15 +150,40 @@
     .bg-option:hover{border-color:var(--accent)}
     select,input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px}
   </style>
-</head>
+  <style>
+    .seo-tool-frame{width:100%;border:1px solid var(--border);border-radius:var(--radius);background:#f8fafc;min-height:900px}
+  </style>
+</head></head>
 <body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="header-logo" href="../../">Free Tools<span class="dot">.</span></a>
+    <nav class="header-nav">
+      <a href="../../">Home</a>
+      <a href="../../#seo">SEO</a>
+      <a href="https://clienvora.com">Clienvora</a>
+    </nav>
+  </div>
+</header>
 <div class="container">
   <div class="tool-page">
-    <a href="../../" class="back-link">← Back to Tools</a>
-    <h1>Font Preview</h1>
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb">
+      <a href="../../">Home</a> &gt; <a href="../../#font">Font Tools</a> &gt; Free Online Font Preview
+    </nav>
+
+    <h1>Free Online Font Preview</h1>
     <p class="subtitle">Preview fonts with custom text, character sets, metrics. All in your browser.</p>
 
-    <div class="tabs" id="tabs">
+    <!-- Trust Badges -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;font-size:.9rem;color:var(--text2)">
+      <span>✓ No uploads</span>
+      <span>✓ No sign-ups</span>
+      <span>✓ 100% private</span>
+      <span>✓ Works offline</span>
+    </div>
+
+<div class="tabs" id="tabs">
       <button class="tab active" data-tab="preview">Preview</button>
       <button class="tab" data-tab="characters">Characters</button>
       <button class="tab" data-tab="metrics">Metrics</button>
@@ -129,6 +260,91 @@
         <button class="btn btn-secondary" id="downloadSampleBtn">Download Sample</button>
         <button class="btn btn-secondary" id="resetBtn">Reset</button>
       </div>
+    </div>
+
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+      <h2>How to Preview Fonts Online</h2>
+      <p>Follow these simple steps to use the free online font preview tool:</p>
+      <ol style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li style="margin-bottom:8px"><strong>Load a font</strong> - Drop a TTF, OTF, or WOFF file or click to browse. Multiple fonts can be loaded for comparison.</li>
+        <li style="margin-bottom:8px"><strong>Type custom text</strong> - Enter your own text to see exactly how the font renders words, numbers, and symbols.</li>
+        <li style="margin-bottom:8px"><strong>Explore character sets</strong> - Browse the full glyph map to check which characters and languages the font supports.</li>
+        <li style="margin-bottom:8px"><strong>Check metrics</strong> - Review line height, ascender, descender, and spacing, or compare two fonts side by side.</li>
+      </ol>
+
+      <h2>Features</h2>
+      <ul style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li><strong>Supports TTF, OTF, and WOFF font files</strong></li>
+        <li><strong>Live preview with your own custom text</strong></li>
+        <li><strong>Full character map / glyph browser</strong></li>
+        <li><strong>Typography metrics: line height, ascender, descender, spacing</strong></li>
+        <li><strong>Side-by-side font comparison</strong></li>
+      </ul>
+
+      <h2>Why Choose This Tool?</h2>
+      <p>Choosing the right font is easier when you can see it render your actual text at different sizes. Our Font Preview loads font files directly in your browser, so you can test glyph coverage, measure metrics, and compare candidates before you commit — with zero uploads.</p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+
+      <details class="faq-item">
+        <summary>What font formats are supported?</summary>
+        <p>The preview tool accepts TTF, OTF, and WOFF font files and renders them in your browser using the OpenType parser.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I preview a font with my own text?</summary>
+        <p>Yes, type any text into the preview box and it renders instantly in the loaded font, at multiple sizes.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is my font file uploaded to a server?</summary>
+        <p>No, font files are parsed locally in your browser. Nothing is uploaded, so your commercial fonts stay private.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I compare two fonts?</summary>
+        <p>Yes, load multiple fonts and use the Compare tab to view them side by side with the same sample text.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What font metrics can I see?</summary>
+        <p>The Metrics tab shows line height, units per em, ascender, descender, and glyph spacing information.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I check which characters a font supports?</summary>
+        <p>Yes, the Characters tab shows the complete glyph map so you can verify coverage for symbols and languages.</p>
+      </details>
+    </section>
+
+    <!-- Related Tools Section -->
+    <section class="related-tools">
+      <h2>Related Tools</h2>
+      <div class="related-grid">
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">📄</div>
+          <h3>Text to PDF</h3>
+          <p>Convert text to PDF with font, margins, and header/footer control. All in your browser.</p>
+          <a href="../text-to-pdf/">Open Text to PDF →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🔤</div>
+          <h3>Text Tools</h3>
+          <p>Word counter, JSON formatter, Base64, URL encoder, hash, case converter and more.</p>
+          <a href="../text-tools/">Open Text Tools →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">📊</div>
+          <h3>CSV Viewer</h3>
+          <p>View CSV files with sort, filter, search and export. All in your browser.</p>
+          <a href="../csv-viewer/">Open CSV Viewer →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <p>Need custom web tools or automation for your business?</p>
+      <a href="https://clienvora.com">Learn more about Clienvora - Custom Web Development →</a>
     </div>
   </div>
 </div>
@@ -383,5 +599,36 @@
   });
 })();
 </script>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h4>Free Online Tools</h4>
+        <p>32+ free, private, browser-based tools. No uploads, no accounts. Your files never leave your device.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Popular Tools</h4>
+        <a href="../../tools/image-converter/">Image Converter</a>
+        <a href="../../tools/pdf-tools/">PDF Tools</a>
+        <a href="../../tools/zip-tool/">ZIP Tool</a>
+        <a href="../../tools/text-tools/">Text Tools</a>
+      </div>
+      <div class="footer-col">
+        <h4>SEO Tools</h4>
+        <a href="../../tools/canonical-tag-checker/">Canonical Checker</a>
+        <a href="../../tools/robots-txt-checker/">Robots.txt Checker</a>
+        <a href="../../tools/redirect-chain-checker/">Redirect Chain Checker</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://clienvora.com">Clienvora</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>All tools run in your browser. Files are never uploaded. 32+ tools, 100% free, 100% private.</p>
+      <p>Built by <a href="https://clienvora.com">Clienvora</a> &middot; <a href="../../">Free Online Tools</a></p>
+    </div>
+  </div>
+</footer>
 </body>
 </html>

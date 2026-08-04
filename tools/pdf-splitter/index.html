@@ -3,9 +3,136 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Advanced PDF Splitter | Free, Private, Client-Side</title>
-  <meta name="description" content="Advanced PDF splitter with page preview, range selection, every N pages. Free, private, runs in your browser.">
+  <title>PDF Splitter - Free Online PDF Splitter | No Upload | 100% Private</title>
+  <meta name="description" content="Split PDF files online for free. Page preview, range selection, every N pages, batch split. No uploads, 100% private.">
+  <meta name="keywords" content="pdf splitter, split pdf, split pdf free, pdf split, free pdf splitter, split pdf pages, extract pdf pages, separate pdf">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://amirali115c-hub.github.io/Tools/tools/pdf-splitter/">
   <link rel="stylesheet" href="../../assets/style.css">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="PDF Splitter - Free Online PDF Splitter">
+  <meta property="og:description" content="Split PDF files online for free. Page preview, range selection, every N pages, batch split.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://amirali115c-hub.github.io/Tools/tools/pdf-splitter/">
+
+  <!-- Schema.org SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "PDF Splitter - Free Online Tool",
+    "operatingSystem": "Any",
+    "applicationCategory": "UtilitiesApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Split PDF files online for free. Page preview, range selection, every N pages, batch split. No uploads, 100% private."
+  }
+  </script>
+
+  <!-- Schema.org BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://amirali115c-hub.github.io/Tools/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Document Tools",
+        "item": "https://amirali115c-hub.github.io/Tools/#document"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "PDF Splitter"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Schema.org FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I split a PDF for free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use our free PDF Splitter tool. Drag and drop your PDF, select pages or enter ranges (e.g., 1-3, 5, 7-10), choose split mode, and click Split. The split PDF files will download instantly. No uploads, no sign-ups required."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my PDF data uploaded to any server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, your PDF files never leave your device. All processing happens locally in your browser using client-side JavaScript. Your privacy is 100% guaranteed."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I split PDF by page ranges?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our PDF Splitter supports custom ranges. Enter ranges like 1-3, 5, 7-10 to split specific pages. You can also use the visual page picker to select pages."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I split every N pages?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our splitter has an 'Every N Pages' mode. Set the number of pages per group and the PDF will be split into multiple files accordingly."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I preview pages before splitting?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our PDF Splitter renders thumbnail previews of all pages so you can visually select which pages to include in each split file."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between Split and Extract?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Split creates multiple separate PDF files from your original. Extract creates a single new PDF containing only the selected pages."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How many PDFs can I create at once?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "There is no limit. You can define as many split groups as needed and create multiple PDF files in a single operation."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does this work on mobile devices?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our PDF Splitter works on all modern browsers including mobile. The interface is responsive and adapts to smaller screens."
+        }
+      }
+    ]
+  }
+  </script>
   <style>
     .splitter-layout{display:grid;grid-template-columns:1fr 320px;gap:20px;margin-top:16px}
     .splitter-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
@@ -13,22 +140,22 @@
     .page-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;max-height:500px;overflow-y:auto;padding:4px}
     .page-card{position:relative;background:#fff;border:2px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer;transition:all .15s}
     .page-card:hover{border-color:var(--accent);transform:translateY(-2px)}
-    .page-card.selected{border-color:var(--accent);background:rgba(99,102,241,.1)}
+    .page-card.selected{border-color:var(--accent);background:rgba(201,162,39,.1)}
     .page-card img{width:100%;height:auto;display:block}
     .page-card .page-num{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.7);color:#fff;text-align:center;font-size:.7rem;padding:3px}
-    .page-card .page-check{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;display:none;align-items:center;justify-content:center;font-size:.7rem;font-weight:700}
+    .page-card .page-check{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--navy);display:none;align-items:center;justify-content:center;font-size:.7rem;font-weight:700}
     .page-card.selected .page-check{display:flex}
-    .page-card .page-range{position:absolute;top:6px;left:6px;background:rgba(99,102,241,.9);color:#fff;padding:1px 6px;border-radius:4px;font-size:.6rem;display:none}
+    .page-card .page-range{position:absolute;top:6px;left:6px;background:rgba(201,162,39,.9);color:var(--navy);padding:1px 6px;border-radius:4px;font-size:.6rem;display:none}
     .page-card.in-range .page-range{display:block}
     .range-list{max-height:200px;overflow-y:auto}
     .range-item{display:flex;align-items:center;gap:8px;padding:8px;border-bottom:1px solid var(--border);font-size:.85rem}
     .range-item:last-child{border-bottom:none}
-    .range-badge{padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600;background:rgba(99,102,241,.2);color:var(--accent)}
+    .range-badge{padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600;background:rgba(201,162,39,.2);color:var(--accent)}
     .range-remove{background:none;border:none;color:var(--text2);cursor:pointer;font-size:1rem}
     .range-remove:hover{color:#f87171}
     .tabs{display:flex;gap:4px;margin-bottom:16px}
     .tab{padding:8px 16px;border-radius:6px;font-size:.85rem;cursor:pointer;background:var(--bg);color:var(--text2);border:1px solid var(--border);transition:all .15s}
-    .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .tab.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
     .tab-content{display:none}
     .tab-content.active{display:block}
     .progress-section{margin-top:16px}
@@ -46,7 +173,7 @@
     .mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
     .mode-option{padding:12px;border:2px solid var(--border);border-radius:8px;cursor:pointer;text-align:center;transition:all .15s}
     .mode-option:hover{border-color:var(--accent)}
-    .mode-option.active{border-color:var(--accent);background:rgba(99,102,241,.1)}
+    .mode-option.active{border-color:var(--accent);background:rgba(201,162,39,.1)}
     .mode-option .mode-icon{font-size:1.5rem;margin-bottom:4px}
     .mode-option .mode-name{font-size:.85rem;font-weight:600}
     .mode-option .mode-desc{font-size:.7rem;color:var(--text2);margin-top:2px}
@@ -60,14 +187,63 @@
     .output-options label{display:flex;align-items:center;gap:8px;padding:6px 0;color:var(--text2);font-size:.85rem;cursor:pointer}
     .output-options input[type="checkbox"]{accent-color:var(--accent)}
     @media(max-width:768px){.splitter-layout{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+    .breadcrumb{font-size:.85rem;color:var(--text2);margin-bottom:16px}
+    .breadcrumb a{color:var(--accent);text-decoration:none}
+    .breadcrumb a:hover{text-decoration:underline}
+    .seo-content{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .seo-content h2{font-size:1.3rem;margin:24px 0 12px;color:var(--text)}
+    .seo-content p{color:var(--text2);line-height:1.7;margin-bottom:12px}
+    .seo-content ul{color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px}
+    .seo-content li{margin-bottom:8px}
+    .seo-content a{color:var(--accent);text-decoration:none}
+    .seo-content a:hover{text-decoration:underline}
+    .faq-section{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .faq-section h2{font-size:1.3rem;margin-bottom:16px}
+    .faq-item{margin-bottom:8px;padding:16px;background:var(--surface);border-radius:8px;cursor:pointer}
+    .faq-item summary{font-weight:600;font-size:1rem}
+    .faq-item p{margin-top:12px;color:var(--text2);line-height:1.6}
+    .related-tools{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .related-tools h2{font-size:1.3rem;margin-bottom:16px}
+    .related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+    .related-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+    .related-card h3{font-size:1rem;margin:8px 0}
+    .related-card p{font-size:.85rem;color:var(--text2);margin-bottom:12px}
+    .related-card a{color:var(--accent);text-decoration:none;font-weight:600}
+    .related-card a:hover{text-decoration:underline}
+    .footer-cta{margin-top:40px;padding:30px;background:var(--surface);border-radius:12px;text-align:center}
+    .footer-cta p{margin-bottom:8px;color:var(--text2)}
+    .footer-cta a{color:var(--accent);font-weight:600;text-decoration:none}
+    .footer-cta a:hover{text-decoration:underline}
   </style>
 </head>
 <body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="header-logo" href="../../">Free Tools<span class="dot">.</span></a>
+    <nav class="header-nav">
+      <a href="../../">Home</a>
+      <a href="../../#seo">SEO</a>
+      <a href="https://clienvora.com">Clienvora</a>
+    </nav>
+  </div>
+</header>
 <div class="container">
   <div class="tool-page">
-    <a href="../../" class="back-link">&larr; Back to Tools</a>
-    <h1>PDF Splitter</h1>
-    <p class="subtitle">Split PDF with page preview, range selection, every N pages. No uploads.</p>
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb">
+      <a href="../../">Home</a> &gt; <a href="../../#document">Document Tools</a> &gt; PDF Splitter
+    </nav>
+
+    <h1>Split PDF Files Online - Free PDF Splitter</h1>
+    <p class="subtitle">Split PDF files online for free. Page preview, range selection, every N pages, batch split. No uploads, 100% private.</p>
+
+    <!-- Trust Badges -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;font-size:.9rem;color:var(--text2)">
+      <span>✓ No uploads</span>
+      <span>✓ No sign-ups</span>
+      <span>✓ 100% private</span>
+      <span>✓ Works offline</span>
+    </div>
     <div class="tool-area">
 
       <div class="upload-zone" id="dropZone">
@@ -219,6 +395,109 @@
         </div>
 
       </div>
+    </div>
+
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+      <h2>How to Split PDF Files Online</h2>
+      <p>Splitting PDF files has never been easier. Our free online PDF splitter allows you to separate pages from any PDF document in just a few simple steps:</p>
+      <ol style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li style="margin-bottom:8px"><strong>Drop your PDF</strong> - Drag and drop a PDF file into the upload area, or click to browse.</li>
+        <li style="margin-bottom:8px"><strong>Select pages</strong> - Click pages to select them, or enter page ranges (e.g., 1-3, 5, 7-10).</li>
+        <li style="margin-bottom:8px"><strong>Choose split mode</strong> - Select Extract (one file with selected pages) or Split (separate files by range).</li>
+        <li style="margin-bottom:8px"><strong>Configure options</strong> - Use Every N Pages mode for automatic splitting, or define custom ranges.</li>
+        <li style="margin-bottom:8px"><strong>Split and download</strong> - Click "Split PDF" and download your split files instantly.</li>
+      </ol>
+
+      <h2>Features of Our Free PDF Splitter</h2>
+      <ul style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li><strong>Page Preview</strong> - Visual thumbnails of all pages before splitting</li>
+        <li><strong>Range Selection</strong> - Enter custom ranges like 1-3, 5, 7-10</li>
+        <li><strong>Every N Pages</strong> - Automatically split every N pages</li>
+        <li><strong>Visual Page Picker</strong> - Click pages to select/deselect</li>
+        <li><strong>Extract Mode</strong> - Create single PDF with selected pages</li>
+        <li><strong>Split Mode</strong> - Create separate PDFs by range</li>
+        <li><strong>100% Private</strong> - PDFs never leave your browser</li>
+      </ul>
+
+      <h2>Why Choose Our PDF Splitter?</h2>
+      <p>Unlike other online PDF splitters, our tool runs entirely in your browser. Your PDF files are never uploaded to any server, ensuring complete privacy and security. There are no file size limits, no watermarks added, and no sign-ups required. The entire process happens locally on your device using client-side JavaScript.</p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+
+      <details class="faq-item">
+        <summary>How do I split a PDF for free?</summary>
+        <p>Use our free PDF Splitter tool. Drag and drop your PDF, select pages or enter ranges (e.g., 1-3, 5, 7-10), choose split mode, and click Split. The split PDF files will download instantly. No uploads, no sign-ups required.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Is my PDF data uploaded to any server?</summary>
+        <p>No, your PDF files never leave your device. All processing happens locally in your browser using client-side JavaScript. Your privacy is 100% guaranteed.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I split PDF by page ranges?</summary>
+        <p>Yes, our PDF Splitter supports custom ranges. Enter ranges like 1-3, 5, 7-10 to split specific pages. You can also use the visual page picker to select pages.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I split every N pages?</summary>
+        <p>Yes, our splitter has an "Every N Pages" mode. Set the number of pages per group and the PDF will be split into multiple files accordingly.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I preview pages before splitting?</summary>
+        <p>Yes, our PDF Splitter renders thumbnail previews of all pages so you can visually select which pages to include in each split file.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What is the difference between Split and Extract?</summary>
+        <p>Split creates multiple separate PDF files from your original. Extract creates a single new PDF containing only the selected pages.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>How many PDFs can I create at once?</summary>
+        <p>There is no limit. You can define as many split groups as needed and create multiple PDF files in a single operation.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does this work on mobile devices?</summary>
+        <p>Yes, our PDF Splitter works on all modern browsers including mobile. The interface is responsive and adapts to smaller screens.</p>
+      </details>
+    </section>
+
+    <!-- Related Tools Section -->
+    <section class="related-tools">
+      <h2>Related Document Tools</h2>
+      <div class="related-grid">
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">📑</div>
+          <h3>PDF Merger</h3>
+          <p>Merge PDF files online. Drag and drop, reorder pages, add page numbers. All in your browser.</p>
+          <a href="../pdf-merger/">Open PDF Merger →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">📄</div>
+          <h3>PDF Tools</h3>
+          <p>Compress, extract, rotate, merge PDFs. Page numbers, PDF info. All in your browser.</p>
+          <a href="../pdf-tools/">Open PDF Tools →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">📝</div>
+          <h3>Text to PDF</h3>
+          <p>Convert text to PDF. Font, margins, header/footer, page numbers. All in your browser.</p>
+          <a href="../text-to-pdf/">Open Text to PDF →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <p>Need custom web tools or automation for your business?</p>
+      <a href="https://clienvora.com">Learn more about Clienvora - Custom Web Development →</a>
     </div>
   </div>
 </div>
@@ -520,5 +799,36 @@
   });
 })();
 </script>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h4>Free Online Tools</h4>
+        <p>32+ free, private, browser-based tools. No uploads, no accounts. Your files never leave your device.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Popular Tools</h4>
+        <a href="../../tools/image-converter/">Image Converter</a>
+        <a href="../../tools/pdf-tools/">PDF Tools</a>
+        <a href="../../tools/zip-tool/">ZIP Tool</a>
+        <a href="../../tools/text-tools/">Text Tools</a>
+      </div>
+      <div class="footer-col">
+        <h4>SEO Tools</h4>
+        <a href="../../tools/canonical-tag-checker/">Canonical Checker</a>
+        <a href="../../tools/robots-txt-checker/">Robots.txt Checker</a>
+        <a href="../../tools/redirect-chain-checker/">Redirect Chain Checker</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://clienvora.com">Clienvora</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>All tools run in your browser. Files are never uploaded. 32+ tools, 100% free, 100% private.</p>
+      <p>Built by <a href="https://clienvora.com">Clienvora</a> &middot; <a href="../../">Free Online Tools</a></p>
+    </div>
+  </div>
+</footer>
 </body>
 </html>

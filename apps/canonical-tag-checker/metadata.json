@@ -1,0 +1,6 @@
+{
+  "name": "Canonical Tag Checker",
+  "description": "Comprehensive client-side rel=canonical SEO audit tool for single pages and bulk URLs/HTML blocks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
