@@ -1,12 +1,11 @@
 :title: Free Tools Hub
 :description: Free, private, client-side tools. No uploads, no accounts, no tracking.
-:baseurl: /Tools
-url: ""
-
-plugins:
-  - jekyll-seo-tag
-  - jekyll-sitemap
+url: "https://tools.clienvora.com"
+baseurl: ""
 
 exclude:
   - node_modules
   - README.md
+  - PROGRESS.md
+  - apps
+  - Tools Keywords.docx
