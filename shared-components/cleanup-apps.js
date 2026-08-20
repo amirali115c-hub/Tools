@@ -51,8 +51,8 @@ for (const file of files) {
   }
 
   // Remove CSS links
-  const headerCssLink = `<link rel="stylesheet" href="../../shared-components/header.css">`;
-  const footerCssLink = `<link rel="stylesheet" href="../../shared-components/footer.css">`;
+  const headerCssLink = `<link rel="stylesheet" href="../../shared-components/tools-header.css">`;
+  const footerCssLink = `<link rel="stylesheet" href="../../shared-components/tools-footer.css">`;
   if (html.includes(headerCssLink)) {
     html = html.replace(headerCssLink + '\n', '').replace(headerCssLink, '');
     modified = true;

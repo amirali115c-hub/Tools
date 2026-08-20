@@ -51,8 +51,8 @@ for (const file of files) {
 
   // Remove CSS links
   const cssLinks = [
-    `<link rel="stylesheet" href="../../shared-components/header.css">`,
-    `<link rel="stylesheet" href="../../shared-components/footer.css">`
+    `<link rel="stylesheet" href="../../shared-components/tools-header.css">`,
+    `<link rel="stylesheet" href="../../shared-components/tools-footer.css">`
   ];
   for (const link of cssLinks) {
     if (html.includes(link)) {

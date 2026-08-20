@@ -10,8 +10,8 @@ const ROOT = path.resolve(__dirname, '..');
 const SHARED = __dirname;
 
 // Read shared components
-const headerHTML = fs.readFileSync(path.join(SHARED, 'header.html'), 'utf8');
-const footerHTML = fs.readFileSync(path.join(SHARED, 'footer.html'), 'utf8');
+const headerHTML = fs.readFileSync(path.join(SHARED, 'tools-header.html'), 'utf8');
+const footerHTML = fs.readFileSync(path.join(SHARED, 'tools-footer.html'), 'utf8');
 
 // Only target homepage
 const homepagePath = path.join(ROOT, 'index.html');
@@ -35,7 +35,7 @@ if (headEnd === -1) {
   console.log('ERROR: No </head> found');
   process.exit(1);
 }
-const cssLinks = `  <link rel="stylesheet" href="./shared-components/header.css">\n  <link rel="stylesheet" href="./shared-components/footer.css">\n`;
+const cssLinks = `  <link rel="stylesheet" href="./shared-components/tools-header.css">\n  <link rel="stylesheet" href="./shared-components/tools-footer.css">\n`;
 html = html.slice(0, headEnd) + cssLinks + html.slice(headEnd);
 
 // Inject header after <body>
