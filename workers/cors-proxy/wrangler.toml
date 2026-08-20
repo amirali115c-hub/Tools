@@ -1,6 +1,7 @@
 name = "cors-proxy"
 main = "index.js"
 compatibility_date = "2024-01-01"
+account_id = "ae286f2c80f95afef1a0eddd5009099f"
 
 [env.production]
 routes = [

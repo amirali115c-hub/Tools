@@ -17,7 +17,7 @@ interface AnalysisResult {
 }
 
 const PROXIES = [
-  (url: string) => `https://proxy.tools.clienvora.com/?url=${encodeURIComponent(url)}`,
+  (url: string) => `https://cors-proxy.amircontentwriter.workers.dev/?url=${encodeURIComponent(url)}`,
   (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
   (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
   (url: string) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,

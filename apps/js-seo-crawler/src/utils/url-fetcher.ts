@@ -1,6 +1,6 @@
 const CORS_PROXIES = [
   // Custom Cloudflare Worker proxy (primary - no rate limits)
-  (url: string) => `https://proxy.tools.clienvora.com/?url=${encodeURIComponent(url)}`,
+  (url: string) => `https://cors-proxy.amircontentwriter.workers.dev/?url=${encodeURIComponent(url)}`,
   // Free fallback proxies (if custom proxy is down)
   (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
   (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
