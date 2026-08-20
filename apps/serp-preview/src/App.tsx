@@ -1,5 +1,5 @@
-import {useState, useCallback} from 'react';
-import {Eye, Monitor, Smartphone, RotateCcw, Info, Check} from 'lucide-react';
+import {useState} from 'react';
+import {Eye, Monitor, Smartphone, RotateCcw, Search} from 'lucide-react';
 
 function App() {
   const [title, setTitle] = useState('');
@@ -8,200 +8,156 @@ function App() {
   const [date, setDate] = useState('');
   const [siteName, setSiteName] = useState('');
   const [device, setDevice] = useState<'desktop' | 'mobile'>('desktop');
-  const [copied, setCopied] = useState(false);
 
-  const truncateTitle = (t: string, max: number) => {
-    if (t.length <= max) return t;
-    return t.slice(0, max - 3) + '...';
-  };
-
-  const truncateDescription = (d: string, max: number) => {
-    if (d.length <= max) return d;
-    return d.slice(0, max - 3) + '...';
-  };
+  const truncate = (t: string, max: number) => t.length <= max ? t : t.slice(0, max - 3) + '...';
 
   const displayTitle = title || 'Page Title - Your Brand Name';
   const displayDesc = description || 'A compelling meta description that encourages users to click through from search results to your website...';
   const displayUrl = url || 'https://example.com/page';
   const displaySiteName = siteName || 'example.com';
 
-  const displayTitleTruncated = truncateTitle(displayTitle, device === 'desktop' ? 60 : 50);
-  const displayDescTruncated = truncateDescription(displayDesc, device === 'desktop' ? 155 : 120);
-
   const extractBreadcrumb = (urlStr: string) => {
     try {
       const u = new URL(urlStr.startsWith('http') ? urlStr : 'https://' + urlStr);
       const parts = u.pathname.split('/').filter(Boolean);
       return [u.hostname.replace('www.', ''), ...parts].join(' › ');
-    } catch {
-      return displayUrl;
-    }
+    } catch { return displayUrl; }
   };
 
   const today = new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'short', day: 'numeric'});
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50">
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            <Eye className="w-4 h-4" /> Free SERP Preview Tool
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans antialiased">
+      <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
+                <Eye className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-semibold text-white">SERP Preview Tool</h1>
+                <p className="text-xs text-slate-400">See how your page looks in Google search</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setDevice('desktop')} className={`p-2 rounded-lg transition-all ${device === 'desktop' ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}`}>
+                <Monitor className="w-4 h-4" />
+              </button>
+              <button onClick={() => setDevice('mobile')} className={`p-2 rounded-lg transition-all ${device === 'mobile' ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-slate-200'}`}>
+                <Smartphone className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">Free SERP Preview Tool</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            See exactly how your page will look in Google search results. Preview title tags, meta descriptions, and rich snippets before publishing.
-          </p>
         </div>
+      </header>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid lg:grid-cols-2 gap-6">
           {/* Left: Form */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-4">
-              <h2 className="text-lg font-semibold text-gray-900">Page Details</h2>
+          <div className="space-y-5">
+            <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-5 space-y-4">
+              <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Page Details</h2>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title Tag</label>
-                <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
-                  placeholder="My Page Title - Brand Name" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={70} />
-                <p className={`text-xs mt-1 ${title.length > 60 ? 'text-red-500' : 'text-gray-500'}`}>
-                  {title.length}/60 characters {title.length > 60 ? '(may be truncated)' : ''}
-                </p>
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">Title Tag</label>
+                <input type="text" className="w-full px-3 py-2.5 bg-slate-900/50 border border-slate-700/50 rounded-lg text-sm text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-600 transition-colors" placeholder="My Page Title - Brand Name" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={70} />
+                <p className={`text-xs mt-1 ${title.length > 60 ? 'text-amber-400' : 'text-slate-500'}`}>{title.length}/60 {title.length > 60 ? '(may truncate)' : ''}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Meta Description</label>
-                <textarea className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
-                  placeholder="A compelling description that encourages clicks from search results..." value={description}
-                  onChange={(e) => setDescription(e.target.value)} rows={3} maxLength={200} />
-                <p className={`text-xs mt-1 ${description.length > 155 ? 'text-red-500' : 'text-gray-500'}`}>
-                  {description.length}/155 characters {description.length > 155 ? '(may be truncated)' : ''}
-                </p>
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">Meta Description</label>
+                <textarea className="w-full px-3 py-2.5 bg-slate-900/50 border border-slate-700/50 rounded-lg text-sm text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-600 transition-colors" placeholder="A compelling description that encourages clicks..." value={description} onChange={(e) => setDescription(e.target.value)} rows={3} maxLength={200} />
+                <p className={`text-xs mt-1 ${description.length > 155 ? 'text-amber-400' : 'text-slate-500'}`}>{description.length}/155 {description.length > 155 ? '(may truncate)' : ''}</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Page URL</label>
-                <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
-                  placeholder="https://example.com/page" value={url} onChange={(e) => setUrl(e.target.value)} />
+                <label className="block text-sm font-medium text-slate-300 mb-1.5">Page URL</label>
+                <input type="text" className="w-full px-3 py-2.5 bg-slate-900/50 border border-slate-700/50 rounded-lg text-sm text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-600 transition-colors" placeholder="https://example.com/page" value={url} onChange={(e) => setUrl(e.target.value)} />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Site Name</label>
-                  <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
-                    placeholder="example.com" value={siteName} onChange={(e) => setSiteName(e.target.value)} />
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Site Name</label>
+                  <input type="text" className="w-full px-3 py-2.5 bg-slate-900/50 border border-slate-700/50 rounded-lg text-sm text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-600 transition-colors" placeholder="example.com" value={siteName} onChange={(e) => setSiteName(e.target.value)} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Publish Date</label>
-                  <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
-                    placeholder="Jan 15, 2025" value={date} onChange={(e) => setDate(e.target.value)} />
+                  <label className="block text-sm font-medium text-slate-300 mb-1.5">Publish Date</label>
+                  <input type="text" className="w-full px-3 py-2.5 bg-slate-900/50 border border-slate-700/50 rounded-lg text-sm text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-600 transition-colors" placeholder="Jan 15, 2025" value={date} onChange={(e) => setDate(e.target.value)} />
                 </div>
               </div>
-            </div>
-
-            {/* Device Toggle */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex items-center justify-center gap-4">
-              <button onClick={() => setDevice('desktop')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${device === 'desktop' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
-                <Monitor className="w-4 h-4" /> Desktop
-              </button>
-              <button onClick={() => setDevice('mobile')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${device === 'mobile' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
-                <Smartphone className="w-4 h-4" /> Mobile
-              </button>
             </div>
 
             <button onClick={() => {setTitle(''); setDescription(''); setUrl(''); setSiteName(''); setDate('');}}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
-              <RotateCcw className="w-4 h-4" /> Reset All Fields
+              className="w-full px-4 py-3 bg-slate-800 text-slate-400 rounded-xl hover:bg-slate-700 hover:text-slate-200 transition-all flex items-center justify-center gap-2">
+              <RotateCcw className="w-4 h-4" /> Reset
             </button>
+
+            {/* Character Limits */}
+            <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wider">SERP Limits</h2>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                  <span className="text-sm text-slate-400">Title Tag</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-500">50-60 chars</span>
+                    <div className={`w-2.5 h-2.5 rounded-full ${title.length <= 60 ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                  <span className="text-sm text-slate-400">Meta Description</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-500">120-155 chars</span>
+                    <div className={`w-2.5 h-2.5 rounded-full ${description.length <= 155 ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Right: Preview */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Google Search Preview</h2>
-              <div className={`mx-auto ${device === 'mobile' ? 'max-w-[360px]' : 'max-w-full'}`}>
-                {/* Desktop Preview */}
-                {device === 'desktop' && (
-                  <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
-                    <div className="flex items-center gap-2 text-sm text-gray-500 mb-1">
-                      <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs">
-                        {displaySiteName.charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <span className="text-gray-700">{displaySiteName}</span>
-                        <span className="mx-1">·</span>
-                        <span>{date || today}</span>
-                      </div>
-                    </div>
-                    <h3 className="text-xl text-blue-700 hover:underline cursor-pointer mb-1 font-normal leading-tight">
-                      {displayTitleTruncated}
-                    </h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">
-                      {displayDescTruncated}
-                    </p>
-                    <div className="mt-2 text-xs text-gray-400">
-                      {extractBreadcrumb(displayUrl)}
-                    </div>
-                  </div>
-                )}
-
-                {/* Mobile Preview */}
-                {device === 'mobile' && (
-                  <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                    <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-                      <div className="w-5 h-5 bg-gray-100 rounded-full flex items-center justify-center text-xs">
-                        {displaySiteName.charAt(0).toUpperCase()}
-                      </div>
-                      <span className="text-gray-700">{displaySiteName}</span>
-                      <span className="text-gray-400">· {date || today}</span>
-                    </div>
-                    <h3 className="text-base text-blue-700 hover:underline cursor-pointer mb-1 font-normal leading-tight">
-                      {displayTitleTruncated}
-                    </h3>
-                    <p className="text-xs text-gray-600 leading-relaxed">
-                      {displayDescTruncated}
-                    </p>
-                    <div className="mt-1.5 text-xs text-gray-400 truncate">
-                      {extractBreadcrumb(displayUrl)}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Character Counter Tips */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Info className="w-5 h-5 text-green-500" /> SERP Character Limits
+          <div className="space-y-5">
+            <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wider flex items-center gap-2">
+                <Search className="w-4 h-4" /> Google Search Preview
               </h2>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">Title Tag</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500">50-60 characters</span>
-                    <div className={`w-3 h-3 rounded-full ${title.length <= 60 ? 'bg-green-500' : 'bg-red-500'}`} />
+              <div className={`mx-auto ${device === 'mobile' ? 'max-w-[360px]' : 'max-w-full'}`}>
+                <div className="bg-white rounded-lg p-5 shadow-lg">
+                  <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                    <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-xs font-medium text-gray-600">
+                      {displaySiteName.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <span className="text-gray-700">{displaySiteName}</span>
+                      <span className="mx-1">·</span>
+                      <span>{date || today}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">Meta Description</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500">120-155 characters</span>
-                    <div className={`w-3 h-3 rounded-full ${description.length <= 155 ? 'bg-green-500' : 'bg-red-500'}`} />
+                  <h3 className={`${device === 'mobile' ? 'text-base' : 'text-xl'} text-blue-700 hover:underline cursor-pointer mb-1 font-normal leading-tight`}>
+                    {truncate(displayTitle, device === 'mobile' ? 50 : 60)}
+                  </h3>
+                  <p className={`${device === 'mobile' ? 'text-xs' : 'text-sm'} text-gray-600 leading-relaxed`}>
+                    {truncate(displayDesc, device === 'mobile' ? 120 : 155)}
+                  </p>
+                  <div className="mt-2 text-xs text-gray-400 truncate">
+                    {extractBreadcrumb(displayUrl)}
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-green-50 border border-green-100 rounded-2xl p-6">
-              <h3 className="font-semibold text-green-900 mb-2">SERP Optimization Tips</h3>
-              <ul className="text-sm text-green-800 space-y-1.5">
-                <li>• Put your primary keyword near the beginning of the title</li>
-                <li>• Make descriptions compelling with a clear call-to-action</li>
-                <li>• Use numbers and power words to increase click-through rate</li>
-                <li>• Include your brand name at the end of the title</li>
-                <li>• Match search intent with your title and description</li>
+            <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-5">
+              <h3 className="font-semibold text-indigo-400 text-sm mb-2">SERP Optimization Tips</h3>
+              <ul className="text-xs text-slate-400 space-y-1.5">
+                <li>• Put primary keyword near the beginning of the title</li>
+                <li>• Make descriptions compelling with a clear CTA</li>
+                <li>• Use numbers and power words for higher CTR</li>
+                <li>• Include brand name at the end of the title</li>
               </ul>
             </div>
           </div>
         </div>
-      </div>
+      </main>
+
+      <footer className="border-t border-slate-800 bg-slate-950/80 py-4 text-center text-xs text-slate-500">
+        SERP Preview Tool — Desktop & Mobile — Real-time Google Simulation
+      </footer>
     </div>
   );
 }

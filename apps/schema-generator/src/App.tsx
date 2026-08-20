@@ -1,5 +1,5 @@
 import {useState, useCallback} from 'react';
-import {Copy, Check, Code2, Eye, ChevronDown, ChevronRight, Download, RotateCcw, Code} from 'lucide-react';
+import {Copy, Check, Code2, RotateCcw, ChevronDown, ChevronRight, Download, Layers} from 'lucide-react';
 import {SchemaType} from './types';
 import {SCHEMA_TEMPLATES} from './data/templates';
 import {generateSchema} from './utils/schema-generator';
@@ -18,6 +18,7 @@ function App() {
     setSelectedType(type);
     setFormData({});
     setGeneratedJson('');
+    setShowPreview(false);
   }, []);
 
   const updateField = useCallback((name: string, value: string) => {
@@ -27,11 +28,7 @@ function App() {
   const updateRepeaterItem = useCallback((fieldName: string, index: number, subField: string, value: string) => {
     setFormData((prev) => {
       let items: Array<Record<string, string>> = [];
-      try {
-        items = JSON.parse(prev[fieldName] || '[]');
-      } catch {
-        items = [];
-      }
+      try { items = JSON.parse(prev[fieldName] || '[]'); } catch { items = []; }
       while (items.length <= index) items.push({});
       items[index] = {...items[index], [subField]: value};
       return {...prev, [fieldName]: JSON.stringify(items, null, 2)};
@@ -41,11 +38,7 @@ function App() {
   const addRepeaterItem = useCallback((fieldName: string) => {
     setFormData((prev) => {
       let items: Array<Record<string, string>> = [];
-      try {
-        items = JSON.parse(prev[fieldName] || '[]');
-      } catch {
-        items = [];
-      }
+      try { items = JSON.parse(prev[fieldName] || '[]'); } catch { items = []; }
       items.push({});
       return {...prev, [fieldName]: JSON.stringify(items, null, 2)};
     });
@@ -54,11 +47,7 @@ function App() {
   const removeRepeaterItem = useCallback((fieldName: string, index: number) => {
     setFormData((prev) => {
       let items: Array<Record<string, string>> = [];
-      try {
-        items = JSON.parse(prev[fieldName] || '[]');
-      } catch {
-        items = [];
-      }
+      try { items = JSON.parse(prev[fieldName] || '[]'); } catch { items = []; }
       items.splice(index, 1);
       return {...prev, [fieldName]: JSON.stringify(items, null, 2)};
     });
@@ -86,153 +75,100 @@ function App() {
     URL.revokeObjectURL(url);
   }, [generatedJson, selectedType]);
 
-  const handleReset = useCallback(() => {
-    setFormData({});
-    setGeneratedJson('');
-    setShowPreview(false);
-  }, []);
-
-  const getHtmlSnippet = useCallback(() => {
-    if (!generatedJson) return '';
-    return `<script type="application/ld+json">\n${generatedJson}\n</script>`;
-  }, [generatedJson]);
+  const htmlSnippet = generatedJson ? `<script type="application/ld+json">\n${generatedJson}\n</script>` : '';
 
   const renderRepeater = (field: typeof template.fields[0]) => {
     let items: Array<Record<string, string>> = [];
-    try {
-      items = JSON.parse(formData[field.name] || '[]');
-    } catch {
-      items = [];
-    }
+    try { items = JSON.parse(formData[field.name] || '[]'); } catch { items = []; }
 
     return (
       <div key={field.name} className="space-y-3">
-        <label className="block text-sm font-medium text-gray-700">{field.label}</label>
+        <label className="block text-sm font-medium text-slate-300">{field.label}</label>
         {items.map((item, idx) => (
-          <div key={idx} className="bg-gray-50 border border-gray-200 rounded-lg p-3 space-y-2">
+          <div key={idx} className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-3 space-y-2">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-gray-500">Item {idx + 1}</span>
-              <button
-                onClick={() => removeRepeaterItem(field.name, idx)}
-                className="text-red-500 hover:text-red-700 text-xs"
-              >
-                Remove
-              </button>
+              <span className="text-xs font-medium text-slate-500">Item {idx + 1}</span>
+              <button onClick={() => removeRepeaterItem(field.name, idx)} className="text-red-400 hover:text-red-300 text-xs">Remove</button>
             </div>
             {field.fields!.map((sub) => (
               <div key={sub.name}>
-                <label className="block text-xs text-gray-500 mb-1">{sub.label}</label>
+                <label className="block text-xs text-slate-500 mb-1">{sub.label}</label>
                 {sub.type === 'textarea' ? (
-                  <textarea
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder={sub.placeholder}
-                    value={item[sub.name] || ''}
-                    onChange={(e) => updateRepeaterItem(field.name, idx, sub.name, e.target.value)}
-                    rows={3}
-                  />
+                  <textarea className="w-full px-3 py-2 bg-slate-900/50 border border-slate-700/50 rounded-lg text-sm text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-600" placeholder={sub.placeholder} value={item[sub.name] || ''} onChange={(e) => updateRepeaterItem(field.name, idx, sub.name, e.target.value)} rows={3} />
                 ) : (
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    placeholder={sub.placeholder}
-                    value={item[sub.name] || ''}
-                    onChange={(e) => updateRepeaterItem(field.name, idx, sub.name, e.target.value)}
-                  />
+                  <input type="text" className="w-full px-3 py-2 bg-slate-900/50 border border-slate-700/50 rounded-lg text-sm text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-600" placeholder={sub.placeholder} value={item[sub.name] || ''} onChange={(e) => updateRepeaterItem(field.name, idx, sub.name, e.target.value)} />
                 )}
               </div>
             ))}
           </div>
         ))}
-        <button
-          onClick={() => addRepeaterItem(field.name)}
-          className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
-        >
-          + Add {field.label.replace(/s$/, '')}
-        </button>
+        <button onClick={() => addRepeaterItem(field.name)} className="text-sm text-indigo-400 hover:text-indigo-300 font-medium">+ Add {field.label.replace(/s$/, '')}</button>
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50">
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 bg-indigo-100 text-indigo-700 px-4 py-1.5 rounded-full text-sm font-medium mb-4">
-            <Code2 className="w-4 h-4" />
-            Free Schema Markup Generator
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans antialiased">
+      {/* Header */}
+      <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
+                <Layers className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-semibold text-white">Schema Markup Generator</h1>
+                <p className="text-xs text-slate-400">Generate valid JSON-LD structured data</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded-full">Free</span>
+              <span className="px-2 py-1 bg-slate-800 text-slate-400 rounded-full">No Signup</span>
+            </div>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-3">
-            Free Schema Markup Generator
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Generate valid JSON-LD structured data for Google rich results. Pick a type, fill in the fields, copy the code.
-          </p>
         </div>
+      </header>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid lg:grid-cols-2 gap-6">
           {/* Left: Form */}
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* Type Selector */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Choose Schema Type</h2>
+            <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-slate-300 mb-3 uppercase tracking-wider">Schema Type</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {SCHEMA_TEMPLATES.map((t) => (
-                  <button
-                    key={t.type}
-                    onClick={() => handleTypeChange(t.type)}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                      selectedType === t.type
-                        ? 'bg-indigo-600 text-white shadow-sm'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
+                  <button key={t.type} onClick={() => handleTypeChange(t.type)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${selectedType === t.type ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800 hover:text-slate-200'}`}>
                     {t.label}
                   </button>
                 ))}
               </div>
-              <p className="mt-3 text-sm text-gray-500">{template.description}</p>
+              <p className="mt-3 text-xs text-slate-500">{template.description}</p>
             </div>
 
             {/* Fields */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Fill in Details</h2>
+            <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-slate-300 mb-4 uppercase tracking-wider">Properties</h2>
               <div className="space-y-4">
                 {template.fields.map((field) => {
                   if (field.type === 'repeater') return renderRepeater(field);
                   return (
                     <div key={field.name}>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-slate-300 mb-1.5">
                         {field.label}
-                        {field.required && <span className="text-red-500 ml-1">*</span>}
+                        {field.required && <span className="text-red-400 ml-1">*</span>}
                       </label>
                       {field.type === 'textarea' ? (
-                        <textarea
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                          placeholder={field.placeholder}
-                          value={formData[field.name] || ''}
-                          onChange={(e) => updateField(field.name, e.target.value)}
-                          rows={3}
-                        />
+                        <textarea className="w-full px-3 py-2.5 bg-slate-900/50 border border-slate-700/50 rounded-lg text-sm text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-600 transition-colors" placeholder={field.placeholder} value={formData[field.name] || ''} onChange={(e) => updateField(field.name, e.target.value)} rows={3} />
                       ) : field.type === 'select' ? (
-                        <select
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                          value={formData[field.name] || ''}
-                          onChange={(e) => updateField(field.name, e.target.value)}
-                        >
-                          <option value="">Select...</option>
-                          {field.options?.map((opt) => (
-                            <option key={opt} value={opt}>{opt}</option>
-                          ))}
+                        <select className="w-full px-3 py-2.5 bg-slate-900/50 border border-slate-700/50 rounded-lg text-sm text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors" value={formData[field.name] || ''} onChange={(e) => updateField(field.name, e.target.value)}>
+                          <option value="" className="bg-slate-900">Select...</option>
+                          {field.options?.map((opt) => (<option key={opt} value={opt} className="bg-slate-900">{opt}</option>))}
                         </select>
                       ) : (
-                        <input
-                          type={field.type === 'email' ? 'email' : field.type === 'url' ? 'url' : 'text'}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                          placeholder={field.placeholder}
-                          value={formData[field.name] || ''}
-                          onChange={(e) => updateField(field.name, e.target.value)}
-                        />
+                        <input type={field.type === 'email' ? 'email' : field.type === 'url' ? 'url' : 'text'} className="w-full px-3 py-2.5 bg-slate-900/50 border border-slate-700/50 rounded-lg text-sm text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder-slate-600 transition-colors" placeholder={field.placeholder} value={formData[field.name] || ''} onChange={(e) => updateField(field.name, e.target.value)} />
                       )}
                     </div>
                   );
@@ -240,18 +176,11 @@ function App() {
               </div>
 
               <div className="flex gap-3 mt-6">
-                <button
-                  onClick={handleGenerate}
-                  className="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2"
-                >
+                <button onClick={handleGenerate} className="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-xl font-medium hover:bg-indigo-500 transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25">
                   <Code2 className="w-4 h-4" />
                   Generate Schema
                 </button>
-                <button
-                  onClick={handleReset}
-                  className="px-4 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
-                  title="Reset form"
-                >
+                <button onClick={() => {setFormData({}); setGeneratedJson(''); setShowPreview(false);}} className="px-4 py-3 bg-slate-800 text-slate-400 rounded-xl hover:bg-slate-700 hover:text-slate-200 transition-all" title="Reset">
                   <RotateCcw className="w-4 h-4" />
                 </button>
               </div>
@@ -259,23 +188,17 @@ function App() {
           </div>
 
           {/* Right: Output */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+          <div className="space-y-5">
+            <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">Generated JSON-LD</h2>
+                <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Generated JSON-LD</h2>
                 {generatedJson && (
                   <div className="flex gap-2">
-                    <button
-                      onClick={handleCopy}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-sm font-medium hover:bg-green-100 transition-colors"
-                    >
+                    <button onClick={handleCopy} className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 rounded-lg text-xs font-medium hover:bg-emerald-500/20 transition-colors">
                       {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                       {copied ? 'Copied!' : 'Copy'}
                     </button>
-                    <button
-                      onClick={handleDownload}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
-                    >
+                    <button onClick={handleDownload} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 text-slate-400 rounded-lg text-xs font-medium hover:bg-slate-700 hover:text-slate-200 transition-colors">
                       <Download className="w-3.5 h-3.5" />
                       Download
                     </button>
@@ -284,73 +207,54 @@ function App() {
               </div>
 
               {generatedJson ? (
-                <div className="bg-gray-900 rounded-xl p-4 overflow-auto max-h-[500px]">
-                  <pre className="text-sm text-green-400 font-mono whitespace-pre-wrap">{generatedJson}</pre>
+                <div className="bg-slate-950 rounded-xl p-4 overflow-auto max-h-[500px] border border-slate-800">
+                  <pre className="text-sm text-emerald-400 font-mono whitespace-pre-wrap">{generatedJson}</pre>
                 </div>
               ) : (
-                <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl p-8 text-center">
-                  <Code2 className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                  <p className="text-gray-500">Fill in the form and click "Generate Schema" to see the JSON-LD output</p>
+                <div className="bg-slate-950/50 border-2 border-dashed border-slate-800 rounded-xl p-8 text-center">
+                  <Code2 className="w-10 h-10 text-slate-700 mx-auto mb-3" />
+                  <p className="text-slate-500 text-sm">Fill in the form and click Generate to see output</p>
                 </div>
               )}
             </div>
 
             {/* HTML Snippet */}
             {generatedJson && (
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+              <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <Code className="w-5 h-5" />
-                    HTML Snippet
-                  </h2>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(getHtmlSnippet());
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 2000);
-                    }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors"
-                  >
-                    {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    Copy HTML
+                  <h2 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">HTML Snippet</h2>
+                  <button onClick={() => {navigator.clipboard.writeText(htmlSnippet); setCopied(true); setTimeout(() => setCopied(false), 2000);}}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/10 text-blue-400 rounded-lg text-xs font-medium hover:bg-blue-500/20 transition-colors">
+                    <Copy className="w-3.5 h-3.5" /> Copy HTML
                   </button>
                 </div>
-                <div className="bg-gray-900 rounded-xl p-4 overflow-auto max-h-[200px]">
-                  <pre className="text-sm text-yellow-300 font-mono whitespace-pre-wrap">{getHtmlSnippet()}</pre>
+                <div className="bg-slate-950 rounded-xl p-4 overflow-auto max-h-[150px] border border-slate-800">
+                  <pre className="text-sm text-amber-400 font-mono whitespace-pre-wrap">{htmlSnippet}</pre>
                 </div>
-                <p className="mt-2 text-xs text-gray-500">
-                  Add this code to the &lt;head&gt; section of your HTML page
-                </p>
+                <p className="mt-2 text-xs text-slate-600">Add this to the &lt;head&gt; section of your HTML page</p>
               </div>
             )}
 
             {/* Tips */}
-            <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-6">
-              <h3 className="font-semibold text-indigo-900 mb-2">Schema Markup Tips</h3>
-              <ul className="text-sm text-indigo-800 space-y-1.5">
-                <li>• Use Google's Rich Results Test to validate your schema</li>
+            <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-xl p-5">
+              <h3 className="font-semibold text-indigo-400 text-sm mb-2">Quick Tips</h3>
+              <ul className="text-xs text-slate-400 space-y-1.5">
+                <li>• Validate with Google's Rich Results Test</li>
                 <li>• Only include properties that have values</li>
-                <li>• Keep descriptions under 160 characters for best results</li>
-                <li>• Update schema when page content changes</li>
+                <li>• Keep descriptions under 160 characters</li>
                 <li>• Multiple schema types can be used on one page</li>
               </ul>
             </div>
           </div>
         </div>
+      </main>
 
-        {/* Schema Types Guide */}
-        <div className="mt-12 bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Schema Types & When to Use Them</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {SCHEMA_TEMPLATES.map((t) => (
-              <div key={t.type} className="bg-gray-50 rounded-xl p-4">
-                <h3 className="font-semibold text-gray-900 mb-1">{t.label}</h3>
-                <p className="text-sm text-gray-600">{t.description}</p>
-              </div>
-            ))}
-          </div>
+      {/* Footer */}
+      <footer className="border-t border-slate-800 bg-slate-950/80 py-4 text-center text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto px-4">
+          Schema Markup Generator — 15+ Types — JSON-LD Output — Google Rich Results Ready
         </div>
-      </div>
+      </footer>
     </div>
   );
 }
