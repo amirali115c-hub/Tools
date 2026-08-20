@@ -1,0 +1,8 @@
+name = "cors-proxy"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+[env.production]
+routes = [
+  { pattern = "proxy.tools.clienvora.com/*", zone_name = "clienvora.com" }
+]

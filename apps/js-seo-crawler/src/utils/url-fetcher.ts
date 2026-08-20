@@ -1,17 +1,23 @@
 const CORS_PROXIES = [
-  'https://api.allorigins.win/raw?url=',
-  'https://corsproxy.io/?',
-  'https://api.codetabs.com/v1/proxy?quest=',
+  // Custom Cloudflare Worker proxy (primary - no rate limits)
+  (url: string) => `https://proxy.tools.clienvora.com/?url=${encodeURIComponent(url)}`,
+  // Free fallback proxies (if custom proxy is down)
+  (url: string) => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+  (url: string) => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+  (url: string) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
 ];
 
 export async function fetchWithCORS(url: string): Promise<{html: string; statusCode: number; loadTime: number}> {
   const startTime = Date.now();
 
-  for (const proxy of CORS_PROXIES) {
+  for (const proxyFn of CORS_PROXIES) {
+    const proxyUrl = proxyFn(url);
     try {
-      const proxyUrl = proxy + encodeURIComponent(url);
       const response = await fetch(proxyUrl, {
-        signal: AbortSignal.timeout(15000),
+        signal: AbortSignal.timeout(20000),
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; ClienvoraBot/1.0)',
+        },
       });
 
       if (response.ok) {
