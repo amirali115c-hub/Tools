@@ -2,9 +2,9 @@
 
 ## Project Overview
 - **Repository:** amirali115c-hub.github.io/technical-seo-checklist
-- **Live Site:** https://amirali115c-hub.github.io/Tools/
+- **Live Site:** https://tools.clienvora.com/
 - **Main Website:** https://clienvora.com
-- **Total Tools:** 35+ advanced tools across 8 categories
+- **Total Tools:** 29+ advanced tools across 8 categories
 - **All tools:** 100% client-side, no uploads, no tracking
 
 ---
@@ -46,19 +46,13 @@ Each tool upgraded with tabbed interface, batch support, progress indicators, er
 
 | # | Tool | Folder | Build Source | Notes |
 |---|------|--------|--------------|-------|
-| 21 | Canonical Tag Checker | `tools/canonical-tag-checker/` | `apps/canonical-tag-checker/` | Client-side, paste HTML/URL, bulk, CSV export |
-| 22 | Robots.txt Checker & Generator | `tools/robots-txt-checker/` | `apps/robots-txt-checker/` | Client-side, RFC 9309, URL tester, generator |
-| 23 | Redirect Chain Checker | `tools/redirect-chain-checker/` | `apps/redirect-chain-checker/` | Client-side, curl paste, loops, bulk |
-| 24 | SEO Keyword Gap & Targeting Planner | `tools/seo-keyword-gap/` | `apps/seo-keyword-gap/` | Client-side, TF-IDF, clusters, CSV |
-| 25 | MetaShield AI - Image Metadata & Privacy Studio | `tools/metashield-ai/` | `apps/metashield-ai/` | Client-side audit, EXIF/GPS/AI prompt scrub |
-| 26 | Schema Markup Generator | `tools/schema-generator/` | `apps/schema-generator/` | 15+ schema types, JSON-LD, HTML snippet, download |
-| 27 | Meta Tag Generator | `tools/meta-tag-generator/` | `apps/meta-tag-generator/` | Basic SEO, OG, Twitter Cards, Google preview |
-| 28 | Page Speed Checker | `tools/page-speed-checker/` | `apps/page-speed-checker/` | 12+ checks, scoring, recommendations |
-| 29 | SERP Preview Tool | `tools/serp-preview/` | `apps/serp-preview/` | Desktop/mobile preview, character counter |
+| 21 | Canonical Tag Checker | `canonical-tag-checker/` | `apps/canonical-tag-checker/` | Client-side, paste HTML/URL, bulk, CSV export |
+| 22 | Robots.txt Checker & Generator | `robots-txt-checker/` | `apps/robots-txt-checker/` | Client-side, RFC 9309, URL tester, generator |
+| 23 | Redirect Chain Checker | `redirect-chain-checker/` | `apps/redirect-chain-checker/` | Client-side, curl paste, loops, bulk |
+| 24 | SEO Keyword Gap & Targeting Planner | `seo-keyword-gap/` | `apps/seo-keyword-gap/` | Client-side, TF-IDF, clusters, CSV |
+| 25 | MetaShield AI - Image Metadata & Privacy Studio | `metashield-ai/` | `apps/metashield-ai/` | Client-side audit, EXIF/GPS/AI prompt scrub |
 
-**Build workflow:** Each React app lives in `apps/<name>/`, built with `npm run build` (Vite, `base: './'` for relative paths), output copied to `tools/<name>/app/`. The tool page wrapper at `tools/<name>/index.html` embeds the built app in an iframe with site design + SEO content.
-
-**Not deployed:** `llms.txt-generator` zip requires a backend server (Express crawl pipeline) - cannot run on static GitHub Pages. Source zips retained in `tools/*.zip`.
+**Build workflow:** Each React app lives in `apps/<name>/`, built with `npm run build` (Vite, `base: './'` for relative paths), output copied to `<name>/app/`. The tool page wrapper at `<name>/index.html` embeds the built app in an iframe with site design + SEO content.
 
 ### Phase 2.7: JS SEO Crawler - Advanced Technical SEO Audit Tool (New - 1 tool)
 
@@ -66,7 +60,7 @@ Each tool upgraded with tabbed interface, batch support, progress indicators, er
 
 | # | Tool | Folder | Build Source | Notes |
 |---|------|--------|--------------|-------|
-| 30 | JS SEO Crawler | `tools/js-seo-crawler/` | `apps/js-seo-crawler/` | Client-side, 14 analysis tabs, JS rendering detection, AI crawler analysis, llms.txt validation, CSV/JSON export |
+| 30 | JS SEO Crawler | `js-seo-crawler/` | `apps/js-seo-crawler/` | Client-side, 14 analysis tabs, JS rendering detection, AI crawler analysis, llms.txt validation, CSV/JSON export |
 
 **Key Features:**
 - **Basic SEO Analysis:** Title tags, meta descriptions, canonical tags, headings, links, images, schema markup, Open Graph, Twitter Cards
@@ -81,8 +75,6 @@ Each tool upgraded with tabbed interface, batch support, progress indicators, er
 - Long-tail: `javascript seo checker`, `ai crawler checker`, `llms.txt validator`, `technical seo audit tool`
 
 **Schema Markup:** SoftwareApplication, FAQPage, BreadcrumbList, HowTo, WebApplication
-
-**Build workflow:** Each React app lives in `apps/<name>/`, built with `npm run build` (Vite, `base: './'` for relative paths), output copied to `tools/<name>/app/`. The tool page wrapper at `tools/<name>/index.html` embeds the built app in an iframe with site design + SEO content.
 
 ### Phase 2.8: Knowledge Graph Implementation - New Tools (4 new tools)
 
@@ -103,7 +95,105 @@ Knowledge graph from `/home/amir/Desktop/Claude/Clienvora Knowledge Graph.docx` 
 
 **Schema markup:** SoftwareApplication, FAQPage, BreadcrumbList for each new tool page
 **Cross-links:** All existing tool pages updated with links to new tools
-**Build workflow:** Same React + Vite pattern, `apps/<name>/` → `tools/<name>/`
+
+### Phase 2.9: Hero Section Redesign (Completed - 5 SEO tools)
+
+Redesigned hero sections for the 5 Knowledge Graph SEO tools with Clienvora design system.
+
+| # | Tool | Design Features |
+|---|------|-----------------|
+| 1 | JS SEO Crawler | Dark gradient, gold shimmer, glass-morphism badges, stats |
+| 2 | Schema Generator | Dark gradient, gold shimmer, glass-morphism badges |
+| 3 | Meta Tag Generator | Dark gradient, gold shimmer, glass-morphism badges |
+| 4 | Page Speed Checker | Dark gradient, gold shimmer, glass-morphism badges |
+| 5 | SERP Preview | Dark gradient, gold shimmer, glass-morphism badges |
+
+**Design System Applied:**
+- Dark gradient background: `#0B1324 → #111827 → #0F172A`
+- Gold shimmer text: Playfair Display with `linear-gradient(135deg, #D4AF37, #E8C547, #C9A227, #fff)`
+- Glass-morphism trust badges: `backdrop-filter: blur(12px)` with semi-transparent borders
+- Centered layout with trust pills and stats section
+- No dashes or em signs in titles
+
+**Note:** 26 other tools (Image, Video, Audio, Document, etc.) were reverted to original design per user request.
+
+### Phase 2.10: FAQ Schema, Keywords, and Structured Data (Completed - 4 tools)
+
+Added comprehensive SEO optimization to the 4 Knowledge Graph tools (excluding JS SEO Crawler which already had it).
+
+| # | Tool | FAQ Questions | Keywords | Schema |
+|---|------|---------------|----------|--------|
+| 1 | Schema Generator | 5 questions | Yes | BreadcrumbList, SoftwareApplication, FAQPage |
+| 2 | Meta Tag Generator | 4 questions | Yes | BreadcrumbList, SoftwareApplication, FAQPage |
+| 3 | Page Speed Checker | 4 questions | Yes | BreadcrumbList, SoftwareApplication, FAQPage |
+| 4 | SERP Preview | 4 questions | Yes | BreadcrumbList, SoftwareApplication, FAQPage |
+
+### Phase 2.11: URL Flattening (Completed)
+
+Removed `/tools/` layer from URL structure for better SEO crawl depth.
+
+**Before:**
+```
+tools.clienvora.com/tools/image-cropper/
+tools.clienvora.com/tools/pdf-merger/
+```
+
+**After:**
+```
+tools.clienvora.com/image-cropper/
+tools.clienvora.com/pdf-merger/
+```
+
+**Changes:**
+- Moved all 29 tool folders from `tools/` to root level
+- Updated homepage links to point to new paths
+- Updated all wrapper HTML relative paths (`../../` → `../`)
+- Updated canonical URLs in all tools
+- Updated sitemap.xml with new URLs
+- Added 301 redirects from old URLs to new (`tools/*/index.html`)
+
+### Phase 2.12: Homepage Section Reorder (Completed)
+
+Moved SEO Tools section to the top of the homepage, above Image Tools.
+
+**New Order:**
+1. SEO Tools (moved to top)
+2. Image Tools
+3. Video Tools
+4. Audio Tools
+5. Document Tools
+6. Archive Tools
+7. Spreadsheet Tools
+8. Font Tools
+9. Text Tools
+
+### Phase 2.13: Homepage SEO Optimization (Completed)
+
+Optimized meta tags and H1 for primary keyword targeting.
+
+| Element | Before | After |
+|---------|--------|-------|
+| Title | Free Online Tools - 32+ File Converter Tools \| No Upload \| 100% Private | Free Online Tools 32+ SEO Website Checker Private |
+| H1 | Free Online File Converter Tools | Free Online Tools for SEO and Website |
+| Description | 32+ free online file converter tools. Image converter, video compressor... | 32+ free online tools. SEO checker, schema generator, meta tag builder... |
+| Keywords | file converter, image converter, video compressor... | seo checker, seo tools, website seo checker, schema generator... |
+| OG/Twitter | File Converter Tools | SEO Website Checker Private |
+
+**Primary Keyword Target:** "free online tools" + "seo checker" focus
+
+### Phase 2.14: Tools Reference for Blog Writers (Completed)
+
+Created `CLIENVOBA-TOOLS-REFERENCE.md` in Clienvora Astro project for internal linking strategy.
+
+**File Location:** `/home/amir/Desktop/clienvora-astro-redesign/CLIENVOBA-TOOLS-REFERENCE.md`
+
+**Contents:**
+- All 29 tools documented with URLs and descriptions
+- Anchor text ideas for natural linking
+- Blog topic suggestions per tool
+- Quick reference table by blog topic
+
+**Note:** File is local only, not committed to git per user request.
 
 ### Phase 2.6: Engine Upgrades (Option A - 5 pages upgraded)
 
@@ -117,7 +207,31 @@ The combined `image-processor-suite.zip` and `audio-converter-studio.zip` apps w
 | `audio-converter/` | ConverterStudio (`?mode=converter`) |
 | `audio-trimmer/` | TrimmerStudio (`?mode=trimmer`) |
 
-**Build sources:** `apps/image-processor-suite/`, `apps/audio-converter-studio/`. Each page keeps its existing SEO wrapper (title/meta/FAQ/schema) — only the inline tool area was swapped for the iframe. Old inline engines removed. **Not creating** separate pages for enhance/batch/recorder (keeping page count focused on existing keywords).
+**Build sources:** `apps/image-processor-suite/`, `apps/audio-converter-studio/`. Each page keeps its existing SEO wrapper (title/meta/FAQ/schema) — only the inline tool area was swapped for the iframe. Old inline engines removed.
+
+---
+
+## CLOUDFLARE WORKER CORS PROXY
+
+**Worker:** `cors-proxy.amircontentwriter.workers.dev`
+**Custom Domain:** `proxy.tools.clienvora.com` (pending DNS setup)
+**Account ID:** `ae286f2c80f95afef1a0eddd5009099f`
+**Email:** `amircontentwriter@gmail.com`
+
+**Features:**
+- Blocks private IPs (SSRF protection)
+- 5-minute cache
+- 20-second timeout
+- Custom CORS headers
+
+**Used by:**
+- JS SEO Crawler (primary proxy)
+- Page Speed Checker (primary proxy)
+- Free proxies as fallback
+
+**DNS Setup Required:**
+- CNAME record: `proxy.tools.clienvora.com` → `cors-proxy.amircontentwriter.workers.dev`
+- Proxied flag: ON
 
 ---
 
@@ -247,20 +361,21 @@ Example: "Free Online PDF Merger"
 
 ### Primary Keywords
 - free online tools
-- file converter
-- image converter
-- video compressor
-- pdf tools
-- audio converter
-- no upload tools
+- seo checker
+- seo tools
+- website seo checker
+- technical seo tools
+- schema generator
+- meta tag generator
 
 ### Content Sections
-1. **Hero** - "32+ Free Online File Converter Tools"
-2. **Categories** - Tool cards with keywords
-3. **Why Use Section** - "100% Private & Secure"
-4. **How It Works** - 3 steps
-5. **FAQ Section** - 10+ questions with schema
-6. **About Section** - Link to Clienvora
+1. **Hero** - "Free Online Tools for SEO and Website"
+2. **SEO Tools** (moved to top)
+3. **Categories** - Tool cards with keywords
+4. **Why Use Section** - "100% Private & Secure"
+5. **How It Works** - 3 steps
+6. **FAQ Section** - 10+ questions with schema
+7. **About Section** - Link to Clienvora
 
 ---
 
@@ -307,12 +422,12 @@ Example: "Free Online PDF Merger"
     "@type": "ListItem",
     "position": 1,
     "name": "Home",
-    "item": "https://amirali115c-hub.github.io/Tools/"
+    "item": "https://tools.clienvora.com/"
   },{
     "@type": "ListItem",
     "position": 2,
     "name": "[Category]",
-    "item": "https://amirali115c-hub.github.io/Tools/#[category]"
+    "item": "https://tools.clienvora.com/#[category]"
   },{
     "@type": "ListItem",
     "position": 3,
@@ -339,11 +454,24 @@ Example: "Free Online PDF Merger"
 ### Link Distribution
 ```
 Homepage
+├── SEO Tools (11 tools) ← TOP OF PAGE
+│   ├── Free SEO Checker → Schema Generator, Meta Tag Generator, Page Speed Checker
+│   ├── Schema Generator → Free SEO Checker, Meta Tag Generator
+│   ├── Meta Tag Generator → Free SEO Checker, SERP Preview
+│   ├── Page Speed Checker → Free SEO Checker
+│   ├── SERP Preview → Meta Tag Generator
+│   ├── Canonical Tag Checker → Robots.txt Checker, Redirect Chain Checker
+│   ├── Robots.txt Checker → Canonical Tag Checker
+│   ├── Redirect Chain Checker → Canonical Tag Checker
+│   ├── SEO Keyword Gap → Free SEO Checker
+│   ├── MetaShield AI → AI Metadata Remover
+│   └── Prompt Forge → (standalone)
 ├── Image Tools (6 tools)
 │   ├── Image Converter → Image Cropper, Image Compressor, AI Metadata Remover
 │   ├── Image Cropper → Image Converter, Image Compressor
 │   ├── Image Compressor → Image Converter, Image Cropper
 │   ├── Watermark Remover → Image Converter, Image Cropper
+│   ├── Image to Base64 → Image Converter
 │   └── AI Metadata Remover → Image Converter, Image Compressor
 ├── Video Tools (4 tools)
 │   ├── Video Compressor → Video Trimmer, Video to GIF, Video to Audio
@@ -371,84 +499,83 @@ Homepage
 
 ---
 
-## NEXT STEPS
-
-### Phase 3: SEO Optimization (Current)
-1. [x] Create comprehensive progress document
-2. [x] Redesign homepage with SEO content
-3. [x] Create tool page template
-4. [ ] Add schema markup to all pages (done for 20 upgraded + 5 new SEO tools)
-5. [ ] Add FAQ content to all tool pages (done for 20 upgraded + 5 new SEO tools)
-6. [x] Implement internal linking
-7. [x] Integrate Clienvora.com links
-
-### Phase 4: Content Creation
-1. [ ] Write SEO content for each tool (800+ words)
-2. [ ] Create FAQ content (100+ FAQs)
-3. [ ] Add How-To sections
-4. [ ] Create related tools sections
-
-### Phase 5: Testing & Launch
-1. [ ] Validate schema markup
-2. [ ] Test all internal links
-3. [ ] Check mobile responsiveness
-4. [ ] Verify page speed
-5. [ ] Submit to Google Search Console
-
----
-
-## FILE STRUCTURE
+## FILE STRUCTURE (Updated)
 
 ```
 /home/amir/Desktop/Tools/
 ├── index.html (Homepage)
 ├── assets/
 │   ├── style.css
-│   └── tools.js
-├── tools/
-│   ├── image-converter/index.html
-│   ├── image-cropper/index.html
-│   ├── image-compressor/index.html
-│   ├── watermark-remover/index.html
-│   ├── ai-metadata-remover/index.html
-│   ├── video-compressor/index.html
-│   ├── video-trimmer/index.html
-│   ├── video-to-gif/index.html
-│   ├── video-to-audio/index.html
-│   ├── audio-trimmer/index.html
-│   ├── audio-converter/index.html
-│   ├── pdf-merger/index.html
-│   ├── pdf-splitter/index.html
-│   ├── pdf-tools/index.html
-│   ├── text-to-pdf/index.html
-│   ├── zip-tool/index.html
-│   ├── csv-viewer/index.html
-│   ├── json-csv/index.html
-│   ├── font-preview/index.html
-│   └── text-tools/index.html
+│   └── favicon/
+├── apps/ (React source code)
+│   ├── js-seo-crawler/
+│   ├── schema-generator/
+│   ├── meta-tag-generator/
+│   ├── page-speed-checker/
+│   ├── serp-preview/
+│   └── ... (other tool builds)
+├── workers/
+│   └── cors-proxy/ (Cloudflare Worker)
+├── ai-metadata-remover/index.html
+├── audio-converter/index.html
+├── audio-trimmer/index.html
+├── canonical-tag-checker/index.html
+├── csv-viewer/index.html
+├── font-preview/index.html
+├── image-compressor/index.html
+├── image-converter/index.html
+├── image-cropper/index.html
+├── js-seo-crawler/index.html
+├── json-csv/index.html
+├── meta-tag-generator/index.html
+├── metashield-ai/index.html
+├── page-speed-checker/index.html
+├── pdf-merger/index.html
+├── pdf-splitter/index.html
+├── prompt-forge/index.html
+├── redirect-chain-checker/index.html
+├── robots-txt-checker/index.html
+├── schema-generator/index.html
+├── seo-keyword-gap/index.html
+├── serp-preview/index.html
+├── text-to-pdf/index.html
+├── text-tools/index.html
+├── video-compressor/index.html
+├── video-to-audio/index.html
+├── video-to-gif/index.html
+├── video-trimmer/index.html
+├── watermark-remover/index.html
+├── zip-tool/index.html
+├── tools/ (301 redirects only)
+│   └── */index.html (redirect to root)
+├── sitemap.xml
+├── robots.txt
+├── CNAME
 └── PROGRESS.md (This file)
 ```
 
 ---
 
-## KEYWORD TRACKING
+## NEXT STEPS
 
-### Target Rankings (6 months)
+### Phase 3: Content Creation
+1. [ ] Write blog posts linking to tools using CLIENVOBA-TOOLS-REFERENCE.md
+2. [ ] Add SEO content to remaining tool pages (Image, Video, Audio, etc.)
+3. [ ] Add FAQ schema to remaining tool pages
 
-| Tool | Primary Keyword | Current Rank | Target Rank |
-|------|----------------|--------------|-------------|
-| PDF Merger | merge pdf | Not ranked | Top 20 |
-| Watermark Remover | watermark remover | Not ranked | Top 20 |
-| Video to GIF | video to gif | Not ranked | Top 20 |
-| Video Compressor | video compressor | Not ranked | Top 20 |
-| Image Converter | image converter | Not ranked | Top 30 |
-| PDF Splitter | pdf splitter | Not ranked | Top 20 |
-| Image Compressor | image compressor | Not ranked | Top 30 |
-| Audio Trimmer | audio trimmer | Not ranked | Top 20 |
-| Video Trimmer | video trimmer | Not ranked | Top 30 |
-| JSON to CSV | json to csv | Not ranked | Top 10 |
+### Phase 4: Technical SEO
+1. [ ] Set up Cloudflare DNS for proxy.tools.clienvora.com
+2. [ ] Submit updated sitemap to Google Search Console
+3. [ ] Monitor URL flattening migration in Search Console
+4. [ ] Track keyword rankings for target terms
+
+### Phase 5: Content Marketing
+1. [ ] Write "Technical SEO Checklist" blog post (link to SEO tools)
+2. [ ] Write "Image Optimization Guide" blog post (link to image tools)
+3. [ ] Write "Schema Markup Guide" blog post (link to schema generator)
+4. [ ] Write "Core Web Vitals Guide" blog post (link to page speed checker)
 
 ---
 
 *Last Updated: August 2026*
-*Progress: 20/20 tools upgraded, SEO optimization in progress*
+*Progress: 29 tools live, URL flattening complete, SEO optimization in progress*
