@@ -4,7 +4,7 @@
 - **Repository:** amirali115c-hub.github.io/technical-seo-checklist
 - **Live Site:** https://amirali115c-hub.github.io/Tools/
 - **Main Website:** https://clienvora.com
-- **Total Tools:** 20+ advanced tools across 8 categories
+- **Total Tools:** 35+ advanced tools across 8 categories
 - **All tools:** 100% client-side, no uploads, no tracking
 
 ---
@@ -51,10 +51,59 @@ Each tool upgraded with tabbed interface, batch support, progress indicators, er
 | 23 | Redirect Chain Checker | `tools/redirect-chain-checker/` | `apps/redirect-chain-checker/` | Client-side, curl paste, loops, bulk |
 | 24 | SEO Keyword Gap & Targeting Planner | `tools/seo-keyword-gap/` | `apps/seo-keyword-gap/` | Client-side, TF-IDF, clusters, CSV |
 | 25 | MetaShield AI - Image Metadata & Privacy Studio | `tools/metashield-ai/` | `apps/metashield-ai/` | Client-side audit, EXIF/GPS/AI prompt scrub |
+| 26 | Schema Markup Generator | `tools/schema-generator/` | `apps/schema-generator/` | 15+ schema types, JSON-LD, HTML snippet, download |
+| 27 | Meta Tag Generator | `tools/meta-tag-generator/` | `apps/meta-tag-generator/` | Basic SEO, OG, Twitter Cards, Google preview |
+| 28 | Page Speed Checker | `tools/page-speed-checker/` | `apps/page-speed-checker/` | 12+ checks, scoring, recommendations |
+| 29 | SERP Preview Tool | `tools/serp-preview/` | `apps/serp-preview/` | Desktop/mobile preview, character counter |
 
 **Build workflow:** Each React app lives in `apps/<name>/`, built with `npm run build` (Vite, `base: './'` for relative paths), output copied to `tools/<name>/app/`. The tool page wrapper at `tools/<name>/index.html` embeds the built app in an iframe with site design + SEO content.
 
 **Not deployed:** `llms.txt-generator` zip requires a backend server (Express crawl pipeline) - cannot run on static GitHub Pages. Source zips retained in `tools/*.zip`.
+
+### Phase 2.7: JS SEO Crawler - Advanced Technical SEO Audit Tool (New - 1 tool)
+
+1 new advanced React tool added - a comprehensive technical SEO crawler with JavaScript rendering analysis, AI crawler checking, and llms.txt validation.
+
+| # | Tool | Folder | Build Source | Notes |
+|---|------|--------|--------------|-------|
+| 30 | JS SEO Crawler | `tools/js-seo-crawler/` | `apps/js-seo-crawler/` | Client-side, 14 analysis tabs, JS rendering detection, AI crawler analysis, llms.txt validation, CSV/JSON export |
+
+**Key Features:**
+- **Basic SEO Analysis:** Title tags, meta descriptions, canonical tags, headings, links, images, schema markup, Open Graph, Twitter Cards
+- **JavaScript SEO:** Rendering strategy detection (CSR/SSR/SSG/ISR), framework detection (Next.js, Nuxt.js, Remix, Gatsby, Astro, SvelteKit), raw vs rendered HTML diff
+- **AI Search Optimization:** AI crawler access checking (GPTBot, ClaudeBot, PerplexityBot, Google-Extended), llms.txt validation
+- **Advanced Features:** Core Web Vitals display, JavaScript health analysis, lazy loading detection, migration comparison mode
+- **Export:** CSV, JSON, plain-text reports
+
+**Target Keywords:**
+- Primary: `seo checker free` (4.4K volume, 68 KD)
+- Secondary: `seo check` (8.1K volume, 71 KD)
+- Long-tail: `javascript seo checker`, `ai crawler checker`, `llms.txt validator`, `technical seo audit tool`
+
+**Schema Markup:** SoftwareApplication, FAQPage, BreadcrumbList, HowTo, WebApplication
+
+**Build workflow:** Each React app lives in `apps/<name>/`, built with `npm run build` (Vite, `base: './'` for relative paths), output copied to `tools/<name>/app/`. The tool page wrapper at `tools/<name>/index.html` embeds the built app in an iframe with site design + SEO content.
+
+### Phase 2.8: Knowledge Graph Implementation - New Tools (4 new tools)
+
+Knowledge graph from `/home/amir/Desktop/Claude/Clienvora Knowledge Graph.docx` implemented. All tools map to knowledge graph entities (Technical SEO, On-Page SEO, Structured Data). Cross-linked existing tools with new additions.
+
+| # | Tool | Build Size | Knowledge Graph Entity | Service Connection |
+|---|------|-----------|----------------------|-------------------|
+| 1 | Schema Markup Generator | 226 KB JS, 17 KB CSS | Structured Data, JSON-LD | SEO Services |
+| 2 | Meta Tag Generator | 210 KB JS, 15 KB CSS | On-Page SEO, Title Tags | SEO Services |
+| 3 | Page Speed Checker | 213 KB JS, 18 KB CSS | Core Web Vitals, Performance | Technical SEO |
+| 4 | SERP Preview Tool | 207 KB JS, 16 KB CSS | SERP, Search Snippets | Content Strategy |
+
+**Features per tool:**
+- Schema Generator: 15+ schema types, JSON-LD output, HTML snippet, download, real-time preview
+- Meta Tag Generator: Basic SEO, Open Graph, Twitter Cards, Google search preview, character counter
+- Page Speed Checker: 12+ performance checks, scoring, recommendations, image analysis, lazy loading audit
+- SERP Preview: Desktop/mobile preview, character limits, breadcrumb preview, real-time Google simulation
+
+**Schema markup:** SoftwareApplication, FAQPage, BreadcrumbList for each new tool page
+**Cross-links:** All existing tool pages updated with links to new tools
+**Build workflow:** Same React + Vite pattern, `apps/<name>/` → `tools/<name>/`
 
 ### Phase 2.6: Engine Upgrades (Option A - 5 pages upgraded)
 
