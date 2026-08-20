@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Cropper - Free Online Image Cropper | No Upload | 100% Private</title>
+  <meta name="description" content="Crop images online for free. Aspect ratios, rotate, flip, zoom, round crop, before/after preview. No uploads, 100% private.">
+  <meta name="keywords" content="image cropper, crop image, image crop tool, free image cropper, online image cropper, photo cropper, crop photo">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://tools.clienvora.com/image-cropper/">
+  <link rel="stylesheet" href="../assets/style.css">
+  <!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="../assets/favicon/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+<link rel="manifest" href="../assets/favicon/site.webmanifest">
+<meta name="theme-color" content="#0F0F1A">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Image Cropper - Free Online Image Cropper">
+  <meta property="og:description" content="Crop images online for free. Aspect ratios, rotate, flip, zoom, round crop, before/after preview.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tools.clienvora.com/image-cropper/">
+
+  <!-- Schema.org SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Image Cropper - Free Online Tool",
+    "operatingSystem": "Any",
+    "applicationCategory": "UtilitiesApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Crop images online for free. Aspect ratios, rotate, flip, zoom, round crop, before/after preview. No uploads, 100% private."
+  }
+  </script>
+
+  <!-- Schema.org BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://tools.clienvora.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Image Tools",
+        "item": "https://tools.clienvora.com/#image"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Image Cropper"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Schema.org FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I crop an image for free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use our free Image Cropper tool. Drag and drop your image, adjust the crop box by dragging handles, select an aspect ratio preset, and click Crop & Download. No uploads, no sign-ups required."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my image data uploaded to any server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, your images never leave your device. All processing happens locally in your browser using client-side JavaScript and canvas. Your privacy is 100% guaranteed."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What aspect ratios are available?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Our Image Cropper supports Free (custom), 1:1 (square), 4:3, 16:9, 9:16 (portrait), and 3:4 aspect ratios. You can also set custom output dimensions."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I rotate and flip images?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our cropper includes Rotate Left (90°), Rotate Right (90°), Rotate 180°, Flip Horizontal, and Flip Vertical options in the Transform tab."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is round crop?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Round crop creates a circular crop of your image, perfect for profile pictures and avatars. Enable it in the Transform tab and the crop box will become circular."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I set a specific output size?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, enter exact pixel dimensions in the Output fields (W and H). You can also use Quick Size presets for common sizes like 400x400, 1080p, IG Post, FB Cover, and more."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What output formats are supported?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Our Image Cropper supports PNG, JPEG, and WebP output formats. You can select the format and quality in the Transform tab."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I undo crop changes?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our cropper includes Undo and Redo buttons. Each crop, resize, rotate, or flip action is saved to an undo stack (up to 30 states)."
+        }
+      }
+    ]
+  }
+  </script>
+  <style>
+    .cropper-layout{display:grid;grid-template-columns:1fr 320px;gap:20px;margin-top:16px}
+    .cropper-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+    .cropper-panel h3{font-size:.95rem;margin-bottom:12px;color:var(--text)}
+    .canvas-wrap{position:relative;background:#111;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:400px}
+    .canvas-wrap img{max-width:100%;max-height:500px;display:block;user-select:none;-webkit-user-drag:none}
+    .crop-overlay{position:absolute;border:2px dashed var(--accent);background:rgba(201,162,39,.15);cursor:move;box-shadow:0 0 0 9999px rgba(0,0,0,.5)}
+    .crop-overlay.round{border-radius:50%}
+    .crop-handle{position:absolute;width:12px;height:12px;background:#fff;border:2px solid var(--accent);border-radius:50%}
+    .crop-handle.tl{top:-6px;left:-6px;cursor:nw-resize}
+    .crop-handle.tr{top:-6px;right:-6px;cursor:ne-resize}
+    .crop-handle.bl{bottom:-6px;left:-6px;cursor:sw-resize}
+    .crop-handle.br{bottom:-6px;right:-6px;cursor:se-resize}
+    .crop-handle.tm{top:-6px;left:50%;transform:translateX(-50%);cursor:n-resize}
+    .crop-handle.bm{bottom:-6px;left:50%;transform:translateX(-50%);cursor:s-resize}
+    .crop-handle.ml{top:50%;left:-6px;transform:translateY(-50%);cursor:w-resize}
+    .crop-handle.mr{top:50%;right:-6px;transform:translateY(-50%);cursor:e-resize}
+    .aspect-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+    .aspect-btn{padding:8px;border:2px solid var(--border);border-radius:6px;text-align:center;cursor:pointer;font-size:.8rem;transition:all .15s}
+    .aspect-btn:hover{border-color:var(--accent)}
+    .aspect-btn.active{border-color:var(--accent);background:rgba(201,162,39,.1);color:var(--accent)}
+    .transform-row{display:flex;gap:6px;flex-wrap:wrap}
+    .transform-btn{flex:1;min-width:60px;padding:8px;border:1px solid var(--border);border-radius:6px;text-align:center;cursor:pointer;font-size:.8rem;background:var(--bg);color:var(--text2);transition:all .15s}
+    .transform-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .size-presets{display:flex;gap:6px;flex-wrap:wrap}
+    .size-preset{padding:4px 10px;border:1px solid var(--border);border-radius:6px;font-size:.75rem;cursor:pointer;background:var(--bg);color:var(--text2);transition:all .15s}
+    .size-preset:hover,.size-preset.active{border-color:var(--accent);color:var(--accent)}
+    .output-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+    .output-row input{flex:1;padding:6px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.8rem;text-align:center}
+    .output-row span{color:var(--text2);font-size:.75rem}
+    .tabs{display:flex;gap:4px;margin-bottom:16px}
+    .tab{padding:8px 16px;border-radius:6px;font-size:.85rem;cursor:pointer;background:var(--bg);color:var(--text2);border:1px solid var(--border);transition:all .15s}
+    .tab.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+    .compare-container{position:relative;width:100%;aspect-ratio:16/10;background:#000;border-radius:8px;overflow:hidden;cursor:col-resize}
+    .compare-img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain}
+    .compare-after{clip-path:polygon(50% 0,100% 0,100% 100%,50% 100%)}
+    .compare-slider{position:absolute;top:0;bottom:0;width:3px;background:#fff;left:50%;transform:translateX(-50%);pointer-events:none;z-index:2}
+    .compare-slider::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:32px;height:32px;background:#fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+    .compare-label{position:absolute;top:8px;padding:4px 10px;border-radius:4px;font-size:.7rem;font-weight:600;z-index:3;background:rgba(0,0,0,.7);color:#fff}
+    .compare-label.before{left:8px}
+    .compare-label.after{right:8px}
+    .info-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:.85rem}
+    .info-row:last-child{border-bottom:none}
+    .info-label{color:var(--text2)}
+    .info-value{color:var(--text);font-weight:500}
+    .zoom-row{display:flex;gap:8px;align-items:center}
+    .zoom-row input[type="range"]{flex:1}
+    .undo-row{display:flex;gap:6px}
+    .undo-btn{flex:1;padding:6px;border:1px solid var(--border);border-radius:6px;text-align:center;cursor:pointer;font-size:.8rem;background:var(--bg);color:var(--text2)}
+    .undo-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .undo-btn:disabled{opacity:.4;cursor:not-allowed}
+    @media(max-width:768px){.cropper-layout{grid-template-columns:1fr}}
+    .breadcrumb{font-size:.85rem;color:var(--text2);margin-bottom:16px}
+    .breadcrumb a{color:var(--accent);text-decoration:none}
+    .breadcrumb a:hover{text-decoration:underline}
+    .seo-content{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .seo-content h2{font-size:1.3rem;margin:24px 0 12px;color:var(--text)}
+    .seo-content p{color:var(--text2);line-height:1.7;margin-bottom:12px}
+    .seo-content ul{color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px}
+    .seo-content li{margin-bottom:8px}
+    .seo-content a{color:var(--accent);text-decoration:none}
+    .seo-content a:hover{text-decoration:underline}
+    .faq-section{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .faq-section h2{font-size:1.3rem;margin-bottom:16px}
+    .faq-item{margin-bottom:8px;padding:16px;background:var(--surface);border-radius:8px;cursor:pointer}
+    .faq-item summary{font-weight:600;font-size:1rem}
+    .faq-item p{margin-top:12px;color:var(--text2);line-height:1.6}
+    .related-tools{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .related-tools h2{font-size:1.3rem;margin-bottom:16px}
+    .related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+    .related-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+    .related-card h3{font-size:1rem;margin:8px 0}
+    .related-card p{font-size:.85rem;color:var(--text2);margin-bottom:12px}
+    .related-card a{color:var(--accent);text-decoration:none;font-weight:600}
+    .related-card a:hover{text-decoration:underline}
+    .footer-cta{margin-top:40px;padding:30px;background:var(--surface);border-radius:12px;text-align:center}
+    .footer-cta p{margin-bottom:8px;color:var(--text2)}
+    .footer-cta a{color:var(--accent);font-weight:600;text-decoration:none}
+    .footer-cta a:hover{text-decoration:underline}
+      .seo-tool-frame{width:100%;border:1px solid var(--border);border-radius:var(--radius);background:#f8fafc;min-height:900px}
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="header-logo" href="../"><img class="header-logo-img" src="../assets/favicon/favicon-32x32.png" alt="Free Online Tools" width="22" height="22">Free Tools<span class="dot">.</span></a>
+    <nav class="header-nav">
+      <a href="../">Home</a>
+      <a href="../#seo">SEO</a>
+      <a href="https://clienvora.com">Clienvora</a>
+    </nav>
+  </div>
+</header>
+<div class="container">
+  <div class="tool-page">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb">
+      <a href="../">Home</a> &gt; <a href="../#image">Image Tools</a> &gt; Image Cropper
+    </nav>
+
+    <h1>Crop Images Online - Free Image Cropper</h1>
+    <p class="subtitle">Crop images online for free. Aspect ratios, rotate, flip, zoom, round crop, before/after preview. No uploads, 100% private.</p>
+
+    <!-- Trust Badges -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;font-size:.9rem;color:var(--text2)">
+      <span>✓ No uploads</span>
+      <span>✓ No sign-ups</span>
+      <span>✓ 100% private</span>
+      <span>✓ Works offline</span>
+    </div>
+    <div class="tool-area">
+      <iframe class="seo-tool-frame" id="toolFrame" src="app/index.html?tool=crop" title="Image Cropper Tool" loading="lazy"></iframe>
+    </div>
+
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+      <h2>How to Crop Images Online</h2>
+      <p>Cropping images has never been easier. Our free online image cropper allows you to crop, rotate, flip, and transform images in just a few simple steps:</p>
+      <ol style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li style="margin-bottom:8px"><strong>Drop your image</strong> - Drag and drop an image file into the upload area, or click to browse.</li>
+        <li style="margin-bottom:8px"><strong>Adjust the crop box</strong> - Drag the handles to resize the crop area. Use aspect ratio presets for common ratios.</li>
+        <li style="margin-bottom:8px"><strong>Transform as needed</strong> - Rotate 90°/180°, flip horizontal/vertical, or enable round crop for circular crops.</li>
+        <li style="margin-bottom:8px"><strong>Set output size</strong> - Enter exact dimensions or use Quick Size presets like 400x400, 1080p, IG Post.</li>
+        <li style="margin-bottom:8px"><strong>Crop and download</strong> - Click "Crop & Download" to get your cropped image instantly.</li>
+      </ol>
+
+      <h2>Features of Our Free Image Cropper</h2>
+      <ul style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li><strong>Aspect Ratio Presets</strong> - Free, 1:1, 4:3, 16:9, 9:16, 3:4</li>
+        <li><strong>Quick Sizes</strong> - 400x400, 800x600, 1080p, 720p, IG Post, FB Cover, Twitter</li>
+        <li><strong>Rotate & Flip</strong> - 90° left/right, 180°, horizontal/vertical flip</li>
+        <li><strong>Round Crop</strong> - Create circular crops for profile pictures</li>
+        <li><strong>Zoom</strong> - 50-300% zoom for precise crop positioning</li>
+        <li><strong>Undo/Redo</strong> - 30 levels of undo history</li>
+        <li><strong>Before/After Preview</strong> - Compare original and cropped images</li>
+        <li><strong>100% Private</strong> - Images never leave your browser</li>
+      </ul>
+
+      <h2>Why Choose Our Image Cropper?</h2>
+      <p>Unlike other online image croppers, our tool runs entirely in your browser. Your images are never uploaded to any server, ensuring complete privacy and security. There are no file size limits, no watermarks added, and no sign-ups required. The entire process happens locally on your device using client-side JavaScript and canvas.</p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+
+      <details class="faq-item">
+        <summary>How do I crop an image for free?</summary>
+        <p>Use our free Image Cropper tool. Drag and drop your image, adjust the crop box by dragging handles, select an aspect ratio preset, and click Crop & Download. No uploads, no sign-ups required.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Is my image data uploaded to any server?</summary>
+        <p>No, your images never leave your device. All processing happens locally in your browser using client-side JavaScript and canvas. Your privacy is 100% guaranteed.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What aspect ratios are available?</summary>
+        <p>Our Image Cropper supports Free (custom), 1:1 (square), 4:3, 16:9, 9:16 (portrait), and 3:4 aspect ratios. You can also set custom output dimensions.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I rotate and flip images?</summary>
+        <p>Yes, our cropper includes Rotate Left (90°), Rotate Right (90°), Rotate 180°, Flip Horizontal, and Flip Vertical options in the Transform tab.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What is round crop?</summary>
+        <p>Round crop creates a circular crop of your image, perfect for profile pictures and avatars. Enable it in the Transform tab and the crop box will become circular.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I set a specific output size?</summary>
+        <p>Yes, enter exact pixel dimensions in the Output fields (W and H). You can also use Quick Size presets for common sizes like 400x400, 1080p, IG Post, FB Cover, and more.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What output formats are supported?</summary>
+        <p>Our Image Cropper supports PNG, JPEG, and WebP output formats. You can select the format and quality in the Transform tab.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I undo crop changes?</summary>
+        <p>Yes, our cropper includes Undo and Redo buttons. Each crop, resize, rotate, or flip action is saved to an undo stack (up to 30 states).</p>
+      </details>
+    </section>
+
+    <!-- Related Tools Section -->
+    <section class="related-tools">
+      <h2>Related Image Tools</h2>
+      <div class="related-grid">
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🖼️</div>
+          <h3>Image Converter</h3>
+          <p>Batch convert, resize, compress. PNG, JPG, WebP, GIF, BMP, AVIF. All in your browser.</p>
+          <a href="../image-converter/">Open Image Converter →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">📦</div>
+          <h3>Image Compressor</h3>
+          <p>Compress images to smaller sizes. PNG, JPG, WebP. Batch processing. All in your browser.</p>
+          <a href="../image-compressor/">Open Image Compressor →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🔄</div>
+          <h3>Watermark Remover</h3>
+          <p>Remove watermarks from images. AI-powered, batch processing. All in your browser.</p>
+          <a href="../watermark-remover/">Open Watermark Remover →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <p>Need custom web tools or automation for your business?</p>
+      <a href="https://clienvora.com">Learn more about Clienvora - Custom Web Development →</a>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  var f=document.getElementById('toolFrame');
+  function resize(){
+    try{
+      var h=f.contentWindow.document.documentElement.scrollHeight;
+      if(h>200)f.style.height=(h+40)+'px';
+    }catch(e){}
+  }
+  f.addEventListener('load',resize);
+  window.addEventListener('resize',resize);
+  setTimeout(resize,1000);
+})();
+</script>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h4>Free Online Tools</h4>
+        <p>32+ free, private, browser-based tools. No uploads, no accounts. Your files never leave your device.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Popular Tools</h4>
+        <a href="../image-converter/">Image Converter</a>
+        <a href="../pdf-tools/">PDF Tools</a>
+        <a href="../zip-tool/">ZIP Tool</a>
+        <a href="../text-tools/">Text Tools</a>
+      </div>
+      <div class="footer-col">
+        <h4>SEO Tools</h4>
+        <a href="../canonical-tag-checker/">Canonical Checker</a>
+        <a href="../robots-txt-checker/">Robots.txt Checker</a>
+        <a href="../redirect-chain-checker/">Redirect Chain Checker</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://clienvora.com">Clienvora</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>All tools run in your browser. Files are never uploaded. 32+ tools, 100% free, 100% private.</p>
+      <p>Built by <a href="https://clienvora.com">Clienvora</a> &middot; <a href="../">Free Online Tools</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

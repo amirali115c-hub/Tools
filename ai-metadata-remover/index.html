@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Image Metadata Remover - Free Online EXIF Stripper | No Upload | 100% Private</title>
+  <meta name="description" content="Remove EXIF, XMP, ICC and AI tags from JPG, PNG, WebP images online for free. Strip metadata before publishing. No uploads, 100% private.">
+  <meta name="keywords" content="ai metadata remover, remove exif, strip metadata, image metadata remover, remove ai tags, exif remover, xmp remover, clean image metadata">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://tools.clienvora.com/ai-metadata-remover/">
+  <link rel="stylesheet" href="../assets/style.css">
+  <!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="../assets/favicon/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+<link rel="manifest" href="../assets/favicon/site.webmanifest">
+<meta name="theme-color" content="#0F0F1A">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="AI Image Metadata Remover - Free Online EXIF Stripper | No Upload | 100% Private">
+  <meta property="og:description" content="Remove EXIF, XMP, ICC and AI tags from JPG, PNG, WebP images online for free. Strip metadata before publishing. No uploads, 100% private.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tools.clienvora.com/ai-metadata-remover/">
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "AI Image Metadata Remover - Free Online Tool",
+  "operatingSystem": "Any",
+  "applicationCategory": "UtilitiesApplication",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Remove EXIF, XMP, ICC and AI tags from JPG, PNG, WebP images online for free. Strip metadata before publishing. No uploads, 100% private."
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://tools.clienvora.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Image Tools",
+      "item": "https://tools.clienvora.com/#image"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "AI Image Metadata Remover"
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is AI image metadata?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "AI-generated images contain hidden EXIF and XMP tags that record the tool, model version, and generation settings. Our metadata remover strips these tags so the image carries no identifying information."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does this tool remove EXIF data?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, it removes EXIF, XMP, ICC, and IPTC metadata from JPG, PNG, and WebP images. You can preview every tag found before cleaning."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my image uploaded to any server?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. All processing happens locally in your browser using client-side JavaScript. Your images never leave your device."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I clean multiple images at once?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, batch mode lets you drop multiple files, clean them all, and download the results as individual files or a ZIP archive."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will cleaning metadata reduce image quality?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No, removing metadata only deletes embedded data tags. The pixels and visual quality of the image are untouched."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What tags does it remove?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It strips GPS coordinates, camera settings, timestamps, software info, and AI-generation tags including prompt and model metadata."
+      }
+    }
+  ]
+}
+  </script>
+<style>
+    .tabs{display:flex;gap:4px;margin-bottom:16px}
+    .tab{padding:10px 20px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
+    .tab.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
+    .tab:hover:not(.active){border-color:var(--accent)}
+    .compare-area{display:flex;gap:12px;margin:16px 0}
+    .compare-box{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+    .compare-box img{max-width:100%;max-height:300px;border-radius:8px;object-fit:contain}
+    .compare-label{font-size:.8rem;color:var(--text2);margin-bottom:8px;font-weight:600}
+    .meta-badge{display:inline-block;padding:4px 10px;border-radius:12px;font-size:.75rem;font-weight:600;margin:2px}
+    .badge-exif{background:#3b82f620;color:#3b82f6}
+    .badge-xmp{background:#8b5cf620;color:#8b5cf6}
+    .badge-icc{background:#10b98120;color:#10b981}
+    .badge-jfif{background:#f59e0b20;color:#f59e0b}
+    .badge-comment{background:#ef444420;color:#ef4444}
+    .badge-ai{background:#ec489920;color:#ec4899}
+    .badge-png{background:#06b6d420;color:#06b6d4}
+    .badge-preserved{background:#22c55e20;color:#22c55e}
+    .file-list{margin:12px 0}
+    .file-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;margin-bottom:8px}
+    .file-item img{width:60px;height:60px;object-fit:cover;border-radius:6px}
+    .file-item-info{flex:1}
+    .file-item-name{font-weight:600;font-size:.9rem}
+    .file-item-size{font-size:.8rem;color:var(--text2)}
+    .file-item-meta{font-size:.8rem;margin-top:4px}
+    .file-item-actions{display:flex;gap:8px}
+    .file-item-actions button{padding:6px 12px;border-radius:6px;font-size:.8rem;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer}
+    .file-item-actions button:hover{border-color:var(--accent)}
+    .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+    .stat-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+    .stat-value{font-size:1.5rem;font-weight:700;color:var(--accent)}
+    .stat-label{font-size:.8rem;color:var(--text2);margin-top:4px}
+    .meta-table{width:100%;border-collapse:collapse;font-size:.85rem}
+    .meta-table th{text-align:left;padding:8px;border-bottom:2px solid var(--border);color:var(--text2);font-weight:600}
+    .meta-table td{padding:8px;border-bottom:1px solid var(--border)}
+    .expand-btn{cursor:pointer;color:var(--accent);font-size:.8rem}
+    .detail-panel{max-height:0;overflow:hidden;transition:.3s}
+    .detail-panel.open{max-height:500px;overflow:auto}
+    .checkbox-group{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
+    .checkbox-group label{display:flex;align-items:center;gap:6px;font-size:.85rem;cursor:pointer}
+    select,input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px}
+  </style>
+  <style>
+    .seo-tool-frame{width:100%;border:1px solid var(--border);border-radius:var(--radius);background:#f8fafc;min-height:900px}
+  </style>
+</head></head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="header-logo" href="../"><img class="header-logo-img" src="../assets/favicon/favicon-32x32.png" alt="Free Online Tools" width="22" height="22">Free Tools<span class="dot">.</span></a>
+    <nav class="header-nav">
+      <a href="../">Home</a>
+      <a href="../#seo">SEO</a>
+      <a href="https://clienvora.com">Clienvora</a>
+    </nav>
+  </div>
+</header>
+<div class="container">
+  <div class="tool-page">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb">
+      <a href="../">Home</a> &gt; <a href="../#image">Image Tools</a> &gt; AI Image Metadata Remover
+    </nav>
+
+    <h1>AI Image Metadata Remover</h1>
+    <p class="subtitle">Strip EXIF, XMP, ICC, AI tags from JPG/PNG/WebP. Batch mode. All in your browser.</p>
+
+    <!-- Trust Badges -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;font-size:.9rem;color:var(--text2)">
+      <span>✓ No uploads</span>
+      <span>✓ No sign-ups</span>
+      <span>✓ 100% private</span>
+      <span>✓ Works offline</span>
+    </div>
+
+<div class="tabs" id="tabs">
+      <button class="tab active" data-tab="single">Single Image</button>
+      <button class="tab" data-tab="batch">Batch Mode</button>
+      <button class="tab" data-tab="info">File Info</button>
+    </div>
+
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">🖼️</div>
+        <strong>Drop AI-generated images here</strong>
+        <p>or click to browse (JPG, PNG, WebP)</p>
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple>
+      </div>
+
+      <div id="singleSection" style="display:none">
+        <div class="compare-area">
+          <div class="compare-box">
+            <div class="compare-label">Original</div>
+            <img id="originalPreview">
+            <div id="originalBadges" style="margin-top:8px"></div>
+          </div>
+          <div class="compare-box">
+            <div class="compare-label">Cleaned</div>
+            <img id="cleanedPreview" style="opacity:.3">
+            <div id="cleanedBadges" style="margin-top:8px"></div>
+          </div>
+        </div>
+
+        <div class="controls-panel">
+          <h3 style="margin-bottom:8px">Found Metadata</h3>
+          <div id="metaList" style="margin-bottom:12px"></div>
+          <div class="expand-btn" id="expandMeta">Show all metadata ▼</div>
+          <div class="detail-panel" id="metaDetail"></div>
+        </div>
+
+        <div style="margin:16px 0">
+          <h3 style="margin-bottom:8px">Clean Options</h3>
+          <div class="checkbox-group">
+            <label><input type="checkbox" id="optExif" checked> EXIF (camera, GPS)</label>
+            <label><input type="checkbox" id="optXmp" checked> XMP (AI prompts)</label>
+            <label><input type="checkbox" id="optIcc" checked> ICC Profile</label>
+            <label><input type="checkbox" id="optJfif" checked> JFIF</label>
+            <label><input type="checkbox" id="optComments" checked> Comments</label>
+          </div>
+        </div>
+      </div>
+
+      <div id="batchSection" class="tool-section" style="display:none">
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-value" id="batchTotal">0</div><div class="stat-label">Files Loaded</div></div>
+          <div class="stat-card"><div class="stat-value" id="batchCleaned">0</div><div class="stat-label">Cleaned</div></div>
+          <div class="stat-card"><div class="stat-value" id="batchSaved">0 B</div><div class="stat-label">Space Saved</div></div>
+        </div>
+        <div class="file-list" id="fileList"></div>
+        <div style="margin:12px 0">
+          <h3 style="margin-bottom:8px">Batch Clean Options</h3>
+          <div class="checkbox-group">
+            <label><input type="checkbox" id="optExifBatch" checked> EXIF</label>
+            <label><input type="checkbox" id="optXmpBatch" checked> XMP</label>
+            <label><input type="checkbox" id="optIccBatch" checked> ICC</label>
+            <label><input type="checkbox" id="optJfifBatch" checked> JFIF</label>
+            <label><input type="checkbox" id="optCommentsBatch" checked> Comments</label>
+          </div>
+        </div>
+      </div>
+
+      <div id="infoSection" class="tool-section" style="display:none">
+        <div id="fileInfoContent">
+          <p class="small">Upload a file to see detailed metadata info.</p>
+        </div>
+      </div>
+
+      <div class="status" id="status"></div>
+
+      <div class="progress-bar" id="progressBar" style="display:none">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <div class="action-row" id="actionRow" style="display:none">
+        <button class="btn" id="cleanBtn">Clean Metadata</button>
+        <button class="btn btn-secondary" id="downloadBtn" style="display:none">Download Clean Image</button>
+        <button class="btn btn-secondary" id="downloadAllBtn" style="display:none">Download All (ZIP)</button>
+        <button class="btn btn-secondary" id="resetBtn">Reset</button>
+      </div>
+    </div>
+
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+      <h2>How to Remove Metadata from AI Images</h2>
+      <p>Follow these simple steps to use the ai image metadata remover tool:</p>
+      <ol style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li style="margin-bottom:8px"><strong>Drop your images</strong> - Drag and drop JPG, PNG, or WebP files, or click to browse. Batch mode accepts multiple files at once.</li>
+        <li style="margin-bottom:8px"><strong>Inspect metadata</strong> - The tool reads all embedded tags and shows a breakdown of EXIF, XMP, ICC, and AI-generated labels found.</li>
+        <li style="margin-bottom:8px"><strong>Clean the images</strong> - Click Clean to strip every trace of identifying metadata from your files.</li>
+        <li style="margin-bottom:8px"><strong>Download</strong> - Grab the cleaned images individually or as a ZIP archive, ready to publish safely.</li>
+      </ol>
+
+      <h2>Features</h2>
+      <ul style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li><strong>Strips EXIF, XMP, ICC, IPTC and AI-generated tags</strong></li>
+        <li><strong>Batch processing for multiple images at once</strong></li>
+        <li><strong>File info viewer shows every tag before cleaning</strong></li>
+        <li><strong>Downloads cleaned files individually or as a ZIP</strong></li>
+        <li><strong>100% client-side - images never leave your browser</strong></li>
+      </ul>
+
+      <h2>Why Choose This Tool?</h2>
+      <p>When you generate images with AI tools, the files often carry hidden metadata that identifies the generator, model, and prompt settings. Posting them publicly leaks that data. Our AI Image Metadata Remover runs entirely in your browser, so your images are scrubbed on your device and never uploaded anywhere.</p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+
+      <details class="faq-item">
+        <summary>What is AI image metadata?</summary>
+        <p>AI-generated images contain hidden EXIF and XMP tags that record the tool, model version, and generation settings. Our metadata remover strips these tags so the image carries no identifying information.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does this tool remove EXIF data?</summary>
+        <p>Yes, it removes EXIF, XMP, ICC, and IPTC metadata from JPG, PNG, and WebP images. You can preview every tag found before cleaning.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is my image uploaded to any server?</summary>
+        <p>No. All processing happens locally in your browser using client-side JavaScript. Your images never leave your device.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I clean multiple images at once?</summary>
+        <p>Yes, batch mode lets you drop multiple files, clean them all, and download the results as individual files or a ZIP archive.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Will cleaning metadata reduce image quality?</summary>
+        <p>No, removing metadata only deletes embedded data tags. The pixels and visual quality of the image are untouched.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What tags does it remove?</summary>
+        <p>It strips GPS coordinates, camera settings, timestamps, software info, and AI-generation tags including prompt and model metadata.</p>
+      </details>
+    </section>
+
+    <!-- Related Tools Section -->
+    <section class="related-tools">
+      <h2>Related Tools</h2>
+      <div class="related-grid">
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🖼️</div>
+          <h3>Image Converter</h3>
+          <p>Convert, resize, compress. PNG, JPG, WebP, GIF, BMP, AVIF. All in your browser.</p>
+          <a href="../image-converter/">Open Image Converter →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">✂️</div>
+          <h3>Image Cropper</h3>
+          <p>Crop, rotate, flip, zoom. Aspect ratios, round crop. All in your browser.</p>
+          <a href="../image-cropper/">Open Image Cropper →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🔍</div>
+          <h3>Watermark Remover</h3>
+          <p>Remove watermarks from images. AI-powered, batch processing. All in your browser.</p>
+          <a href="../watermark-remover/">Open Watermark Remover →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <p>Need custom web tools or automation for your business?</p>
+      <a href="https://clienvora.com">Learn more about Clienvora - Custom Web Development →</a>
+    </div>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="../assets/tools.js"></script>
+<script>
+(function(){
+  var dropZone=document.getElementById('dropZone');
+  var fileInput=document.getElementById('fileInput');
+  var singleSection=document.getElementById('singleSection');
+  var batchSection=document.getElementById('batchSection');
+  var infoSection=document.getElementById('infoSection');
+  var originalPreview=document.getElementById('originalPreview');
+  var cleanedPreview=document.getElementById('cleanedPreview');
+  var originalBadges=document.getElementById('originalBadges');
+  var cleanedBadges=document.getElementById('cleanedBadges');
+  var metaList=document.getElementById('metaList');
+  var metaDetail=document.getElementById('metaDetail');
+  var expandMeta=document.getElementById('expandMeta');
+  var fileList=document.getElementById('fileList');
+  var fileInfoContent=document.getElementById('fileInfoContent');
+  var cleanBtn=document.getElementById('cleanBtn');
+  var downloadBtn=document.getElementById('downloadBtn');
+  var downloadAllBtn=document.getElementById('downloadAllBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var statusEl=document.getElementById('status');
+  var progressBar=document.getElementById('progressBar');
+  var progressFill=document.getElementById('progressFill');
+  var actionRow=document.getElementById('actionRow');
+
+  var files=[];
+  var currentFile=null;
+  var currentImageData=null;
+  var cleanBlob=null;
+  var batchResults=[];
+
+  Tools.setupDropZone(dropZone,function(f){handleFiles(f)});
+  fileInput.addEventListener('change',function(e){for(var i=0;i<e.target.files.length;i++)handleFiles(e.target.files[i]);});
+
+  function handleFiles(f){
+    if(!f.type.match(/^image\/(jpeg|png|webp)$/)){
+      Tools.setStatus(statusEl,'Please use JPG, PNG, or WebP images.','error');return;
+    }
+    files.push(f);
+    dropZone.style.display='none';
+    actionRow.style.display='flex';
+    if(files.length===1){
+      currentFile=f;
+      singleSection.style.display='block';
+      infoSection.style.display='block';
+      showSingle(f);
+    }else{
+      singleSection.style.display='none';
+      batchSection.style.display='block';
+      showBatch();
+    }
+  }
+
+  function showSingle(f){
+    originalPreview.src=URL.createObjectURL(f);
+    cleanedPreview.src='';
+    cleanedPreview.style.opacity='.3';
+    originalBadges.innerHTML='';
+    cleanedBadges.innerHTML='';
+    metaList.innerHTML='';
+    metaDetail.innerHTML='';
+    Tools.setStatus(statusEl,'Reading metadata...','');
+    readMetadata(f,function(metadata,metaTags){
+      renderBadges(originalBadges,metadata);
+      renderMetaList(metadata);
+      renderMetaDetail(metadata);
+      renderFileInfo(f,metadata);
+      Tools.setStatus(statusEl,metadata.length+' metadata tags found.','done');
+    });
+  }
+
+  function readMetadata(f,cb){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      var buffer=e.target.result;
+      var view=new DataView(buffer);
+      var metadata=[];
+      var metaTags={exif:false,xmp:false,icc:false,jfif:false,comments:false};
+
+      if(f.type==='image/jpeg'||f.type==='image/jpg'){
+        if(view.getUint16(0)!==0xFFD8){Tools.setStatus(statusEl,'Invalid JPEG.','error');return;}
+        var offset=2;
+        while(offset<buffer.byteLength){
+          if(view.getUint16(offset)!==0xFF){offset++;continue;}
+          var marker=view.getUint8(offset+1);
+          if(marker===0xE1){
+            var segLen=view.getUint16(offset+2);
+            var segData=new Uint8Array(buffer,offset+4,segLen-2);
+            var segStr=String.fromCharCode.apply(null,segData);
+            if(segStr.indexOf('Exif')===0){
+              metaTags.exif=true;
+              parseExif(segData).forEach(function(item){metadata.push({type:'EXIF',key:item.key,value:item.value});});
+            }else if(segStr.indexOf('XMP')===0||segStr.indexOf('http://ns.adobe.com')!==-1){
+              metaTags.xmp=true;
+              parseXmp(segStr).forEach(function(item){metadata.push({type:'XMP',key:item.key,value:item.value});});
+            }
+          }else if(marker===0xE0){
+            var jfifLen=view.getUint16(offset+2);
+            if(jfifLen>5){
+              var jfifStr=String.fromCharCode.apply(null,new Uint8Array(buffer,offset+4,5));
+              if(jfifStr==='JFIF\0'){metaTags.jfif=true;metadata.push({type:'JFIF',key:'Version',value:'1.'+view.getUint8(offset+9)});}
+            }
+          }else if(marker===0xFE){
+            var comLen=view.getUint16(offset+2);
+            var comStr=String.fromCharCode.apply(null,new Uint8Array(buffer,offset+4,comLen-2));
+            if(comStr.trim()){metaTags.comments=true;metadata.push({type:'Comment',key:'Comment',value:comStr.trim().substring(0,100)});}
+          }else if(marker===0xED){
+            var iccLen=view.getUint16(offset+2);
+            if(iccLen>5){
+              var iccStr=String.fromCharCode.apply(null,new Uint8Array(buffer,offset+4,4));
+              if(iccStr==='ICC_'){metaTags.icc=true;metadata.push({type:'ICC',key:'Profile',value:'Embedded color profile'});}
+            }
+          }
+          if(marker===0xDA)break;
+          offset+=2+view.getUint16(offset+2);
+        }
+      }else if(f.type==='image/png'){
+        if(view.getUint32(0)!==0x89504E47){Tools.setStatus(statusEl,'Invalid PNG.','error');return;}
+        var offset=8;
+        while(offset<buffer.byteLength){
+          var chunkLen=view.getUint32(offset);
+          var chunkType=String.fromCharCode(view.getUint8(offset+4),view.getUint8(offset+5),view.getUint8(offset+6),view.getUint8(offset+7));
+          if(chunkType==='tEXt'||chunkType==='iTXt'||chunkType==='zTXt'){
+            metaTags.xmp=true;
+            var chunkData=new Uint8Array(buffer,offset+8,chunkLen);
+            var chunkStr=String.fromCharCode.apply(null,chunkData);
+            var nullIdx=chunkStr.indexOf('\0');
+            if(nullIdx!==-1){
+              var key=chunkStr.substring(0,nullIdx);
+              var val=chunkStr.substring(nullIdx+1);
+              metadata.push({type:'PNG',key:key,value:val.substring(0,100)});
+              if(key.indexOf('prompt')!==-1)metaTags.xmp=true;
+            }
+          }else if(chunkType==='iCCP'){
+            metaTags.icc=true;metadata.push({type:'ICC',key:'Profile',value:'Embedded color profile'});
+          }
+          offset+=12+chunkLen;
+          if(chunkType==='IEND')break;
+        }
+      }else if(f.type==='image/webp'){
+        if(view.getUint32(0)!==0x52494646){Tools.setStatus(statusEl,'Invalid WebP.','error');return;}
+        var offset=12;
+        while(offset<buffer.byteLength-4){
+          var chunkId=String.fromCharCode(view.getUint8(offset),view.getUint8(offset+1),view.getUint8(offset+2),view.getUint8(offset+3));
+          var chunkLen=view.getUint32(offset+4);
+          if(chunkId==='EXIF'){metaTags.exif=true;metadata.push({type:'EXIF',key:'EXIF Data',value:'Embedded EXIF metadata'});}
+          else if(chunkId==='XMP '){metaTags.xmp=true;metadata.push({type:'XMP',key:'XMP Data',value:'Embedded XMP metadata'});}
+          else if(chunkId==='ICCP'){metaTags.icc=true;metadata.push({type:'ICC',key:'Profile',value:'Embedded color profile'});}
+          offset+=8+chunkLen;
+          if(offset>buffer.byteLength)break;
+        }
+      }
+
+      var aiPatterns=['Midjourney','DALL-E','Stable Diffusion','ComfyUI','Automatic1111','Fooocus','Leonardo','Craiyon','Firefly','Bing Image','Copilot','Ideogram','Playground','Bria','Flux'];
+      var fullStr=JSON.stringify(metadata);
+      var foundAI=aiPatterns.filter(function(p){return fullStr.indexOf(p)!==-1;});
+      if(foundAI.length>0)metadata.unshift({type:'AI DETECTED',key:'AI Generator',value:foundAI.join(', ')});
+
+      currentImageData={buffer:buffer,view:view,metadata:metadata,metaTags:metaTags,type:f.type};
+      cb(metadata,metaTags);
+    };
+    reader.readAsArrayBuffer(f);
+  }
+
+  function parseExif(data){
+    var items=[];
+    try{
+      var str=String.fromCharCode.apply(null,data);
+      if(str.substring(0,2)!=='Exif')return items;
+      var tiffStart=6;
+      var view=new DataView(data.buffer,data.byteOffset,data.byteLength);
+      var bigEndian=view.getUint16(tiffStart)===0x4D4D;
+      var ifdOffset=view.getUint32(tiffStart+4,!bigEndian);
+      var numEntries=view.getUint16(tiffStart+ifdOffset,!bigEndian);
+      for(var i=0;i<numEntries;i++){
+        var entryOffset=tiffStart+ifdOffset+2+i*12;
+        var tag=view.getUint16(entryOffset,!bigEndian);
+        var type=view.getUint16(entryOffset+2,!bigEndian);
+        var count=view.getUint32(entryOffset+4,!bigEndian);
+        var valueOffset=entryOffset+8;
+        var tagNames={0x010F:'Make',0x0110:'Model',0x0112:'Orientation',0x011A:'XResolution',0x011B:'YResolution',0x0131:'Software',0x0132:'DateTime',0x8298:'Copyright',0x8769:'ExifOffset',0x8825:'GPSInfo',0xA005:'InteropOffset',0x010E:'ImageDescription',0xA430:'CameraOwnerName',0xA431:'BodySerialNumber',0xA432:'LensInfo',0xA433:'LensMake',0xA434:'LensModel',0x9209:'Flash',0x920A:'FocalLength',0xA002:'PixelXDimension',0xA003:'PixelYDimension'};
+        var tagName=tagNames[tag]||('Tag 0x'+tag.toString(16).toUpperCase());
+        var value='';
+        if(type===2){
+          if(count<=4)value=String.fromCharCode.apply(null,new Uint8Array(data.buffer,data.byteOffset+valueOffset,count).slice(0,count));
+          else{var strOffset=view.getUint32(valueOffset,!bigEndian);value=String.fromCharCode.apply(null,new Uint8Array(data.buffer,data.byteOffset+tiffStart+strOffset,count).slice(0,count));}
+        }else if(type===3)value=view.getUint16(valueOffset,!bigEndian);
+        else if(type===4)value=view.getUint32(valueOffset,!bigEndian);
+        else if(type===5||type===10){var num=view.getUint32(valueOffset,!bigEndian);var den=view.getUint32(valueOffset+4,!bigEndian);value=num+'/'+den;}
+        if(tag!==0x8769&&tag!==0xA005&&tag!==0x8825&&tagName!=='Orientation')items.push({key:tagName,value:String(value).substring(0,80)});
+      }
+    }catch(e){}
+    return items;
+  }
+
+  function parseXmp(str){
+    var items=[];
+    var patterns=[
+      {re:/<dc:creator[^>]*>([\s\S]*?)<\/dc:creator>/gi,key:'Creator'},
+      {re:/<dc:description[^>]*>([\s\S]*?)<\/dc:description>/gi,key:'Description'},
+      {re:/<photoshop:TransmissionReference[^>]*>([\s\S]*?)<\/photoshop:TransmissionReference>/gi,key:'Prompt'},
+      {re:/<xmp:Prompt[^>]*>([\s\S]*?)<\/xmp:Prompt>/gi,key:'AI Prompt'},
+      {re:/<raw:prompt[^>]*>([\s\S]*?)<\/raw:prompt>/gi,key:'Raw Prompt'},
+      {re:/<lr:hierarchicalSubject[^>]*>([\s\S]*?)<\/lr:hierarchicalSubject>/gi,key:'Tags'},
+      {re:/<dc:subject[^>]*>([\s\S]*?)<\/dc:subject>/gi,key:'Subject'},
+      {re:/<xmp:CreatorTool[^>]*>([\s\S]*?)<\/xmp:CreatorTool>/gi,key:'Creator Tool'},
+      {re:/<rdf:li[^>]*>([\s\S]*?)<\/rdf:li>/gi,key:'Parameter'}
+    ];
+    patterns.forEach(function(p){
+      var match;
+      while((match=p.re.exec(str))!==null){
+        var val=match[1].replace(/<[^>]+>/g,'').trim();
+        if(val)items.push({key:p.key,value:val.substring(0,100)});
+      }
+    });
+    return items;
+  }
+
+  function renderBadges(el,metadata){
+    el.innerHTML='';
+    var types={};
+    metadata.forEach(function(m){types[m.type]=true;});
+    var classMap={EXIF:'badge-exif',XMP:'badge-xmp',ICC:'badge-icc',JFIF:'badge-jfif',Comment:'badge-comment','AI DETECTED':'badge-ai',PNG:'badge-png'};
+    Object.keys(types).forEach(function(type){
+      var span=document.createElement('span');
+      span.className='meta-badge '+(classMap[type]||'badge-exif');
+      span.textContent=type;
+      el.appendChild(span);
+    });
+  }
+
+  function renderMetaList(metadata){
+    metaList.innerHTML='';
+    if(metadata.length===0){metaList.innerHTML='<p class="small">No metadata found</p>';return;}
+    var visible=metadata.slice(0,8);
+    visible.forEach(function(m){
+      var div=document.createElement('div');
+      div.style.cssText='display:flex;gap:8px;align-items:center;padding:4px 0;font-size:.85rem';
+      var classMap={EXIF:'badge-exif',XMP:'badge-xmp',ICC:'badge-icc',JFIF:'badge-jfif',Comment:'badge-comment','AI DETECTED':'badge-ai',PNG:'badge-png'};
+      div.innerHTML='<span class="meta-badge '+(classMap[m.type]||'badge-exif')+'">'+m.type+'</span><span style="color:var(--text2)">'+m.key+':</span><span>'+m.value+'</span>';
+      metaList.appendChild(div);
+    });
+    if(metadata.length>8){
+      var more=document.createElement('div');
+      more.style.cssText='font-size:.8rem;color:var(--text2);padding:4px 0';
+      more.textContent='+'+(metadata.length-8)+' more...';
+      metaList.appendChild(more);
+    }
+  }
+
+  function renderMetaDetail(metadata){
+    metaDetail.innerHTML='';
+    var table=document.createElement('table');
+    table.className='meta-table';
+    table.innerHTML='<thead><tr><th>Type</th><th>Key</th><th>Value</th></tr></thead>';
+    var tbody=document.createElement('tbody');
+    metadata.forEach(function(m){
+      var tr=document.createElement('tr');
+      var classMap={EXIF:'badge-exif',XMP:'badge-xmp',ICC:'badge-icc',JFIF:'badge-jfif',Comment:'badge-comment','AI DETECTED':'badge-ai',PNG:'badge-png'};
+      tr.innerHTML='<td><span class="meta-badge '+(classMap[m.type]||'badge-exif')+'">'+m.type+'</span></td><td>'+m.key+'</td><td>'+m.value+'</td>';
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    metaDetail.appendChild(table);
+  }
+
+  var metaExpanded=false;
+  expandMeta.addEventListener('click',function(){
+    metaExpanded=!metaExpanded;
+    metaDetail.classList.toggle('open',metaExpanded);
+    expandMeta.textContent=metaExpanded?'Hide metadata ▲':'Show all metadata ▼';
+  });
+
+  function renderFileInfo(f,metadata){
+    var types={};
+    metadata.forEach(function(m){types[m.type]=(types[m.type]||0)+1;});
+    fileInfoContent.innerHTML='<div class="stat-grid"><div class="stat-card"><div class="stat-value">'+Tools.formatSize(f.size)+'</div><div class="stat-label">File Size</div></div><div class="stat-card"><div class="stat-value">'+metadata.length+'</div><div class="stat-label">Metadata Tags</div></div><div class="stat-card"><div class="stat-value">'+Object.keys(types).length+'</div><div class="stat-label">Tag Types</div></div></div><div class="meta-table" style="margin-top:12px"><table class="meta-table"><thead><tr><th>Property</th><th>Value</th></tr></thead><tbody><tr><td>Name</td><td>'+f.name+'</td></tr><tr><td>Type</td><td>'+f.type+'</td></tr><tr><td>Size</td><td>'+Tools.formatSize(f.size)+'</td></tr><tr><td>Last Modified</td><td>'+new Date(f.lastModified).toLocaleString()+'</td></tr><tr><td>Tags Found</td><td>'+metadata.length+'</td></tr><tr><td>Tag Types</td><td>'+Object.keys(types).join(', ')+'</td></tr></tbody></table></div>';
+  }
+
+  function showBatch(){
+    fileList.innerHTML='';
+    batchResults=[];
+    var totalMeta=0;
+    files.forEach(function(f,idx){
+      var item=document.createElement('div');
+      item.className='file-item';
+      item.innerHTML='<img id="batchImg'+idx+'"><div class="file-item-info"><div class="file-item-name">'+f.name+'</div><div class="file-item-size">'+Tools.formatSize(f.size)+'</div><div class="file-item-meta" id="batchMeta'+idx+'">Reading...</div></div><div class="file-item-actions"><button id="batchClean'+idx+'">Clean</button><button id="batchDownload'+idx+'" style="display:none">Download</button></div>';
+      fileList.appendChild(item);
+      var img=document.getElementById('batchImg'+idx);
+      img.src=URL.createObjectURL(f);
+      readMetadata(f,function(metadata){
+        document.getElementById('batchMeta'+idx).textContent=metadata.length+' tags';
+        batchResults[idx]={file:f,metadata:metadata,cleaned:false,blob:null};
+        totalMeta+=metadata.length;
+        document.getElementById('batchTotal').textContent=files.length;
+      });
+      document.getElementById('batchClean'+idx).addEventListener('click',function(){
+        cleanSingle(idx);
+      });
+    });
+  }
+
+  function cleanSingle(idx){
+    var r=batchResults[idx];
+    if(!r||r.cleaned)return;
+    Tools.setStatus(statusEl,'Cleaning '+r.file.name+'...','');
+    setTimeout(function(){
+      try{
+        var opts={
+          exif:document.getElementById('optExifBatch').checked,
+          xmp:document.getElementById('optXmpBatch').checked,
+          icc:document.getElementById('optIccBatch').checked,
+          jfif:document.getElementById('optJfifBatch').checked,
+          comments:document.getElementById('optCommentsBatch').checked
+        };
+        var buffer=r.file;
+        var blob=cleanFile(buffer,opts);
+        r.cleaned=true;r.blob=blob;
+        document.getElementById('batchClean'+idx).style.display='none';
+        document.getElementById('batchDownload'+idx).style.display='inline-block';
+        document.getElementById('batchDownload'+idx).addEventListener('click',function(){
+          var ext=r.file.type==='image/png'?'.png':r.file.type==='image/webp'?'.webp':'.jpg';
+          Tools.downloadBlob(blob,r.file.name.replace(/\.[^.]+$/,'')+ext);
+        });
+        var cleaned=0;var saved=0;
+        batchResults.forEach(function(r2){if(r2.cleaned){cleaned++;saved+=r2.file.size-r2.blob.size;}});
+        document.getElementById('batchCleaned').textContent=cleaned;
+        document.getElementById('batchSaved').textContent=Tools.formatSize(Math.max(0,saved));
+        Tools.setStatus(statusEl,r.file.name+' cleaned!','done');
+      }catch(err){
+        Tools.setStatus(statusEl,'Error: '+err.message,'error');
+      }
+    },100);
+  }
+
+  function cleanFile(f,opts){
+    return new Promise(function(resolve){
+      var reader=new FileReader();
+      reader.onload=function(e){
+        var buffer=e.target.result;
+        var bytes=new Uint8Array(buffer);
+        var type=f.type;
+        var result;
+        if(type==='image/jpeg'||type==='image/jpg')result=stripJpeg(buffer,opts.exif,opts.xmp,opts.icc,opts.jfif,opts.comments);
+        else if(type==='image/png')result=stripPng(buffer,opts.xmp,opts.icc);
+        else if(type==='image/webp')result=stripWebp(buffer,opts.exif,opts.xmp,opts.icc);
+        resolve(new Blob([result],{type:type}));
+      };
+      reader.readAsArrayBuffer(f);
+    });
+  }
+
+  function cleanMetadataSync(){
+    if(!currentImageData)return;
+    Tools.setStatus(statusEl,'Cleaning metadata...','');
+    progressBar.style.display='block';progressFill.style.width='0%';
+    setTimeout(function(){
+      try{
+        var opts={
+          exif:document.getElementById('optExif').checked,
+          xmp:document.getElementById('optXmp').checked,
+          icc:document.getElementById('optIcc').checked,
+          jfif:document.getElementById('optJfif').checked,
+          comments:document.getElementById('optComments').checked
+        };
+        var buffer=currentImageData.buffer;
+        var type=currentImageData.type;
+        var result;
+        if(type==='image/jpeg'||type==='image/jpg')result=stripJpeg(buffer,opts.exif,opts.xmp,opts.icc,opts.jfif,opts.comments);
+        else if(type==='image/png')result=stripPng(buffer,opts.xmp,opts.icc);
+        else if(type==='image/webp')result=stripWebp(buffer,opts.exif,opts.xmp,opts.icc);
+        cleanBlob=new Blob([result],{type:type});
+        cleanedPreview.src=URL.createObjectURL(cleanBlob);
+        cleanedPreview.style.opacity='1';
+        cleanedBadges.innerHTML='<span class="meta-badge badge-preserved">Cleaned</span>';
+        progressBar.style.display='none';
+        downloadBtn.style.display='inline-block';
+        var saved=buffer.byteLength-cleanBlob.size;
+        Tools.setStatus(statusEl,'Metadata removed! Saved '+Tools.formatSize(Math.max(0,saved)),'done');
+      }catch(err){
+        progressBar.style.display='none';
+        Tools.setStatus(statusEl,'Error: '+err.message,'error');
+      }
+    },100);
+  }
+
+  function stripJpeg(buffer,stripExif,stripXmp,stripIcc,stripJfif,stripComments){
+    var bytes=new Uint8Array(buffer);var parts=[];
+    if(bytes[0]!==0xFF||bytes[1]!==0xD8)throw new Error('Invalid JPEG');
+    parts.push(bytes.slice(0,2));var offset=2;
+    while(offset<bytes.length){
+      if(bytes[offset]!==0xFF){offset++;continue;}
+      var marker=bytes[offset+1];
+      if(marker===0xD9)break;
+      if(marker===0xDA){parts.push(bytes.slice(offset));break;}
+      var segLen=(bytes[offset+2]<<8)|bytes[offset+3];var totalLen=2+segLen;var skip=false;
+      if(marker===0xE1){
+        var segStr=String.fromCharCode.apply(null,bytes.slice(offset+4,offset+2+segLen));
+        if(stripXmp&&(segStr.indexOf('Exif')===0||segStr.indexOf('XMP')===0||segStr.indexOf('http://ns.adobe.com')!==-1))skip=true;
+        if(stripExif&&segStr.indexOf('Exif')===0)skip=true;
+      }else if(marker===0xE0){if(stripJfif)skip=true;}
+      else if(marker===0xFE){if(stripComments)skip=true;}
+      else if(marker===0xED){if(stripIcc)skip=true;}
+      if(!skip)parts.push(bytes.slice(offset,offset+totalLen));
+      offset+=totalLen;
+    }
+    var totalLen=0;parts.forEach(function(p){totalLen+=p.length;});
+    var result=new Uint8Array(totalLen);var pos=0;
+    parts.forEach(function(p){result.set(p,pos);pos+=p.length;});
+    return result;
+  }
+
+  function stripPng(buffer,stripXmp,stripIcc){
+    var bytes=new Uint8Array(buffer);
+    if(bytes[0]!==0x89||bytes[1]!==0x50)throw new Error('Invalid PNG');
+    var parts=[bytes.slice(0,8)];var offset=8;
+    while(offset<bytes.length){
+      var chunkLen=(bytes[offset]<<24)|(bytes[offset+1]<<16)|(bytes[offset+2]<<8)|bytes[offset+3];
+      var chunkType=String.fromCharCode(bytes[offset+4],bytes[offset+5],bytes[offset+6],bytes[offset+7]);
+      var totalLen=12+chunkLen;var skip=false;
+      if(stripXmp&&(chunkType==='tEXt'||chunkType==='iTXt'||chunkType==='zTXt'))skip=true;
+      if(stripIcc&&chunkType==='iCCP')skip=true;
+      if(!skip)parts.push(bytes.slice(offset,offset+totalLen));
+      offset+=totalLen;if(chunkType==='IEND')break;
+    }
+    var totalLen=0;parts.forEach(function(p){totalLen+=p.length;});
+    var result=new Uint8Array(totalLen);var pos=0;
+    parts.forEach(function(p){result.set(p,pos);pos+=p.length;});
+    return result;
+  }
+
+  function stripWebp(buffer,stripExif,stripXmp,stripIcc){
+    var bytes=new Uint8Array(buffer);
+    if(String.fromCharCode(bytes[0],bytes[1],bytes[2],bytes[3])!=='RIFF')throw new Error('Invalid WebP');
+    var parts=[bytes.slice(0,12)];var offset=12;
+    while(offset<bytes.length-4){
+      var chunkId=String.fromCharCode(bytes[offset],bytes[offset+1],bytes[offset+2],bytes[offset+3]);
+      var chunkLen=(bytes[offset+4]<<24)|(bytes[offset+5]<<16)|(bytes[offset+6]<<8)|bytes[offset+7];
+      var totalLen=8+chunkLen;if(chunkLen%2!==0)totalLen++;var skip=false;
+      if(stripExif&&chunkId==='EXIF')skip=true;
+      if(stripXmp&&chunkId==='XMP ')skip=true;
+      if(stripIcc&&chunkId==='ICCP')skip=true;
+      if(!skip)parts.push(bytes.slice(offset,offset+totalLen));
+      offset+=totalLen;
+    }
+    var totalLen=0;parts.forEach(function(p){totalLen+=p.length;});
+    var result=new Uint8Array(totalLen);var pos=0;
+    parts.forEach(function(p){result.set(p,pos);pos+=p.length;});
+    return result;
+  }
+
+  cleanBtn.addEventListener('click',function(){
+    if(files.length<=1)cleanMetadataSync();
+    else{
+      files.forEach(function(f,i){cleanSingle(i);});
+    }
+  });
+
+  downloadBtn.addEventListener('click',function(){
+    if(!cleanBlob||!currentFile)return;
+    var ext=currentFile.type==='image/png'?'.png':currentFile.type==='image/webp'?'.webp':'.jpg';
+    Tools.downloadBlob(cleanBlob,currentFile.name.replace(/\.[^.]+$/,'')+ext);
+  });
+
+  downloadAllBtn.addEventListener('click',function(){
+    var cleaned=batchResults.filter(function(r){return r.cleaned;});
+    if(cleaned.length===0)return;
+    Tools.setStatus(statusEl,'Creating ZIP...','');
+    var zip=new JSZip();
+    cleaned.forEach(function(r,i){
+      var ext=r.file.type==='image/png'?'.png':r.file.type==='image/webp'?'.webp':'.jpg';
+      zip.file(r.file.name.replace(/\.[^.]+$/,'')+ext,r.blob);
+    });
+    zip.generateAsync({type:'blob'}).then(function(content){
+      Tools.downloadBlob(content,'cleaned_images.zip');
+      Tools.setStatus(statusEl,'ZIP downloaded with '+cleaned.length+' images!','done');
+    });
+  });
+
+  resetBtn.addEventListener('click',function(){
+    files=[];currentFile=null;currentImageData=null;cleanBlob=null;batchResults=[];
+    dropZone.style.display='block';
+    singleSection.style.display='none';batchSection.style.display='none';infoSection.style.display='none';
+    actionRow.style.display='none';statusEl.style.display='none';
+    downloadBtn.style.display='none';downloadAllBtn.style.display='none';
+    progressBar.style.display='none';fileInput.value='';
+  });
+})();
+</script>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h4>Free Online Tools</h4>
+        <p>32+ free, private, browser-based tools. No uploads, no accounts. Your files never leave your device.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Popular Tools</h4>
+        <a href="../image-converter/">Image Converter</a>
+        <a href="../pdf-tools/">PDF Tools</a>
+        <a href="../zip-tool/">ZIP Tool</a>
+        <a href="../text-tools/">Text Tools</a>
+      </div>
+      <div class="footer-col">
+        <h4>SEO Tools</h4>
+        <a href="../canonical-tag-checker/">Canonical Checker</a>
+        <a href="../robots-txt-checker/">Robots.txt Checker</a>
+        <a href="../redirect-chain-checker/">Redirect Chain Checker</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://clienvora.com">Clienvora</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>All tools run in your browser. Files are never uploaded. 32+ tools, 100% free, 100% private.</p>
+      <p>Built by <a href="https://clienvora.com">Clienvora</a> &middot; <a href="../">Free Online Tools</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video Compressor - Free Online Video Compressor | No Upload | 100% Private</title>
+  <meta name="description" content="Compress videos online for free. Batch compress, trim, resize. VP8/VP9/H.264 codec selection. Target file size. No uploads, 100% private.">
+  <meta name="keywords" content="video compressor, compress video, video compressor free, online video compressor, reduce video size, compress mp4, video size reducer">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://tools.clienvora.com/video-compressor/">
+  <link rel="stylesheet" href="../assets/style.css">
+  <!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="../assets/favicon/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+<link rel="manifest" href="../assets/favicon/site.webmanifest">
+<meta name="theme-color" content="#0F0F1A">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Video Compressor - Free Online Video Compressor">
+  <meta property="og:description" content="Compress videos online for free. Batch compress, trim, resize. VP8/VP9/H.264 codec selection. Target file size.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tools.clienvora.com/video-compressor/">
+
+  <!-- Schema.org SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Video Compressor - Free Online Tool",
+    "operatingSystem": "Any",
+    "applicationCategory": "UtilitiesApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Compress videos online for free. Batch compress, trim, resize. VP8/VP9/H.264 codec selection. Target file size. No uploads, 100% private."
+  }
+  </script>
+
+  <!-- Schema.org BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://tools.clienvora.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Video Tools",
+        "item": "https://tools.clienvora.com/#video"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Video Compressor"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Schema.org FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I compress a video for free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use our free Video Compressor tool. Drag and drop your video, choose quality settings or target file size, select codec (VP9 recommended), and click Compress. The compressed video will download instantly. No uploads, no sign-ups required."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my video data uploaded to any server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, your videos never leave your device. All processing happens locally in your browser using client-side JavaScript and the MediaRecorder API. Your privacy is 100% guaranteed."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What video formats are supported?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Our Video Compressor supports MP4, WebM, MOV, and AVI as input formats. Output is always WebM (VP8/VP9/H.264), which is supported by all modern browsers."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I compress multiple videos at once?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our Video Compressor supports batch processing. Drop multiple video files and they will all be compressed with the same settings in sequence."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I compress video to a specific file size?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Switch the Target Mode to 'File Size' and enter your desired size in MB. The tool will calculate the required bitrate automatically to hit that target."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the best video codec for compression?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "VP9 offers the best compression ratio (smallest files) but takes longer to encode. H.264 is faster and more compatible with older devices. VP8 is a middle ground. We recommend VP9 for best results."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I trim video while compressing?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, switch to the Trim tab and set start/end times. The compressor will only process the trimmed portion, which also reduces the output file size."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much can I compress a video?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Compression results depend on the original video. With VP9 codec, you can typically achieve 40-60% size reduction. Using lower resolution (720p) and bitrate settings can reduce size even further."
+        }
+      }
+    ]
+  }
+  </script>
+  <style>
+    .compressor-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px}
+    .compressor-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+    .compressor-panel h3{font-size:.95rem;margin-bottom:12px;color:var(--text)}
+    .batch-list{max-height:300px;overflow-y:auto}
+    .batch-item{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid var(--border);transition:background .15s}
+    .batch-item:hover{background:rgba(201,162,39,.05)}
+    .batch-item:last-child{border-bottom:none}
+    .batch-thumb{width:80px;height:50px;object-fit:cover;border-radius:6px;background:#000;flex-shrink:0}
+    .batch-info{flex:1;min-width:0}
+    .batch-name{font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .batch-size{font-size:.75rem;color:var(--text2)}
+    .batch-status{font-size:.7rem;padding:2px 8px;border-radius:4px;white-space:nowrap}
+    .batch-status.pending{background:var(--border);color:var(--text2)}
+    .batch-status.processing{background:rgba(201,162,39,.2);color:var(--accent)}
+    .batch-status.done{background:rgba(52,211,153,.2);color:#34d399}
+    .batch-status.error{background:rgba(248,113,113,.2);color:#f87171}
+    .batch-remove{background:none;border:none;color:var(--text2);cursor:pointer;padding:4px;font-size:1rem;line-height:1}
+    .batch-remove:hover{color:#f87113}
+    .option-group{margin-bottom:16px}
+    .option-group label{display:block;font-size:.85rem;color:var(--text2);margin-bottom:6px}
+    .option-group select,.option-group input[type="number"],.option-group input[type="text"]{width:100%;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.85rem}
+    .option-group input[type="range"]{width:100%}
+    .radio-group{display:flex;gap:8px;flex-wrap:wrap}
+    .radio-option{padding:8px 14px;border:2px solid var(--border);border-radius:8px;cursor:pointer;font-size:.8rem;transition:all .15s}
+    .radio-option:hover{border-color:var(--accent)}
+    .radio-option.active{border-color:var(--accent);background:rgba(201,162,39,.1);color:var(--accent)}
+    .trim-row{display:flex;gap:8px;align-items:center}
+    .trim-row input{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:.85rem}
+    .trim-row span{color:var(--text2);font-size:.8rem}
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+    .stat-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+    .stat-value{font-size:1.1rem;font-weight:700;color:var(--accent)}
+    .stat-label{font-size:.65rem;color:var(--text2);margin-top:4px}
+    .tabs{display:flex;gap:4px;margin-bottom:16px}
+    .tab{padding:8px 16px;border-radius:6px;font-size:.85rem;cursor:pointer;background:var(--bg);color:var(--text2);border:1px solid var(--border);transition:all .15s}
+    .tab.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+    .progress-section{margin-top:16px}
+    .progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0;transition:width .3s}
+    .progress-text{font-size:.8rem;color:var(--text2);margin-top:6px;text-align:center}
+    .codec-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:600;margin-left:6px}
+    .codec-vp9{background:#C9A227;color:var(--navy)}
+    .codec-vp8{background:#f59e0b;color:#000}
+    .codec-h264{background:#10b981;color:#fff}
+    .info-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:.85rem}
+    .info-row:last-child{border-bottom:none}
+    .info-label{color:var(--text2)}
+    .info-value{color:var(--text);font-weight:500}
+    .preview-compare{position:relative;background:#000;border-radius:8px;overflow:hidden;margin-top:12px}
+    .preview-video{width:100%;border-radius:8px}
+    @media(max-width:768px){.compressor-layout{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+    .breadcrumb{font-size:.85rem;color:var(--text2);margin-bottom:16px}
+    .breadcrumb a{color:var(--accent);text-decoration:none}
+    .breadcrumb a:hover{text-decoration:underline}
+    .seo-content{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .seo-content h2{font-size:1.3rem;margin:24px 0 12px;color:var(--text)}
+    .seo-content p{color:var(--text2);line-height:1.7;margin-bottom:12px}
+    .seo-content ul{color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px}
+    .seo-content li{margin-bottom:8px}
+    .seo-content a{color:var(--accent);text-decoration:none}
+    .seo-content a:hover{text-decoration:underline}
+    .faq-section{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .faq-section h2{font-size:1.3rem;margin-bottom:16px}
+    .faq-item{margin-bottom:8px;padding:16px;background:var(--surface);border-radius:8px;cursor:pointer}
+    .faq-item summary{font-weight:600;font-size:1rem}
+    .faq-item p{margin-top:12px;color:var(--text2);line-height:1.6}
+    .related-tools{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .related-tools h2{font-size:1.3rem;margin-bottom:16px}
+    .related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+    .related-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+    .related-card h3{font-size:1rem;margin:8px 0}
+    .related-card p{font-size:.85rem;color:var(--text2);margin-bottom:12px}
+    .related-card a{color:var(--accent);text-decoration:none;font-weight:600}
+    .related-card a:hover{text-decoration:underline}
+    .footer-cta{margin-top:40px;padding:30px;background:var(--surface);border-radius:12px;text-align:center}
+    .footer-cta p{margin-bottom:8px;color:var(--text2)}
+    .footer-cta a{color:var(--accent);font-weight:600;text-decoration:none}
+    .footer-cta a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="header-logo" href="../"><img class="header-logo-img" src="../assets/favicon/favicon-32x32.png" alt="Free Online Tools" width="22" height="22">Free Tools<span class="dot">.</span></a>
+    <nav class="header-nav">
+      <a href="../">Home</a>
+      <a href="../#seo">SEO</a>
+      <a href="https://clienvora.com">Clienvora</a>
+    </nav>
+  </div>
+</header>
+<div class="container">
+  <div class="tool-page">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb">
+      <a href="../">Home</a> &gt; <a href="../#video">Video Tools</a> &gt; Video Compressor
+    </nav>
+
+    <h1>Compress Videos Online - Free Video Compressor</h1>
+    <p class="subtitle">Compress videos online for free. Batch compress, trim, resize. VP8/VP9/H.264 codec selection. Target file size. No uploads, 100% private.</p>
+
+    <!-- Trust Badges -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;font-size:.9rem;color:var(--text2)">
+      <span>✓ No uploads</span>
+      <span>✓ No sign-ups</span>
+      <span>✓ 100% private</span>
+      <span>✓ Works offline</span>
+    </div>
+    <div class="tool-area">
+
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">🎬</div>
+        <strong>Drop videos here</strong>
+        <p>or click to browse (MP4, WebM, MOV, AVI)</p>
+        <input type="file" id="fileInput" accept="video/*" multiple style="display:none">
+      </div>
+
+      <div id="mainArea" style="display:none">
+
+        <div class="tabs">
+          <div class="tab active" data-tab="files">Files <span id="fileCountBadge">(0)</span></div>
+          <div class="tab" data-tab="settings">Settings</div>
+          <div class="tab" data-tab="trim">Trim</div>
+        </div>
+
+        <div class="tab-content active" id="tab-files">
+          <div class="compressor-layout">
+            <div class="compressor-panel">
+              <h3>File Queue</h3>
+              <div class="batch-list" id="batchList"></div>
+              <div style="margin-top:12px;display:flex;gap:8px">
+                <button class="btn btn-secondary" id="addMoreBtn" style="flex:1">+ Add More</button>
+                <button class="btn btn-secondary" id="clearAllBtn" style="flex:1">Clear All</button>
+              </div>
+            </div>
+            <div class="compressor-panel">
+              <h3>Output Settings</h3>
+
+              <div class="option-group">
+                <label>Target Mode</label>
+                <div class="radio-group" id="targetMode">
+                  <div class="radio-option active" data-mode="quality">Quality</div>
+                  <div class="radio-option" data-mode="size">File Size</div>
+                  <div class="radio-option" data-mode="bitrate">Bitrate</div>
+                </div>
+              </div>
+
+              <div class="option-group" id="qualityOption">
+                <label>Quality Level</label>
+                <select id="qualityLevel">
+                  <option value="1000000">Low (1 Mbps)</option>
+                  <option value="2500000" selected>Medium (2.5 Mbps)</option>
+                  <option value="5000000">High (5 Mbps)</option>
+                  <option value="8000000">Very High (8 Mbps)</option>
+                </select>
+              </div>
+
+              <div class="option-group" id="sizeOption" style="display:none">
+                <label>Target File Size (MB)</label>
+                <input type="number" id="targetSize" min="1" max="5000" value="10" placeholder="10">
+                <div style="font-size:.75rem;color:var(--text2);margin-top:4px">Original: <span id="origSizeInfo">0 MB</span></div>
+              </div>
+
+              <div class="option-group" id="bitrateOption" style="display:none">
+                <label>Custom Bitrate (Mbps)</label>
+                <input type="number" id="customBitrate" min="0.1" max="100" step="0.1" value="2.5" placeholder="2.5">
+              </div>
+
+              <div class="option-group">
+                <label>Codec</label>
+                <div class="radio-group" id="codecSelect">
+                  <div class="radio-option active" data-codec="vp9">VP9 <span class="codec-badge codec-vp9">Best</span></div>
+                  <div class="radio-option" data-codec="vp8">VP8</div>
+                  <div class="radio-option" data-codec="h264">H.264 <span class="codec-badge codec-h264">Compatible</span></div>
+                </div>
+              </div>
+
+              <div class="option-group">
+                <label>Resolution</label>
+                <select id="resolution">
+                  <option value="0">Keep original</option>
+                  <option value="2160">4K (2160p)</option>
+                  <option value="1440">2K (1440p)</option>
+                  <option value="1080">Full HD (1080p)</option>
+                  <option value="720" selected>HD (720p)</option>
+                  <option value="480">SD (480p)</option>
+                  <option value="360">Low (360p)</option>
+                  <option value="240">Very Low (240p)</option>
+                </select>
+              </div>
+
+              <div class="option-group">
+                <label>FPS</label>
+                <select id="fps">
+                  <option value="0">Keep original</option>
+                  <option value="24">24 fps</option>
+                  <option value="25">25 fps</option>
+                  <option value="30" selected>30 fps</option>
+                  <option value="60">60 fps</option>
+                </select>
+              </div>
+
+              <div class="info-row" style="margin-top:12px">
+                <span class="info-label">Estimated size</span>
+                <span class="info-value" id="estimatedSize">~5 MB</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Codec support</span>
+                <span class="info-value" id="codecSupport">Checking...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-settings">
+          <div class="compressor-layout">
+            <div class="compressor-panel">
+              <h3>Advanced Options</h3>
+              <label class="checkbox-label"><input type="checkbox" id="audioEnabled" checked> Include audio</label>
+              <div class="option-group" style="margin-top:12px">
+                <label>Audio Bitrate</label>
+                <select id="audioBitrate">
+                  <option value="64000">64 kbps</option>
+                  <option value="128000" selected>128 kbps</option>
+                  <option value="192000">192 kbps</option>
+                  <option value="256000">256 kbps</option>
+                </select>
+              </div>
+              <div class="option-group">
+                <label>Audio Sample Rate</label>
+                <select id="audioSampleRate">
+                  <option value="22050">22050 Hz</option>
+                  <option value="44100" selected>44100 Hz</option>
+                  <option value="48000">48000 Hz</option>
+                </select>
+              </div>
+            </div>
+            <div class="compressor-panel">
+              <h3>Compression Stats</h3>
+              <div class="stats-grid">
+                <div class="stat-box">
+                  <div class="stat-value" id="statFiles">0</div>
+                  <div class="stat-label">Files</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-value" id="statOriginal">0 B</div>
+                  <div class="stat-label">Original</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-value" id="statCompressed">0 B</div>
+                  <div class="stat-label">Compressed</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-value" id="statSaved">0%</div>
+                  <div class="stat-label">Saved</div>
+                </div>
+              </div>
+              <div style="margin-top:16px">
+                <h3>File Info</h3>
+                <div class="info-row"><span class="info-label">Duration</span><span class="info-value" id="infoDuration">-</span></div>
+                <div class="info-row"><span class="info-label">Resolution</span><span class="info-value" id="infoResolution">-</span></div>
+                <div class="info-row"><span class="info-label">Codec</span><span class="info-value" id="infoCodec">-</span></div>
+                <div class="info-row"><span class="info-label">Bitrate</span><span class="info-value" id="infoBitrate">-</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-content" id="tab-trim">
+          <div class="compressor-panel">
+            <h3>Trim Video</h3>
+            <p style="font-size:.85rem;color:var(--text2);margin-bottom:16px">Set start and end time to compress only a portion of the video.</p>
+            <div class="trim-row">
+              <div style="flex:1">
+                <label style="font-size:.8rem;color:var(--text2)">Start Time</label>
+                <input type="text" id="trimStart" placeholder="00:00:00" value="00:00:00">
+              </div>
+              <div style="flex:1">
+                <label style="font-size:.8rem;color:var(--text2)">End Time</label>
+                <input type="text" id="trimEnd" placeholder="00:00:00">
+              </div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px">
+              <button class="btn btn-secondary" id="setStartBtn">Set Start</button>
+              <button class="btn btn-secondary" id="setEndBtn">Set End</button>
+              <button class="btn btn-secondary" id="clearTrimBtn">Clear Trim</button>
+            </div>
+            <div style="margin-top:12px">
+              <label class="checkbox-label"><input type="checkbox" id="trimEnabled"> Enable trimming</label>
+            </div>
+            <div class="preview-compare" style="margin-top:16px">
+              <video id="trimPreview" class="preview-video" controls style="max-height:300px"></video>
+            </div>
+          </div>
+        </div>
+
+        <div class="progress-section" id="progressSection" style="display:none">
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="progress-text" id="progressText">Preparing...</div>
+        </div>
+
+        <div id="status" class="status" style="display:none"></div>
+
+        <div class="action-row">
+          <button class="btn" id="compressBtn">Compress All</button>
+          <button class="btn btn-secondary" id="downloadAllBtn" style="display:none">Download All (ZIP)</button>
+          <button class="btn btn-secondary" id="resetBtn">Reset</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+      <h2>How to Compress Videos Online</h2>
+      <p>Compressing videos has never been easier. Our free online video compressor allows you to reduce video file sizes while maintaining quality in just a few simple steps:</p>
+      <ol style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li style="margin-bottom:8px"><strong>Drop your videos</strong> - Drag and drop video files into the upload area, or click to browse (MP4, WebM, MOV, AVI supported).</li>
+        <li style="margin-bottom:8px"><strong>Choose target mode</strong> - Select Quality, File Size, or Bitrate depending on your needs.</li>
+        <li style="margin-bottom:8px"><strong>Select codec</strong> - Choose VP9 for best compression, H.264 for compatibility, or VP8 for a balance.</li>
+        <li style="margin-bottom:8px"><strong>Adjust settings</strong> - Set resolution, FPS, and audio options. Use the Trim tab to compress only a portion.</li>
+        <li style="margin-bottom:8px"><strong>Compress and download</strong> - Click "Compress All" and download your compressed videos. Batch download as ZIP for multiple files.</li>
+      </ol>
+
+      <h2>Features of Our Free Video Compressor</h2>
+      <ul style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li><strong>Batch Processing</strong> - Compress multiple videos at once</li>
+        <li><strong>3 Target Modes</strong> - Quality, File Size, or Bitrate control</li>
+        <li><strong>Codec Selection</strong> - VP9 (best), VP8, or H.264 (compatible)</li>
+        <li><strong>Resolution Scaling</strong> - 4K, 2K, 1080p, 720p, 480p, 360p, 240p</li>
+        <li><strong>Video Trimming</strong> - Compress only the portion you need</li>
+        <li><strong>Audio Control</strong> - Enable/disable audio, adjust bitrate and sample rate</li>
+        <li><strong>100% Private</strong> - Videos never leave your browser</li>
+      </ul>
+
+      <h2>Why Choose Our Video Compressor?</h2>
+      <p>Unlike other online video compressors, our tool runs entirely in your browser. Your videos are never uploaded to any server, ensuring complete privacy and security. There are no file size limits, no watermarks added, and no sign-ups required. The entire process happens locally on your device using the MediaRecorder API and client-side JavaScript.</p>
+
+      <h2>What is the Best Codec for Video Compression?</h2>
+      <p><strong>VP9</strong> offers the best compression ratio, typically achieving 40-60% size reduction with good quality. It is YouTube's preferred codec. <strong>H.264</strong> is the most compatible codec, working on virtually all devices and platforms, but produces slightly larger files. <strong>VP8</strong> is a middle ground with decent compression and good compatibility. For most users, we recommend VP9 for the best balance of quality and file size.</p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+
+      <details class="faq-item">
+        <summary>How do I compress a video for free?</summary>
+        <p>Use our free Video Compressor tool. Drag and drop your video, choose quality settings or target file size, select codec (VP9 recommended), and click Compress. The compressed video will download instantly. No uploads, no sign-ups required.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Is my video data uploaded to any server?</summary>
+        <p>No, your videos never leave your device. All processing happens locally in your browser using client-side JavaScript and the MediaRecorder API. Your privacy is 100% guaranteed.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What video formats are supported?</summary>
+        <p>Our Video Compressor supports MP4, WebM, MOV, and AVI as input formats. Output is always WebM (VP8/VP9/H.264), which is supported by all modern browsers.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I compress multiple videos at once?</summary>
+        <p>Yes, our Video Compressor supports batch processing. Drop multiple video files and they will all be compressed with the same settings in sequence.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>How do I compress video to a specific file size?</summary>
+        <p>Switch the Target Mode to 'File Size' and enter your desired size in MB. The tool will calculate the required bitrate automatically to hit that target.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What is the best video codec for compression?</summary>
+        <p>VP9 offers the best compression ratio (smallest files) but takes longer to encode. H.264 is faster and more compatible with older devices. VP8 is a middle ground. We recommend VP9 for best results.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I trim video while compressing?</summary>
+        <p>Yes, switch to the Trim tab and set start/end times. The compressor will only process the trimmed portion, which also reduces the output file size.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>How much can I compress a video?</summary>
+        <p>Compression results depend on the original video. With VP9 codec, you can typically achieve 40-60% size reduction. Using lower resolution (720p) and bitrate settings can reduce size even further.</p>
+      </details>
+    </section>
+
+    <!-- Related Tools Section -->
+    <section class="related-tools">
+      <h2>Related Video Tools</h2>
+      <div class="related-grid">
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">✂️</div>
+          <h3>Video Trimmer</h3>
+          <p>Trim video files. Set start/end, preview, batch process. All in your browser.</p>
+          <a href="../video-trimmer/">Open Video Trimmer →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🎥</div>
+          <h3>Video to GIF</h3>
+          <p>Convert videos to animated GIFs. Quality, FPS, resolution control. All in your browser.</p>
+          <a href="../video-to-gif/">Open Video to GIF →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🎵</div>
+          <h3>Video to Audio</h3>
+          <p>Extract audio from videos. MP3, WAV, OGG, WebM. All in your browser.</p>
+          <a href="../video-to-audio/">Open Video to Audio →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <p>Need custom web tools or automation for your business?</p>
+      <a href="https://clienvora.com">Learn more about Clienvora - Custom Web Development →</a>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script>
+(function(){
+  var dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput');
+  var mainArea=document.getElementById('mainArea'),batchList=document.getElementById('batchList');
+  var addMoreBtn=document.getElementById('addMoreBtn'),clearAllBtn=document.getElementById('clearAllBtn');
+  var statusEl=document.getElementById('status'),progressSection=document.getElementById('progressSection');
+  var progressFill=document.getElementById('progressFill'),progressText=document.getElementById('progressText');
+  var compressBtn=document.getElementById('compressBtn'),downloadAllBtn=document.getElementById('downloadAllBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var qualityLevel=document.getElementById('qualityLevel'),resolution=document.getElementById('resolution');
+  var fpsSelect=document.getElementById('fps'),targetSize=document.getElementById('targetSize');
+  var customBitrate=document.getElementById('customBitrate'),audioEnabled=document.getElementById('audioEnabled');
+  var audioBitrate=document.getElementById('audioBitrate'),audioSampleRate=document.getElementById('audioSampleRate');
+  var trimStart=document.getElementById('trimStart'),trimEnd=document.getElementById('trimEnd');
+  var trimEnabled=document.getElementById('trimEnabled'),trimPreview=document.getElementById('trimPreview');
+  var setStartBtn=document.getElementById('setStartBtn'),setEndBtn=document.getElementById('setEndBtn');
+  var clearTrimBtn=document.getElementById('clearTrimBtn');
+  var fileCountBadge=document.getElementById('fileCountBadge');
+  var statFiles=document.getElementById('statFiles'),statOriginal=document.getElementById('statOriginal');
+  var statCompressed=document.getElementById('statCompressed'),statSaved=document.getElementById('statSaved');
+  var infoDuration=document.getElementById('infoDuration'),infoResolution=document.getElementById('infoResolution');
+  var infoCodec=document.getElementById('infoCodec'),infoBitrate=document.getElementById('infoBitrate');
+  var origSizeInfo=document.getElementById('origSizeInfo'),estimatedSize=document.getElementById('estimatedSize');
+  var codecSupport=document.getElementById('codecSupport');
+
+  var files=[];
+  var results=[];
+  var selectedCodec='vp9';
+  var targetMode='quality';
+
+  function formatSize(bytes){
+    if(bytes===0)return '0 B';
+    var k=1024,sizes=['B','KB','MB','GB'];
+    var i=Math.floor(Math.log(bytes)/Math.log(k));
+    return (bytes/Math.pow(k,i)).toFixed(1)+' '+sizes[i];
+  }
+
+  function formatTime(sec){
+    var h=Math.floor(sec/3600);
+    var m=Math.floor((sec%3600)/60);
+    var s=Math.floor(sec%60);
+    return (h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  }
+
+  function parseTime(str){
+    var parts=str.split(':').map(Number);
+    if(parts.length===3)return parts[0]*3600+parts[1]*60+parts[2];
+    if(parts.length===2)return parts[0]*60+parts[1];
+    return parts[0]||0;
+  }
+
+  function showStatus(msg,type){
+    statusEl.textContent=msg;statusEl.className='status '+(type||'');statusEl.style.display='block';
+  }
+
+  function checkCodecSupport(){
+    var codecs=[];
+    if(MediaRecorder.isTypeSupported('video/webm;codecs=vp9'))codecs.push('VP9');
+    if(MediaRecorder.isTypeSupported('video/webm;codecs=vp8'))codecs.push('VP8');
+    if(MediaRecorder.isTypeSupported('video/webm;codecs=h264'))codecs.push('H.264');
+    if(MediaRecorder.isTypeSupported('video/mp4;codecs=h264'))codecs.push('H.264(mp4)');
+    codecSupport.textContent=codecs.length>0?codecs.join(', '):'Limited';
+    if(!codecs.includes('VP9'))document.querySelector('[data-codec="vp9"]').style.opacity='.5';
+    if(!codecs.includes('VP8'))document.querySelector('[data-codec="vp8"]').style.opacity='.5';
+  }
+
+  function updateStats(){
+    var totalOrig=0;
+    files.forEach(function(f){totalOrig+=f.size;});
+    statFiles.textContent=files.length;
+    statOriginal.textContent=formatSize(totalOrig);
+    fileCountBadge.textContent='('+files.length+')';
+    origSizeInfo.textContent=formatSize(totalOrig);
+    var totalComp=0;
+    results.forEach(function(r){if(!r.error)totalComp+=r.newSize;});
+    statCompressed.textContent=formatSize(totalComp);
+    if(totalOrig>0){
+      var saved=Math.round((1-totalComp/totalOrig)*100);
+      statSaved.textContent=saved+'%';
+    }
+  }
+
+  function estimateSize(){
+    var totalOrig=0;
+    files.forEach(function(f){totalOrig+=f.size;});
+    var mult=selectedCodec==='vp9'?0.5:selectedCodec==='vp8'?0.6:0.7;
+    if(targetMode==='size'){mult=parseInt(targetSize.value||10)*1024*1024/totalOrig;}
+    else if(targetMode==='bitrate'){mult=parseInt(customBitrate.value||2.5)*1000000*60/totalOrig;}
+    estimatedSize.textContent='~'+formatSize(Math.round(totalOrig*mult));
+  }
+
+  function renderBatchList(){
+    batchList.innerHTML='';
+    files.forEach(function(f,i){
+      var item=document.createElement('div');item.className='batch-item';item.dataset.index=i;
+      var thumb=URL.createObjectURL(f);
+      item.innerHTML='<video class="batch-thumb" src="'+thumb+'" muted></video><div class="batch-info"><div class="batch-name">'+f.name+'</div><div class="batch-size">'+formatSize(f.size)+' &bull; '+f.type.split('/')[1].toUpperCase()+'</div></div><span class="batch-status pending">Pending</span><button class="batch-remove" data-idx="'+i+'">&times;</button>';
+      batchList.appendChild(item);
+    });
+    batchList.querySelectorAll('.batch-remove').forEach(function(btn){
+      btn.addEventListener('click',function(e){
+        e.stopPropagation();files.splice(parseInt(btn.dataset.idx),1);
+        renderBatchList();updateStats();
+        if(files.length===0){mainArea.style.display='none';dropZone.style.display='block';}
+      });
+    });
+  }
+
+  function handleFiles(newFiles){
+    for(var i=0;i<newFiles.length;i++){
+      if(newFiles[i].type.startsWith('video/'))files.push(newFiles[i]);
+    }
+    if(files.length>0){
+      dropZone.style.display='none';mainArea.style.display='block';
+      renderBatchList();updateStats();estimateSize();
+      if(files.length===1){
+        var v=document.createElement('video');v.src=URL.createObjectURL(files[0]);
+        v.onloadedmetadata=function(){
+          infoDuration.textContent=formatTime(v.duration);
+          infoResolution.textContent=v.videoWidth+'x'+v.videoHeight;
+          trimEnd.value=formatTime(v.duration);
+          trimPreview.src=v.src;
+        };
+      }
+    }
+  }
+
+  dropZone.addEventListener('click',function(){fileInput.click();});
+  fileInput.addEventListener('change',function(e){if(e.target.files.length)handleFiles(e.target.files);});
+  ['dragenter','dragover'].forEach(function(ev){dropZone.addEventListener(ev,function(e){e.preventDefault();dropZone.classList.add('dragover');});});
+  ['dragleave','drop'].forEach(function(ev){dropZone.addEventListener(ev,function(e){e.preventDefault();dropZone.classList.remove('dragover');});});
+  dropZone.addEventListener('drop',function(e){if(e.dataTransfer.files.length)handleFiles(e.dataTransfer.files);});
+  addMoreBtn.addEventListener('click',function(){fileInput.click();});
+  clearAllBtn.addEventListener('click',function(){files=[];results=[];renderBatchList();updateStats();mainArea.style.display='none';dropZone.style.display='block';});
+
+  document.querySelectorAll('#targetMode .radio-option').forEach(function(opt){
+    opt.addEventListener('click',function(){
+      document.querySelectorAll('#targetMode .radio-option').forEach(function(o){o.classList.remove('active');});
+      opt.classList.add('active');targetMode=opt.dataset.mode;
+      document.getElementById('qualityOption').style.display=targetMode==='quality'?'block':'none';
+      document.getElementById('sizeOption').style.display=targetMode==='size'?'block':'none';
+      document.getElementById('bitrateOption').style.display=targetMode==='bitrate'?'block':'none';
+      estimateSize();
+    });
+  });
+
+  document.querySelectorAll('#codecSelect .radio-option').forEach(function(opt){
+    opt.addEventListener('click',function(){
+      document.querySelectorAll('#codecSelect .radio-option').forEach(function(o){o.classList.remove('active');});
+      opt.classList.add('active');selectedCodec=opt.dataset.codec;estimateSize();
+    });
+  });
+
+  qualityLevel.addEventListener('change',estimateSize);
+  resolution.addEventListener('change',estimateSize);
+  fpsSelect.addEventListener('change',estimateSize);
+  targetSize.addEventListener('input',estimateSize);
+  customBitrate.addEventListener('input',estimateSize);
+
+  setStartBtn.addEventListener('click',function(){trimStart.value=formatTime(trimPreview.currentTime);});
+  setEndBtn.addEventListener('click',function(){trimEnd.value=formatTime(trimPreview.currentTime);});
+  clearTrimBtn.addEventListener('click',function(){trimStart.value='00:00:00';trimEnd.value='';});
+
+  document.querySelectorAll('.tab').forEach(function(tab){
+    tab.addEventListener('click',function(){
+      document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+      document.querySelectorAll('.tab-content').forEach(function(c){c.classList.remove('active');});
+      tab.classList.add('active');document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  function seekVideo(video,time){
+    return new Promise(function(resolve){
+      function onSeeked(){video.removeEventListener('seeked',onSeeked);resolve();}
+      video.addEventListener('seeked',onSeeked);
+      video.currentTime=time;
+    });
+  }
+
+  function compressSingle(file,idx){
+    return new Promise(function(resolve){
+      var video=document.createElement('video');
+      video.muted=true;video.preload='auto';
+      video.src=URL.createObjectURL(file);
+      video.onloadeddata=function(){
+        var startTime=trimEnabled.checked?parseTime(trimStart.value):0;
+        var endTime=trimEnabled.checked&&trimEnd.value?parseTime(trimEnd.value):video.duration;
+        if(endTime<=startTime)endTime=video.duration;
+
+        var targetH=parseInt(resolution.value)||video.videoHeight;
+        var scale=targetH/video.videoHeight;
+        var targetW=Math.round(video.videoWidth*scale);
+        var targetFps=parseInt(fpsSelect.value)||30;
+
+        var bitrate;
+        if(targetMode==='quality'){bitrate=parseInt(qualityLevel.value);}
+        else if(targetMode==='size'){
+          var sizeBytes=parseInt(targetSize.value)*1024*1024;
+          var duration=endTime-startTime;
+          bitrate=Math.round(sizeBytes*8/duration);
+        }else{bitrate=parseInt(customBitrate.value)*1000000;}
+
+        var offCanvas=document.createElement('canvas');
+        offCanvas.width=targetW;offCanvas.height=targetH;
+        var offCtx=offCanvas.getContext('2d');
+
+        var mimeType='video/webm';
+        if(selectedCodec==='vp9'&&MediaRecorder.isTypeSupported('video/webm;codecs=vp9')){mimeType='video/webm;codecs=vp9';}
+        else if(selectedCodec==='vp8'&&MediaRecorder.isTypeSupported('video/webm;codecs=vp8')){mimeType='video/webm;codecs=vp8';}
+        else if(selectedCodec==='h264'&&MediaRecorder.isTypeSupported('video/webm;codecs=h264')){mimeType='video/webm;codecs=h264';}
+
+        var stream=offCanvas.captureStream(targetFps);
+        var chunks=[];
+        var recorder=new MediaRecorder(stream,{mimeType:mimeType,videoBitsPerSecond:bitrate});
+        recorder.ondataavailable=function(e){if(e.data.size>0)chunks.push(e.data);};
+        recorder.onstop=function(){
+          var blob=new Blob(chunks,{type:'video/webm'});
+          var name=file.name.replace(/\.[^.]+$/,'_compressed.webm');
+          URL.revokeObjectURL(video.src);
+          resolve({blob:blob,name:name,origSize:file.size,newSize:blob.size});
+        };
+
+        (async function(){
+          await seekVideo(video,startTime);
+          recorder.start();
+          var duration=endTime-startTime;
+          var totalFrames=Math.ceil(duration*targetFps);
+          var frame=0;
+          var frameInterval=1/targetFps;
+
+          async function processFrame(){
+            if(video.currentTime>=endTime||frame>=totalFrames){recorder.stop();return;}
+            offCtx.drawImage(video,0,0,targetW,targetH);
+            frame++;
+            var nextTime=video.currentTime+frameInterval;
+            if(nextTime>=endTime||frame>=totalFrames){recorder.stop();return;}
+            await seekVideo(video,nextTime);
+            requestAnimationFrame(processFrame);
+          }
+          processFrame();
+        })();
+      };
+      video.onerror=function(){resolve({error:true,name:file.name});};
+    });
+  }
+
+  async function compressAll(){
+    if(files.length===0)return;
+    compressBtn.disabled=true;downloadAllBtn.style.display='none';
+    progressSection.style.display='block';
+    results=[];var done=0;
+    var items=batchList.querySelectorAll('.batch-item');
+
+    for(var i=0;i<files.length;i++){
+      items[i].querySelector('.batch-status').className='batch-status processing';
+      items[i].querySelector('.batch-status').textContent='Compressing...';
+      try{
+        var r=await compressSingle(files[i],i);
+        results.push(r);
+        items[i].querySelector('.batch-status').className='batch-status done';
+        items[i].querySelector('.batch-status').textContent=formatSize(r.origSize)+' → '+formatSize(r.newSize);
+      }catch(e){
+        results.push({error:true,name:files[i].name});
+        items[i].querySelector('.batch-status').className='batch-status error';
+        items[i].querySelector('.batch-status').textContent='Error';
+      }
+      done++;progressFill.style.width=Math.round(done/files.length*100)+'%';
+      progressText.textContent=done+' / '+files.length+' files';
+      updateStats();
+    }
+
+    var totalOrig=0,totalNew=0;
+    results.forEach(function(r){if(!r.error){totalOrig+=r.origSize;totalNew+=r.newSize;}});
+    var saved=totalOrig-totalNew;
+    showStatus('Done! '+results.filter(function(r){return !r.error;}).length+' files compressed. Saved '+formatSize(saved)+' ('+Math.round(saved/totalOrig*100)+'%)','done');
+    compressBtn.disabled=false;
+    if(results.length>1){downloadAllBtn.style.display='inline-block';}
+    else if(results.length===1&&!results[0].error){Tools.downloadBlob(results[0].blob,results[0].name);}
+  }
+
+  downloadAllBtn.addEventListener('click',async function(){
+    if(results.length===0)return;
+    if(results.length===1){Tools.downloadBlob(results[0].blob,results[0].name);return;}
+    if(typeof JSZip==='undefined'){showStatus('ZIP library loading...','error');return;}
+    var zip=new JSZip();
+    results.forEach(function(r){if(!r.error)zip.file(r.name,r.blob);});
+    var blob=await zip.generateAsync({type:'blob'});
+    var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='compressed-videos.zip';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+  });
+
+  compressBtn.addEventListener('click',compressAll);
+
+  resetBtn.addEventListener('click',function(){
+    files=[];results=[];
+    mainArea.style.display='none';dropZone.style.display='block';
+    progressSection.style.display='none';statusEl.style.display='none';
+    downloadAllBtn.style.display='none';fileInput.value='';
+    batchList.innerHTML='';updateStats();
+  });
+
+  checkCodecSupport();
+})();
+</script>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h4>Free Online Tools</h4>
+        <p>32+ free, private, browser-based tools. No uploads, no accounts. Your files never leave your device.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Popular Tools</h4>
+        <a href="../image-converter/">Image Converter</a>
+        <a href="../pdf-tools/">PDF Tools</a>
+        <a href="../zip-tool/">ZIP Tool</a>
+        <a href="../text-tools/">Text Tools</a>
+      </div>
+      <div class="footer-col">
+        <h4>SEO Tools</h4>
+        <a href="../canonical-tag-checker/">Canonical Checker</a>
+        <a href="../robots-txt-checker/">Robots.txt Checker</a>
+        <a href="../redirect-chain-checker/">Redirect Chain Checker</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://clienvora.com">Clienvora</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>All tools run in your browser. Files are never uploaded. 32+ tools, 100% free, 100% private.</p>
+      <p>Built by <a href="https://clienvora.com">Clienvora</a> &middot; <a href="../">Free Online Tools</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

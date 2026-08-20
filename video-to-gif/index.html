@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Video to GIF - Free Online Video to GIF Converter | No Upload | 100% Private</title>
+  <meta name="description" content="Convert videos to GIF online for free. Frame rate control, resolution, start/end time. Batch mode. No uploads, 100% private.">
+  <meta name="keywords" content="video to gif, convert video to gif, video to gif free, online video to gif, gif maker, animated gif, video to animated gif">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://tools.clienvora.com/video-to-gif/">
+  <link rel="stylesheet" href="../assets/style.css">
+  <!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="../assets/favicon/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+<link rel="manifest" href="../assets/favicon/site.webmanifest">
+<meta name="theme-color" content="#0F0F1A">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Video to GIF - Free Online Video to GIF Converter">
+  <meta property="og:description" content="Convert videos to GIF online for free. Frame rate control, resolution, start/end time. Batch mode.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tools.clienvora.com/video-to-gif/">
+
+  <!-- Schema.org SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Video to GIF - Free Online Tool",
+    "operatingSystem": "Any",
+    "applicationCategory": "UtilitiesApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Convert videos to GIF online for free. Frame rate control, resolution, start/end time. Batch mode. No uploads, 100% private."
+  }
+  </script>
+
+  <!-- Schema.org BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://tools.clienvora.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Video Tools",
+        "item": "https://tools.clienvora.com/#video"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Video to GIF"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Schema.org FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I convert video to GIF for free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use our free Video to GIF tool. Drag and drop your video, set start/end time, adjust frame rate and resolution, and click Convert. The animated GIF will download instantly. No uploads, no sign-ups required."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my video data uploaded to any server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, your videos never leave your device. All processing happens locally in your browser using client-side JavaScript, canvas, and the GIF.js library. Your privacy is 100% guaranteed."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What video formats can be converted to GIF?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Our Video to GIF converter supports MP4, WebM, MOV, AVI, and any format supported by your browser's video element."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I control the GIF quality?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, you can control frame rate (1-30 fps), resolution, and color palette. Higher frame rate = smoother but larger GIF. Lower resolution = smaller file size."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I select a specific portion of the video?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, use the start/end time inputs to select the exact portion of the video you want to convert to GIF. You can also use the frame strip to visually select frames."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I convert multiple videos to GIF?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our Video to GIF converter supports batch mode. Add multiple videos and convert them all to GIFs with the same settings."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the maximum GIF length?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "There is no hard limit, but longer GIFs produce larger files. We recommend keeping GIFs under 10 seconds for optimal file size and quality."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does it work on mobile devices?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our Video to GIF converter works on all modern browsers including mobile. The interface is responsive and adapts to smaller screens."
+        }
+      }
+    ]
+  }
+  </script>
+  <style>
+    .frame-strip{display:flex;gap:4px;overflow-x:auto;padding:8px 0;margin:12px 0}
+    .frame-strip canvas,.frame-strip img{height:80px;border-radius:4px;border:2px solid transparent;cursor:pointer;flex-shrink:0;transition:.15s}
+    .frame-strip canvas:hover,.frame-strip img:hover{border-color:var(--accent)}
+    .frame-strip .active{border-color:#22c55e;box-shadow:0 0 0 2px rgba(34,197,94,.3)}
+    .time-row{display:flex;gap:8px;margin-bottom:12px}
+    .time-row>div{flex:1}
+    .time-row label{display:block;margin-bottom:4px;font-size:.8rem;color:var(--text2)}
+    .time-row input{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:6px;border-radius:4px}
+    .setting-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .setting-row label{min-width:100px;font-size:.85rem;color:var(--text2)}
+    .setting-row select,.setting-row input[type=number]{flex:1}
+    .setting-row input[type=range]{flex:1}
+    .setting-row .val{min-width:50px;text-align:center;font-weight:600;color:var(--accent);font-size:.85rem}
+    .preview-tabs{display:flex;gap:4px;margin-bottom:16px}
+    .preview-tabs button{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
+    .preview-tabs button.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
+    .preview-tabs button:hover:not(.active){border-color:var(--accent)}
+    .batch-list{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+    .batch-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.85rem}
+    .batch-item .batch-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .batch-item .batch-size{color:var(--text2);min-width:60px;text-align:right}
+    .batch-item .batch-status{color:#22c55e;font-weight:600;min-width:60px;text-align:right}
+    .batch-item .batch-remove{cursor:pointer;color:var(--red);padding:2px}
+    .gif-preview{max-width:100%;border-radius:8px;border:1px solid var(--border);margin:12px 0}
+    .stat-row{display:flex;gap:8px;margin:12px 0}
+    .stat-box{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+    .stat-box .stat-val{font-size:1.1rem;font-weight:700;color:var(--accent)}
+    .stat-box .stat-label{font-size:.7rem;color:var(--text2);margin-top:4px}
+    select,input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px}
+    .breadcrumb{font-size:.85rem;color:var(--text2);margin-bottom:16px}
+    .breadcrumb a{color:var(--accent);text-decoration:none}
+    .breadcrumb a:hover{text-decoration:underline}
+    .seo-content{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .seo-content h2{font-size:1.3rem;margin:24px 0 12px;color:var(--text)}
+    .seo-content p{color:var(--text2);line-height:1.7;margin-bottom:12px}
+    .seo-content ul{color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px}
+    .seo-content li{margin-bottom:8px}
+    .seo-content a{color:var(--accent);text-decoration:none}
+    .seo-content a:hover{text-decoration:underline}
+    .faq-section{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .faq-section h2{font-size:1.3rem;margin-bottom:16px}
+    .faq-item{margin-bottom:8px;padding:16px;background:var(--surface);border-radius:8px;cursor:pointer}
+    .faq-item summary{font-weight:600;font-size:1rem}
+    .faq-item p{margin-top:12px;color:var(--text2);line-height:1.6}
+    .related-tools{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .related-tools h2{font-size:1.3rem;margin-bottom:16px}
+    .related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+    .related-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+    .related-card h3{font-size:1rem;margin:8px 0}
+    .related-card p{font-size:.85rem;color:var(--text2);margin-bottom:12px}
+    .related-card a{color:var(--accent);text-decoration:none;font-weight:600}
+    .related-card a:hover{text-decoration:underline}
+    .footer-cta{margin-top:40px;padding:30px;background:var(--surface);border-radius:12px;text-align:center}
+    .footer-cta p{margin-bottom:8px;color:var(--text2)}
+    .footer-cta a{color:var(--accent);font-weight:600;text-decoration:none}
+    .footer-cta a:hover{text-decoration:underline}
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="header-logo" href="../"><img class="header-logo-img" src="../assets/favicon/favicon-32x32.png" alt="Free Online Tools" width="22" height="22">Free Tools<span class="dot">.</span></a>
+    <nav class="header-nav">
+      <a href="../">Home</a>
+      <a href="../#seo">SEO</a>
+      <a href="https://clienvora.com">Clienvora</a>
+    </nav>
+  </div>
+</header>
+<div class="container">
+  <div class="tool-page">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb">
+      <a href="../">Home</a> &gt; <a href="../#video">Video Tools</a> &gt; Video to GIF
+    </nav>
+
+    <h1>Convert Videos to GIF Online - Free Video to GIF Converter</h1>
+    <p class="subtitle">Convert videos to GIF online for free. Frame rate control, resolution, start/end time. Batch mode. No uploads, 100% private.</p>
+
+    <!-- Trust Badges -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;font-size:.9rem;color:var(--text2)">
+      <span>✓ No uploads</span>
+      <span>✓ No sign-ups</span>
+      <span>✓ 100% private</span>
+      <span>✓ Works offline</span>
+    </div>
+
+    <div class="tabs" id="tabs">
+      <button class="tab active" data-tab="convert">Convert</button>
+      <button class="tab" data-tab="batch">Batch</button>
+      <button class="tab" data-tab="preview">Preview</button>
+    </div>
+
+    <div class="tool-area">
+      <div class="upload-zone" id="dropZone">
+        <div class="big-icon">📁</div>
+        <strong>Drop video file(s) here</strong>
+        <p>or click to browse (MP4, WebM, MOV)</p>
+        <input type="file" id="fileInput" accept="video/*" multiple>
+      </div>
+
+      <div class="batch-list" id="batchList"></div>
+
+      <div id="convertSection" style="display:none">
+        <div class="preview-area">
+          <video id="videoPreview" controls style="max-width:100%;border-radius:8px"></video>
+          <div id="fileInfo" style="color:var(--text2);margin:12px 0;font-size:.9rem"></div>
+        </div>
+
+        <div class="frame-strip" id="frameStrip"></div>
+
+        <div class="preview-tabs" id="modeTabs">
+          <button class="active" data-mode="settings">Settings</button>
+          <button data-mode="trim">Trim</button>
+          <button data-mode="output">Output</button>
+        </div>
+
+        <div id="settingsMode">
+          <div class="setting-row">
+            <label>Frame Rate</label>
+            <input type="range" id="fps" min="1" max="30" value="12">
+            <span class="val" id="fpsVal">12 fps</span>
+          </div>
+
+          <div class="setting-row">
+            <label>Width</label>
+            <select id="width">
+              <option value="240">240px (tiny)</option>
+              <option value="320">320px (small)</option>
+              <option value="480" selected>480px (medium)</option>
+              <option value="640">640px (large)</option>
+              <option value="800">800px (HD)</option>
+            </select>
+          </div>
+
+          <div class="setting-row">
+            <label>Quality</label>
+            <input type="range" id="gifQuality" min="1" max="30" value="10">
+            <span class="val" id="gifQualityVal">10</span>
+          </div>
+
+          <div class="setting-row">
+            <label>Workers</label>
+            <select id="workers">
+              <option value="1">1 (slow)</option>
+              <option value="2" selected>2 (balanced)</option>
+              <option value="4">4 (fast)</option>
+            </select>
+          </div>
+
+          <div style="font-size:.8rem;color:var(--text2);margin-bottom:12px">Lower quality number = better quality but slower encoding.</div>
+        </div>
+
+        <div id="trimMode" style="display:none">
+          <div class="time-row">
+            <div>
+              <label>Start (sec)</label>
+              <input type="number" id="startTime" value="0" min="0" step="0.1">
+            </div>
+            <div>
+              <label>End (sec)</label>
+              <input type="number" id="endTime" value="5" min="0.1" step="0.1">
+            </div>
+            <div>
+              <label>Duration</label>
+              <input type="number" id="gifDuration" value="5" min="0.5" max="30" step="0.1" readonly style="opacity:.6">
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <button class="btn btn-secondary" id="setStartBtn" style="flex:1">Set Start = Now</button>
+            <button class="btn btn-secondary" id="setEndBtn" style="flex:1">Set End = Now</button>
+          </div>
+          <div style="font-size:.8rem;color:var(--text2)">Max 30 seconds for GIF.</div>
+        </div>
+
+        <div id="outputMode" style="display:none">
+          <div class="setting-row">
+            <label>Loop Count</label>
+            <select id="loopCount">
+              <option value="0" selected>Infinite</option>
+              <option value="1">1 time</option>
+              <option value="2">2 times</option>
+              <option value="3">3 times</option>
+              <option value="5">5 times</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <label>Transparent BG</label>
+            <select id="transparent">
+              <option value="no" selected>No</option>
+              <option value="yes">Yes (if supported)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="stat-row" id="statRow" style="display:none">
+          <div class="stat-box"><div class="stat-val" id="statFrames">-</div><div class="stat-label">Frames</div></div>
+          <div class="stat-box"><div class="stat-val" id="statSize">-</div><div class="stat-label">Est. Size</div></div>
+          <div class="stat-box"><div class="stat-val" id="statTime">-</div><div class="stat-label">Duration</div></div>
+        </div>
+
+        <div class="action-row">
+          <button class="btn" id="convertBtn">Convert to GIF</button>
+          <button class="btn btn-secondary" id="resetBtn">Reset</button>
+        </div>
+      </div>
+
+      <div id="gifResult" style="display:none">
+        <img class="gif-preview" id="gifPreview">
+        <div class="stat-row">
+          <div class="stat-box"><div class="stat-val" id="resultSize">-</div><div class="stat-label">GIF Size</div></div>
+          <div class="stat-box"><div class="stat-val" id="resultFrames">-</div><div class="stat-label">Frames</div></div>
+          <div class="stat-box"><div class="stat-val" id="resultDuration">-</div><div class="stat-label">Duration</div></div>
+        </div>
+        <div class="action-row">
+          <button class="btn" id="downloadBtn">Download GIF</button>
+          <button class="btn btn-secondary" id="downloadAllBtn" style="display:none">Download ZIP</button>
+          <button class="btn btn-secondary" id="newConvertBtn">Convert Another</button>
+        </div>
+      </div>
+
+      <div class="progress-bar" id="progressBar" style="display:none"><div class="fill" id="progressFill"></div></div>
+      <div class="status" id="status"></div>
+    </div>
+
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+      <h2>How to Convert Video to GIF Online</h2>
+      <p>Converting videos to GIFs has never been easier. Our free online video to GIF converter allows you to create animated GIFs in just a few simple steps:</p>
+      <ol style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li style="margin-bottom:8px"><strong>Drop your video</strong> - Drag and drop a video file into the upload area, or click to browse.</li>
+        <li style="margin-bottom:8px"><strong>Select portion</strong> - Set start and end times to choose which part of the video to convert.</li>
+        <li style="margin-bottom:8px"><strong>Adjust settings</strong> - Set frame rate (fps), resolution, and other options.</li>
+        <li style="margin-bottom:8px"><strong>Preview frames</strong> - View individual frames in the frame strip to fine-tune your selection.</li>
+        <li style="margin-bottom:8px"><strong>Convert and download</strong> - Click "Convert to GIF" and download your animated GIF instantly.</li>
+      </ol>
+
+      <h2>Features of Our Free Video to GIF Converter</h2>
+      <ul style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li><strong>Frame Strip</strong> - Visual preview of all frames</li>
+        <li><strong>Precise Timing</strong> - Set exact start/end times</li>
+        <li><strong>Frame Rate Control</strong> - 1-30 fps for quality/size balance</li>
+        <li><strong>Resolution Scaling</strong> - Adjust output size</li>
+        <li><strong>Batch Mode</strong> - Convert multiple videos at once</li>
+        <li><strong>Before/After Preview</strong> - See the result before downloading</li>
+        <li><strong>100% Private</strong> - Videos never leave your browser</li>
+      </ul>
+
+      <h2>Why Choose Our Video to GIF Converter?</h2>
+      <p>Unlike other online converters, our tool runs entirely in your browser. Your videos are never uploaded to any server, ensuring complete privacy and security. There are no file size limits, no watermarks added, and no sign-ups required. The entire process happens locally on your device using client-side JavaScript and the GIF.js library.</p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+
+      <details class="faq-item">
+        <summary>How do I convert video to GIF for free?</summary>
+        <p>Use our free Video to GIF tool. Drag and drop your video, set start/end time, adjust frame rate and resolution, and click Convert. The animated GIF will download instantly. No uploads, no sign-ups required.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Is my video data uploaded to any server?</summary>
+        <p>No, your videos never leave your device. All processing happens locally in your browser using client-side JavaScript, canvas, and the GIF.js library. Your privacy is 100% guaranteed.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What video formats can be converted to GIF?</summary>
+        <p>Our Video to GIF converter supports MP4, WebM, MOV, AVI, and any format supported by your browser's video element.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I control the GIF quality?</summary>
+        <p>Yes, you can control frame rate (1-30 fps), resolution, and color palette. Higher frame rate = smoother but larger GIF. Lower resolution = smaller file size.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I select a specific portion of the video?</summary>
+        <p>Yes, use the start/end time inputs to select the exact portion of the video you want to convert to GIF. You can also use the frame strip to visually select frames.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I convert multiple videos to GIF?</summary>
+        <p>Yes, our Video to GIF converter supports batch mode. Add multiple videos and convert them all to GIFs with the same settings.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What is the maximum GIF length?</summary>
+        <p>There is no hard limit, but longer GIFs produce larger files. We recommend keeping GIFs under 10 seconds for optimal file size and quality.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Does it work on mobile devices?</summary>
+        <p>Yes, our Video to GIF converter works on all modern browsers including mobile. The interface is responsive and adapts to smaller screens.</p>
+      </details>
+    </section>
+
+    <!-- Related Tools Section -->
+    <section class="related-tools">
+      <h2>Related Video Tools</h2>
+      <div class="related-grid">
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🎬</div>
+          <h3>Video Compressor</h3>
+          <p>Compress videos to smaller sizes. VP8/VP9/H.264. Target file size. All in your browser.</p>
+          <a href="../video-compressor/">Open Video Compressor →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">✂️</div>
+          <h3>Video Trimmer</h3>
+          <p>Trim video files. Set start/end, preview, batch process. All in your browser.</p>
+          <a href="../video-trimmer/">Open Video Trimmer →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🎵</div>
+          <h3>Video to Audio</h3>
+          <p>Extract audio from videos. MP3, WAV, OGG. High quality extraction. All in your browser.</p>
+          <a href="../video-to-audio/">Open Video to Audio →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <p>Need custom web tools or automation for your business?</p>
+      <a href="https://clienvora.com">Learn more about Clienvora - Custom Web Development →</a>
+    </div>
+  </div>
+</div>
+<script src="../assets/tools.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.js"></script>
+<script>
+(function(){
+  var dropZone=document.getElementById('dropZone');
+  var fileInput=document.getElementById('fileInput');
+  var convertSection=document.getElementById('convertSection');
+  var videoPreview=document.getElementById('videoPreview');
+  var convertBtn=document.getElementById('convertBtn');
+  var resetBtn=document.getElementById('resetBtn');
+  var statusEl=document.getElementById('status');
+  var fileInfo=document.getElementById('fileInfo');
+  var progressBar=document.getElementById('progressBar');
+  var progressFill=document.getElementById('progressFill');
+  var frameStrip=document.getElementById('frameStrip');
+  var gifResult=document.getElementById('gifResult');
+  var gifPreview=document.getElementById('gifPreview');
+  var downloadBtn=document.getElementById('downloadBtn');
+  var downloadAllBtn=document.getElementById('downloadAllBtn');
+  var newConvertBtn=document.getElementById('newConvertBtn');
+  var modeTabs=document.getElementById('modeTabs');
+  var settingsMode=document.getElementById('settingsMode');
+  var trimMode=document.getElementById('trimMode');
+  var outputMode=document.getElementById('outputMode');
+  var batchList=document.getElementById('batchList');
+  var statRow=document.getElementById('statRow');
+  var fpsSlider=document.getElementById('fps');
+  var fpsVal=document.getElementById('fpsVal');
+  var qualitySlider=document.getElementById('gifQuality');
+  var qualityVal=document.getElementById('gifQualityVal');
+  var startTime=document.getElementById('startTime');
+  var endTime=document.getElementById('endTime');
+  var gifDuration=document.getElementById('gifDuration');
+
+  var currentFile=null;
+  var currentBlob=null;
+  var files=[];
+  var results=[];
+
+  Tools.setupDropZone(dropZone,function(f){addFile(f)});
+  fileInput.addEventListener('change',function(e){for(var i=0;i<e.target.files.length;i++)addFile(e.target.files[i]);});
+
+  modeTabs.addEventListener('click',function(e){
+    var btn=e.target.closest('button');if(!btn)return;
+    modeTabs.querySelectorAll('button').forEach(function(b){b.classList.remove('active');});
+    btn.classList.add('active');
+    var m=btn.dataset.mode;
+    settingsMode.style.display=m==='settings'?'block':'none';
+    trimMode.style.display=m==='trim'?'block':'none';
+    outputMode.style.display=m==='output'?'block':'none';
+  });
+
+  fpsSlider.addEventListener('input',function(){fpsVal.textContent=fpsSlider.value+' fps';updateStats();});
+  qualitySlider.addEventListener('input',function(){qualityVal.textContent=qualitySlider.value;});
+  startTime.addEventListener('input',updateDuration);
+  endTime.addEventListener('input',updateDuration);
+
+  function updateDuration(){
+    var s=parseFloat(startTime.value)||0;
+    var e=parseFloat(endTime.value)||5;
+    if(e<=s)e=s+1;
+    var d=Math.min(e-s,30);
+    gifDuration.value=d.toFixed(1);
+    updateStats();
+  }
+
+  function updateStats(){
+    if(!videoPreview.duration)return;
+    var d=parseFloat(gifDuration.value)||5;
+    var fps=parseInt(fpsSlider.value)||12;
+    var frames=Math.ceil(d*fps);
+    var w=parseInt(document.getElementById('width').value)||480;
+    var ratio=w/videoPreview.videoWidth;
+    var h=Math.round(videoPreview.videoHeight*ratio);
+    var pixels=w*h*frames;
+    var estBytes=pixels*0.1;
+    document.getElementById('statFrames').textContent=frames;
+    document.getElementById('statSize').textContent=Tools.formatSize(estBytes);
+    document.getElementById('statTime').textContent=d.toFixed(1)+'s';
+    statRow.style.display='grid';
+  }
+
+  function addFile(f){
+    if(!f||!f.type.startsWith('video/'))return;
+    files.push(f);
+    renderBatchList();
+    if(files.length===1)loadFile(f);
+  }
+
+  function renderBatchList(){
+    batchList.innerHTML='';
+    if(files.length<=1){batchList.style.display='none';return;}
+    batchList.style.display='block';
+    files.forEach(function(f,i){
+      var r=results[i];
+      var item=document.createElement('div');
+      item.className='batch-item';
+      item.innerHTML='<span class="batch-name">'+f.name+'</span>'+
+        '<span class="batch-size">'+Tools.formatSize(f.size)+'</span>'+
+        (r?'<span class="batch-status">'+Tools.formatSize(r.size)+'</span>':'<span class="batch-status">-</span>')+
+        '<span class="batch-remove" data-idx="'+i+'">✕</span>';
+      batchList.appendChild(item);
+    });
+    batchList.querySelectorAll('.batch-remove').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var idx=parseInt(btn.dataset.idx);
+        files.splice(idx,1);results.splice(idx,1);
+        renderBatchList();
+        if(files.length===0)resetAll();
+        else if(idx===0&&files.length>0)loadFile(files[0]);
+      });
+    });
+  }
+
+  function loadFile(f){
+    currentFile=f;
+    convertSection.style.display='block';
+    gifResult.style.display='none';
+    dropZone.style.display='none';
+    videoPreview.src=URL.createObjectURL(f);
+    fileInfo.textContent='File: '+f.name+' ('+Tools.formatSize(f.size)+')';
+    videoPreview.onloadedmetadata=function(){
+      endTime.value=Math.min(5,videoPreview.duration).toFixed(1);
+      updateDuration();
+      captureFrames();
+    };
+  }
+
+  async function captureFrames(){
+    frameStrip.innerHTML='';
+    if(!videoPreview.duration)return;
+    var dur=videoPreview.duration;
+    var count=Math.min(8,Math.floor(dur));
+    if(count<1)count=1;
+    var step=dur/count;
+    for(var i=0;i<count;i++){
+      var t=i*step+step/2;
+      if(t>=dur)t=dur-0.1;
+      try{
+        var c=document.createElement('canvas');
+        c.width=120;c.height=80;
+        var ctx=c.getContext('2d');
+        videoPreview.currentTime=t;
+        await new Promise(function(r){videoPreview.onseeked=r;});
+        ctx.drawImage(videoPreview,0,0,120,80);
+        c.dataset.time=t.toFixed(2);
+        c.title='Click to set start: '+t.toFixed(1)+'s';
+        c.addEventListener('click',function(){
+          startTime.value=this.dataset.time;
+          updateDuration();
+        });
+        frameStrip.appendChild(c);
+      }catch(e){}
+    }
+  }
+
+  document.getElementById('setStartBtn').addEventListener('click',function(){startTime.value=videoPreview.currentTime.toFixed(1);updateDuration();});
+  document.getElementById('setEndBtn').addEventListener('click',function(){endTime.value=videoPreview.currentTime.toFixed(1);updateDuration();});
+
+  function seekVideo(video,time){
+    return new Promise(function(resolve){
+      function onSeeked(){video.removeEventListener('seeked',onSeeked);resolve();}
+      video.addEventListener('seeked',onSeeked);
+      video.currentTime=time;
+    });
+  }
+
+  convertBtn.addEventListener('click',async function(){
+    if(!currentFile)return;
+    if(typeof GIF==='undefined'){Tools.setStatus(statusEl,'Error: GIF encoder not loaded.','error');return;}
+    convertBtn.disabled=true;
+    progressBar.style.display='block';
+    gifResult.style.display='none';
+    Tools.setStatus(statusEl,'Loading video...','');
+    progressFill.style.width='5%';
+
+    try{
+      var video=document.createElement('video');
+      video.muted=true;video.preload='auto';
+      video.src=videoPreview.src;
+      await new Promise(function(res,rej){video.onloadeddata=res;video.onerror=rej;});
+
+      var start=parseFloat(startTime.value)||0;
+      var end=parseFloat(endTime.value)||video.duration;
+      if(end<=start)end=Math.min(start+5,video.duration);
+      var dur=Math.min(end-start,30);
+      var targetWidth=parseInt(document.getElementById('width').value);
+      var fps=parseInt(fpsSlider.value);
+      var scale=targetWidth/video.videoWidth;
+      var targetHeight=Math.round(video.videoHeight*scale);
+
+      var canvas=document.createElement('canvas');
+      canvas.width=targetWidth;canvas.height=targetHeight;
+      var ctx=canvas.getContext('2d');
+
+      var gif=new GIF({
+        workers:parseInt(document.getElementById('workers').value),
+        quality:parseInt(qualitySlider.value),
+        width:targetWidth,height:targetHeight,
+        workerScript:'https://cdn.jsdelivr.net/npm/gif.js@0.2.0/dist/gif.worker.js'
+      });
+
+      var loopCount=parseInt(document.getElementById('loopCount').value);
+      gif.setOption('loop',loopCount);
+
+      gif.on('progress',function(p){
+        var pct=Math.floor(p*100);
+        progressFill.style.width=(50+pct*0.5)+'%';
+        Tools.setStatus(statusEl,'Encoding GIF... '+pct+'%','');
+      });
+
+      gif.on('finished',function(blob){
+        currentBlob=blob;
+        var url=URL.createObjectURL(blob);
+        gifPreview.src=url;
+        gifResult.style.display='block';
+        document.getElementById('resultSize').textContent=Tools.formatSize(blob.size);
+        document.getElementById('resultFrames').textContent=Math.ceil(dur*fps);
+        document.getElementById('resultDuration').textContent=dur.toFixed(1)+'s';
+        downloadBtn.style.display='inline-block';
+        if(files.length>1){downloadAllBtn.style.display='inline-block';}
+        Tools.setStatus(statusEl,'Done! GIF: '+Tools.formatSize(blob.size),'done');
+        progressFill.style.width='100%';
+        convertBtn.disabled=false;
+      });
+
+      await seekVideo(video,start);
+      var totalFrames=Math.ceil(dur*fps);
+      var frameInterval=1/fps;
+      var frame=0;
+
+      Tools.setStatus(statusEl,'Capturing frames...','');
+
+      async function captureFrame(){
+        if(frame>=totalFrames||video.currentTime>=start+dur){
+          Tools.setStatus(statusEl,'Captured '+frame+' frames. Encoding...','');
+          progressFill.style.width='50%';
+          gif.render();
+          return;
+        }
+        ctx.drawImage(video,0,0,targetWidth,targetHeight);
+        gif.addFrame(ctx,{copy:true,delay:1000/fps});
+        frame++;
+        var pct=Math.floor((frame/totalFrames)*45);
+        progressFill.style.width=pct+'%';
+        var nextTime=video.currentTime+frameInterval;
+        if(nextTime>=start+dur){
+          Tools.setStatus(statusEl,'Captured '+frame+' frames. Encoding...','');
+          progressFill.style.width='50%';
+          gif.render();
+          return;
+        }
+        await seekVideo(video,nextTime);
+        requestAnimationFrame(captureFrame);
+      }
+      captureFrame();
+    }catch(e){
+      Tools.setStatus(statusEl,'Error: '+e.message,'error');
+      convertBtn.disabled=false;
+    }
+  });
+
+  downloadBtn.addEventListener('click',function(){
+    if(!currentBlob||!currentFile)return;
+    Tools.downloadBlob(currentBlob,currentFile.name.replace(/\.[^.]+$/,'.gif'));
+  });
+
+  downloadAllBtn.addEventListener('click',async function(){
+    if(results.length===0)return;
+    var JSZip=window.JSZip;
+    if(!JSZip){Tools.setStatus(statusEl,'Loading JSZip...','');return;}
+    var zip=new JSZip();
+    results.forEach(function(r,i){zip.file(files[i].name.replace(/\.[^.]+$/,'.gif'),r.blob);});
+    var blob=await zip.generateAsync({type:'blob'});
+    Tools.downloadBlob(blob,'gifs.zip');
+  });
+
+  newConvertBtn.addEventListener('click',function(){
+    convertSection.style.display='block';
+    gifResult.style.display='none';
+    currentBlob=null;
+  });
+
+  function resetAll(){
+    currentFile=null;currentBlob=null;files=[];results=[];
+    convertSection.style.display='none';
+    gifResult.style.display='none';
+    dropZone.style.display='block';
+    statusEl.style.display='none';
+    progressBar.style.display='none';
+    statRow.style.display='none';
+    videoPreview.src='';fileInput.value='';
+    batchList.innerHTML='';
+  }
+  resetBtn.addEventListener('click',resetAll);
+})();
+</script>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h4>Free Online Tools</h4>
+        <p>32+ free, private, browser-based tools. No uploads, no accounts. Your files never leave your device.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Popular Tools</h4>
+        <a href="../image-converter/">Image Converter</a>
+        <a href="../pdf-tools/">PDF Tools</a>
+        <a href="../zip-tool/">ZIP Tool</a>
+        <a href="../text-tools/">Text Tools</a>
+      </div>
+      <div class="footer-col">
+        <h4>SEO Tools</h4>
+        <a href="../canonical-tag-checker/">Canonical Checker</a>
+        <a href="../robots-txt-checker/">Robots.txt Checker</a>
+        <a href="../redirect-chain-checker/">Redirect Chain Checker</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://clienvora.com">Clienvora</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>All tools run in your browser. Files are never uploaded. 32+ tools, 100% free, 100% private.</p>
+      <p>Built by <a href="https://clienvora.com">Clienvora</a> &middot; <a href="../">Free Online Tools</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

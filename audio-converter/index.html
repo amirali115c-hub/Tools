@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Converter - Free Online Audio Format Converter | No Upload | 100% Private</title>
+  <meta name="description" content="Convert audio files online for free. WAV, WebM, OGG, MP3 with sample rate and channel controls. Batch mode, trim, fade. No uploads, 100% private.">
+  <meta name="keywords" content="audio converter, convert audio, audio format converter, wav to ogg, mp3 converter, webm to wav, audio file converter online, batch audio converter">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://tools.clienvora.com/audio-converter/">
+  <link rel="stylesheet" href="../assets/style.css">
+  <!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="../assets/favicon/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+<link rel="manifest" href="../assets/favicon/site.webmanifest">
+<meta name="theme-color" content="#0F0F1A">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Audio Converter - Free Online Audio Format Converter | No Upload | 100% Private">
+  <meta property="og:description" content="Convert audio files online for free. WAV, WebM, OGG, MP3 with sample rate and channel controls. Batch mode, trim, fade. No uploads, 100% private.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tools.clienvora.com/audio-converter/">
+
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Free Online Audio Converter - Free Online Tool",
+  "operatingSystem": "Any",
+  "applicationCategory": "UtilitiesApplication",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Convert audio files online for free. WAV, WebM, OGG, MP3 with sample rate and channel controls. Batch mode, trim, fade. No uploads, 100% private."
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://tools.clienvora.com/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Audio Tools",
+      "item": "https://tools.clienvora.com/#audio"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "Free Online Audio Converter"
+    }
+  ]
+}
+  </script>
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What audio formats can I convert?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "You can convert between WAV, WebM, OGG, and MP3. The tool also lets you set sample rate and mono or stereo channels for the output."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is my audio uploaded to any server?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Conversion runs entirely in your browser using the Web Audio API. Your files never leave your device."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I convert multiple files at once?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, batch mode lets you drop many files, set one output format, and convert them all. Results can be downloaded individually or as a ZIP."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I trim audio before converting?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, you can set start and end times to trim the clip, and apply fade in/out effects before conversion."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does conversion reduce audio quality?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "WAV output is lossless. For compressed formats, you control the sample rate, so you can balance file size and quality."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What sample rates are supported?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The converter supports 44100 Hz (CD quality), 48000 Hz (DVD/video quality), and 22050 Hz (low bandwidth)."
+      }
+    }
+  ]
+}
+  </script>
+<style>
+    .waveform-wrap{width:100%;height:80px;background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:12px 0}
+    .waveform-canvas{display:block;width:100%;height:100%}
+    .format-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:16px}
+    .format-card{padding:12px;background:var(--bg);border:2px solid var(--border);border-radius:8px;text-align:center;cursor:pointer;transition:.15s}
+    .format-card:hover{border-color:var(--accent)}
+    .format-card.active{border-color:var(--accent);background:rgba(34,197,94,.1)}
+    .format-card .fmt-name{font-weight:700;color:var(--accent);font-size:1rem}
+    .format-card .fmt-desc{font-size:.7rem;color:var(--text2);margin-top:4px}
+    .setting-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .setting-row label{min-width:100px;font-size:.85rem;color:var(--text2)}
+    .setting-row select,.setting-row input[type=range]{flex:1}
+    .setting-row .val{min-width:50px;text-align:center;font-weight:600;color:var(--accent);font-size:.85rem}
+    .time-row{display:flex;gap:8px;margin-bottom:12px}
+    .time-row>div{flex:1}
+    .time-row label{display:block;margin-bottom:4px;font-size:.8rem;color:var(--text2)}
+    .time-row input{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:6px;border-radius:4px}
+    .preview-tabs{display:flex;gap:4px;margin-bottom:16px}
+    .preview-tabs button{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
+    .preview-tabs button.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
+    .preview-tabs button:hover:not(.active){border-color:var(--accent)}
+    .batch-list{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+    .batch-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.85rem}
+    .batch-item .batch-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .batch-item .batch-size{color:var(--text2);min-width:60px;text-align:right}
+    .batch-item .batch-status{color:#22c55e;font-weight:600;min-width:60px;text-align:right}
+    .batch-item .batch-remove{cursor:pointer;color:var(--red);padding:2px}
+    .stat-row{display:flex;gap:8px;margin:12px 0}
+    .stat-box{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
+    .stat-box .stat-val{font-size:1.1rem;font-weight:700;color:var(--accent)}
+    .stat-box .stat-label{font-size:.7rem;color:var(--text2);margin-top:4px}
+    select,input[type=number]{background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px}
+      .seo-tool-frame{width:100%;border:1px solid var(--border);border-radius:var(--radius);background:#f8fafc;min-height:900px}
+  </style>
+</head></head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="header-logo" href="../"><img class="header-logo-img" src="../assets/favicon/favicon-32x32.png" alt="Free Online Tools" width="22" height="22">Free Tools<span class="dot">.</span></a>
+    <nav class="header-nav">
+      <a href="../">Home</a>
+      <a href="../#seo">SEO</a>
+      <a href="https://clienvora.com">Clienvora</a>
+    </nav>
+  </div>
+</header>
+<div class="container">
+  <div class="tool-page">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb">
+      <a href="../">Home</a> &gt; <a href="../#audio">Audio Tools</a> &gt; Free Online Audio Converter
+    </nav>
+
+    <h1>Free Online Audio Converter</h1>
+    <p class="subtitle">Convert audio formats. WAV, WebM, OGG, MP3. Trim, fade, batch. All in your browser.</p>
+
+    <!-- Trust Badges -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;font-size:.9rem;color:var(--text2)">
+      <span>✓ No uploads</span>
+      <span>✓ No sign-ups</span>
+      <span>✓ 100% private</span>
+      <span>✓ Works offline</span>
+    </div>
+
+<div class="tool-area">
+      <iframe class="seo-tool-frame" id="toolFrame" src="app/index.html?mode=converter" title="Audio Converter Tool" loading="lazy"></iframe>
+    </div>
+
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+      <h2>How to Convert Audio Files Online</h2>
+      <p>Follow these simple steps to use the free online audio converter tool:</p>
+      <ol style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li style="margin-bottom:8px"><strong>Drop your audio files</strong> - Drag and drop MP3, WAV, WebM, or OGG files into the converter, or click to browse.</li>
+        <li style="margin-bottom:8px"><strong>Pick the output format</strong> - Choose WAV, WebM, OGG, or MP3 and set the sample rate and channel count.</li>
+        <li style="margin-bottom:8px"><strong>Trim or fade (optional)</strong> - Cut to a start/end region or apply fade in/out before converting.</li>
+        <li style="margin-bottom:8px"><strong>Convert and download</strong> - Click Convert and download the processed files instantly, or grab a ZIP of a whole batch.</li>
+      </ol>
+
+      <h2>Features</h2>
+      <ul style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li><strong>Converts between WAV, WebM, OGG, and MP3</strong></li>
+        <li><strong>Custom sample rate (44100, 48000, 22050 Hz) and mono/stereo</strong></li>
+        <li><strong>Trim to exact start/end times and apply fades</strong></li>
+        <li><strong>Batch convert many files at once</strong></li>
+        <li><strong>100% in-browser using the Web Audio API</strong></li>
+      </ul>
+
+      <h2>Why Choose This Tool?</h2>
+      <p>Most online audio converters upload your files to a server and force you to wait, sign up, or accept watermarks. Our Audio Converter processes everything locally with the Web Audio API, so your audio never leaves your device. Convert, trim, and batch-process without limits.</p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+
+      <details class="faq-item">
+        <summary>What audio formats can I convert?</summary>
+        <p>You can convert between WAV, WebM, OGG, and MP3. The tool also lets you set sample rate and mono or stereo channels for the output.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is my audio uploaded to any server?</summary>
+        <p>No. Conversion runs entirely in your browser using the Web Audio API. Your files never leave your device.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I convert multiple files at once?</summary>
+        <p>Yes, batch mode lets you drop many files, set one output format, and convert them all. Results can be downloaded individually or as a ZIP.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can I trim audio before converting?</summary>
+        <p>Yes, you can set start and end times to trim the clip, and apply fade in/out effects before conversion.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does conversion reduce audio quality?</summary>
+        <p>WAV output is lossless. For compressed formats, you control the sample rate, so you can balance file size and quality.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What sample rates are supported?</summary>
+        <p>The converter supports 44100 Hz (CD quality), 48000 Hz (DVD/video quality), and 22050 Hz (low bandwidth).</p>
+      </details>
+    </section>
+
+    <!-- Related Tools Section -->
+    <section class="related-tools">
+      <h2>Related Tools</h2>
+      <div class="related-grid">
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">✂️</div>
+          <h3>Audio Trimmer</h3>
+          <p>Cut, slice, fade and boost audio with a visual waveform. All in your browser.</p>
+          <a href="../audio-trimmer/">Open Audio Trimmer →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🎵</div>
+          <h3>Video to Audio</h3>
+          <p>Extract audio from video as WAV, WebM, or OGG. Trim, fade, batch mode.</p>
+          <a href="../video-to-audio/">Open Video to Audio →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🎞️</div>
+          <h3>Video to GIF</h3>
+          <p>Turn video clips into animated GIFs. Batch mode, frame rate control.</p>
+          <a href="../video-to-gif/">Open Video to GIF →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <p>Need custom web tools or automation for your business?</p>
+      <a href="https://clienvora.com">Learn more about Clienvora - Custom Web Development →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var f=document.getElementById('toolFrame');
+  function resize(){
+    try{
+      var h=f.contentWindow.document.documentElement.scrollHeight;
+      if(h>200)f.style.height=(h+40)+'px';
+    }catch(e){}
+  }
+  f.addEventListener('load',resize);
+  window.addEventListener('resize',resize);
+  setTimeout(resize,1000);
+})();
+</script>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h4>Free Online Tools</h4>
+        <p>32+ free, private, browser-based tools. No uploads, no accounts. Your files never leave your device.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Popular Tools</h4>
+        <a href="../image-converter/">Image Converter</a>
+        <a href="../pdf-tools/">PDF Tools</a>
+        <a href="../zip-tool/">ZIP Tool</a>
+        <a href="../text-tools/">Text Tools</a>
+      </div>
+      <div class="footer-col">
+        <h4>SEO Tools</h4>
+        <a href="../canonical-tag-checker/">Canonical Checker</a>
+        <a href="../robots-txt-checker/">Robots.txt Checker</a>
+        <a href="../redirect-chain-checker/">Redirect Chain Checker</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://clienvora.com">Clienvora</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>All tools run in your browser. Files are never uploaded. 32+ tools, 100% free, 100% private.</p>
+      <p>Built by <a href="https://clienvora.com">Clienvora</a> &middot; <a href="../">Free Online Tools</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>

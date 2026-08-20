@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Trimmer - Free Online Audio Trimmer | No Upload | 100% Private</title>
+  <meta name="description" content="Trim audio files online for free. Cut MP3, WAV, OGG, M4A with waveform preview. Batch mode, fade in/out. No uploads, 100% private.">
+  <meta name="keywords" content="audio trimmer, trim audio, audio cutter, cut audio, trim mp3, free audio trimmer, online audio cutter, mp3 cutter">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://tools.clienvora.com/audio-trimmer/">
+  <link rel="stylesheet" href="../assets/style.css">
+  <!-- Favicon -->
+<link rel="icon" type="image/x-icon" href="../assets/favicon/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="../assets/favicon/apple-touch-icon.png">
+<link rel="manifest" href="../assets/favicon/site.webmanifest">
+<meta name="theme-color" content="#0F0F1A">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Audio Trimmer - Free Online Audio Trimmer">
+  <meta property="og:description" content="Trim audio files online for free. Cut MP3, WAV, OGG, M4A with waveform preview. Batch mode, fade in/out.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tools.clienvora.com/audio-trimmer/">
+
+  <!-- Schema.org SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Audio Trimmer - Free Online Tool",
+    "operatingSystem": "Any",
+    "applicationCategory": "UtilitiesApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "Trim audio files online for free. Cut MP3, WAV, OGG, M4A with waveform preview. Batch mode, fade in/out. No uploads, 100% private."
+  }
+  </script>
+
+  <!-- Schema.org BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://tools.clienvora.com/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Audio Tools",
+        "item": "https://tools.clienvora.com/#audio"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Audio Trimmer"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Schema.org FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I trim audio for free?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Use our free Audio Trimmer tool. Drag and drop your audio file, drag the trim handles to select the portion you want, and click Trim. The trimmed audio will download instantly. No uploads, no sign-ups required."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is my audio data uploaded to any server?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No, your audio files never leave your device. All processing happens locally in your browser using client-side JavaScript and Web Audio API. Your privacy is 100% guaranteed."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What audio formats are supported?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Our Audio Trimmer supports MP3, WAV, OGG, M4A, FLAC, and AAC. You can trim any of these formats and download in the same format."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I trim multiple audio files at once?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our Audio Trimmer supports batch mode. Add multiple files and trim them all with the same start/end points."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I add fade in/out effects?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our trimmer includes fade in and fade out options. Set the duration and the tool will apply smooth volume transitions at the start and end."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I see the waveform?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, our Audio Trimmer displays a visual waveform of your audio file. You can drag trim handles directly on the waveform for precise selection."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How precise is the trimming?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Our trimmer offers millisecond precision. You can type exact start/end times or drag the handles on the waveform for visual precision."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I preview before trimming?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, you can play the selected portion before trimming. The preview plays only the area between the trim handles so you hear exactly what will be output."
+        }
+      }
+    ]
+  }
+  </script>
+  <style>
+    .waveform-wrap{position:relative;width:100%;height:120px;background:var(--bg);border:1px solid var(--border);border-radius:8px;overflow:hidden;cursor:pointer}
+    .waveform-canvas{display:block;width:100%;height:100%}
+    .trim-region{position:absolute;top:0;bottom:0;background:rgba(34,197,94,.15);border-left:3px solid #22c55e;border-right:3px solid #22c55e;pointer-events:none}
+    .trim-handle{position:absolute;top:0;bottom:0;width:10px;cursor:ew-resize;z-index:5}
+    .trim-handle::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:4px;height:30px;background:#fff;border-radius:2px;box-shadow:0 1px 4px rgba(0,0,0,.5)}
+    .trim-handle.start{left:-5px;background:#22c55e;border-radius:4px 0 0 4px}
+    .trim-handle.end{right:-5px;background:#22c55e;border-radius:0 4px 4px 0}
+    .playhead{position:absolute;top:0;bottom:0;width:2px;background:var(--accent);pointer-events:none;z-index:4}
+    .time-grid{display:flex;justify-content:space-between;margin-top:4px;font-size:.7rem;color:var(--text2)}
+    .segments-list{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+    .segment-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.85rem}
+    .segment-item .seg-num{color:var(--accent);font-weight:700;min-width:20px}
+    .segment-item .seg-range{flex:1;color:var(--text)}
+    .segment-item .seg-dur{color:var(--text2);min-width:60px;text-align:right}
+    .segment-item .seg-remove{cursor:pointer;color:var(--red);padding:2px}
+    .zoom-controls{display:flex;gap:6px;margin-bottom:12px}
+    .zoom-controls button{padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer;font-size:.8rem}
+    .zoom-controls button:hover{border-color:var(--accent)}
+    .fade-row{display:flex;gap:12px;margin-bottom:12px}
+    .fade-row>div{flex:1}
+    .fade-row label{display:block;margin-bottom:4px;font-size:.8rem;color:var(--text2)}
+    .fade-row input[type=number]{width:100%;background:var(--bg);color:var(--text);border:1px solid var(--border);padding:8px;border-radius:6px}
+    .preview-tabs{display:flex;gap:4px;margin-bottom:16px}
+    .preview-tabs button{flex:1;padding:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);cursor:pointer;font-size:.85rem;transition:.15s}
+    .preview-tabs button.active{background:var(--accent);color:var(--navy);border-color:var(--accent)}
+    .preview-tabs button:hover:not(.active){border-color:var(--accent)}
+    .batch-list{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+    .batch-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.85rem}
+    .batch-item .batch-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .batch-item .batch-dur{color:var(--text2);min-width:60px;text-align:right}
+    .batch-item .batch-remove{cursor:pointer;color:var(--red);padding:2px}
+    .breadcrumb{font-size:.85rem;color:var(--text2);margin-bottom:16px}
+    .breadcrumb a{color:var(--accent);text-decoration:none}
+    .breadcrumb a:hover{text-decoration:underline}
+    .seo-content{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .seo-content h2{font-size:1.3rem;margin:24px 0 12px;color:var(--text)}
+    .seo-content p{color:var(--text2);line-height:1.7;margin-bottom:12px}
+    .seo-content ul{color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px}
+    .seo-content li{margin-bottom:8px}
+    .seo-content a{color:var(--accent);text-decoration:none}
+    .seo-content a:hover{text-decoration:underline}
+    .faq-section{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .faq-section h2{font-size:1.3rem;margin-bottom:16px}
+    .faq-item{margin-bottom:8px;padding:16px;background:var(--surface);border-radius:8px;cursor:pointer}
+    .faq-item summary{font-weight:600;font-size:1rem}
+    .faq-item p{margin-top:12px;color:var(--text2);line-height:1.6}
+    .related-tools{margin-top:40px;padding:40px 0;border-top:1px solid var(--border)}
+    .related-tools h2{font-size:1.3rem;margin-bottom:16px}
+    .related-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+    .related-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+    .related-card h3{font-size:1rem;margin:8px 0}
+    .related-card p{font-size:.85rem;color:var(--text2);margin-bottom:12px}
+    .related-card a{color:var(--accent);text-decoration:none;font-weight:600}
+    .related-card a:hover{text-decoration:underline}
+    .footer-cta{margin-top:40px;padding:30px;background:var(--surface);border-radius:12px;text-align:center}
+    .footer-cta p{margin-bottom:8px;color:var(--text2)}
+    .footer-cta a{color:var(--accent);font-weight:600;text-decoration:none}
+    .footer-cta a:hover{text-decoration:underline}
+      .seo-tool-frame{width:100%;border:1px solid var(--border);border-radius:var(--radius);background:#f8fafc;min-height:900px}
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="header-logo" href="../"><img class="header-logo-img" src="../assets/favicon/favicon-32x32.png" alt="Free Online Tools" width="22" height="22">Free Tools<span class="dot">.</span></a>
+    <nav class="header-nav">
+      <a href="../">Home</a>
+      <a href="../#seo">SEO</a>
+      <a href="https://clienvora.com">Clienvora</a>
+    </nav>
+  </div>
+</header>
+<div class="container">
+  <div class="tool-page">
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumb">
+      <a href="../">Home</a> &gt; <a href="../#audio">Audio Tools</a> &gt; Audio Trimmer
+    </nav>
+
+    <h1>Trim Audio Online - Free Audio Trimmer</h1>
+    <p class="subtitle">Trim audio files online for free. Cut MP3, WAV, OGG, M4A with waveform preview. Batch mode, fade in/out. No uploads, 100% private.</p>
+
+    <!-- Trust Badges -->
+    <div style="display:flex;gap:16px;flex-wrap:wrap;margin:16px 0;font-size:.9rem;color:var(--text2)">
+      <span>✓ No uploads</span>
+      <span>✓ No sign-ups</span>
+      <span>✓ 100% private</span>
+      <span>✓ Works offline</span>
+    </div>
+
+    <div class="tool-area">
+      <iframe class="seo-tool-frame" id="toolFrame" src="app/index.html?mode=trimmer" title="Audio Trimmer Tool" loading="lazy"></iframe>
+    </div>
+
+    <!-- SEO Content Section -->
+    <section class="seo-content">
+      <h2>How to Trim Audio Online</h2>
+      <p>Trimming audio has never been easier. Our free online audio trimmer allows you to cut audio files in just a few simple steps:</p>
+      <ol style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li style="margin-bottom:8px"><strong>Drop your audio</strong> - Drag and drop an audio file into the upload area, or click to browse.</li>
+        <li style="margin-bottom:8px"><strong>Set trim points</strong> - Drag the handles on the waveform or type exact start/end times.</li>
+        <li style="margin-bottom:8px"><strong>Adjust options</strong> - Add fade in/out effects, adjust output format if needed.</li>
+        <li style="margin-bottom:8px"><strong>Preview</strong> - Click play to hear only the selected portion before trimming.</li>
+        <li style="margin-bottom:8px"><strong>Trim and download</strong> - Click "Trim & Download" to get your trimmed audio instantly.</li>
+      </ol>
+
+      <h2>Features of Our Free Audio Trimmer</h2>
+      <ul style="color:var(--text2);line-height:1.7;margin:12px 0;padding-left:24px">
+        <li><strong>Waveform Display</strong> - Visual waveform for precise trimming</li>
+        <li><strong>Drag Handles</strong> - Click and drag on the waveform to set trim points</li>
+        <li><strong>Millisecond Precision</strong> - Type exact start/end times</li>
+        <li><strong>Fade In/Out</strong> - Add smooth volume transitions</li>
+        <li><strong>Batch Mode</strong> - Trim multiple files with the same settings</li>
+        <li><strong>Preview Playback</strong> - Hear the selected portion before trimming</li>
+        <li><strong>100% Private</strong> - Audio never leaves your browser</li>
+      </ul>
+
+      <h2>Why Choose Our Audio Trimmer?</h2>
+      <p>Unlike other online audio trimmers, our tool runs entirely in your browser. Your audio files are never uploaded to any server, ensuring complete privacy and security. There are no file size limits, no watermarks added, and no sign-ups required. The entire process happens locally on your device using the Web Audio API and client-side JavaScript.</p>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+      <h2>Frequently Asked Questions</h2>
+
+      <details class="faq-item">
+        <summary>How do I trim audio for free?</summary>
+        <p>Use our free Audio Trimmer tool. Drag and drop your audio file, drag the trim handles to select the portion you want, and click Trim. The trimmed audio will download instantly. No uploads, no sign-ups required.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Is my audio data uploaded to any server?</summary>
+        <p>No, your audio files never leave your device. All processing happens locally in your browser using client-side JavaScript and Web Audio API. Your privacy is 100% guaranteed.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What audio formats are supported?</summary>
+        <p>Our Audio Trimmer supports MP3, WAV, OGG, M4A, FLAC, and AAC. You can trim any of these formats and download in the same format.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I trim multiple audio files at once?</summary>
+        <p>Yes, our Audio Trimmer supports batch mode. Add multiple files and trim them all with the same start/end points.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I add fade in/out effects?</summary>
+        <p>Yes, our trimmer includes fade in and fade out options. Set the duration and the tool will apply smooth volume transitions at the start and end.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I see the waveform?</summary>
+        <p>Yes, our Audio Trimmer displays a visual waveform of your audio file. You can drag trim handles directly on the waveform for precise selection.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>How precise is the trimming?</summary>
+        <p>Our trimmer offers millisecond precision. You can type exact start/end times or drag the handles on the waveform for visual precision.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I preview before trimming?</summary>
+        <p>Yes, you can play the selected portion before trimming. The preview plays only the area between the trim handles so you hear exactly what will be output.</p>
+      </details>
+    </section>
+
+    <!-- Related Tools Section -->
+    <section class="related-tools">
+      <h2>Related Audio Tools</h2>
+      <div class="related-grid">
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🔄</div>
+          <h3>Audio Converter</h3>
+          <p>Convert between audio formats. MP3, WAV, OGG, WebM. Batch processing. All in your browser.</p>
+          <a href="../audio-converter/">Open Audio Converter →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🎵</div>
+          <h3>Video to Audio</h3>
+          <p>Extract audio from videos. MP3, WAV, OGG. High quality extraction. All in your browser.</p>
+          <a href="../video-to-audio/">Open Video to Audio →</a>
+        </div>
+        <div class="related-card">
+          <div class="icon" style="font-size:2rem">🎤</div>
+          <h3>Font Preview</h3>
+          <p>Preview fonts with custom text. Adjust size, weight, color. All in your browser.</p>
+          <a href="../font-preview/">Open Font Preview →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer CTA -->
+    <div class="footer-cta">
+      <p>Need custom web tools or automation for your business?</p>
+      <a href="https://clienvora.com">Learn more about Clienvora - Custom Web Development →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var f=document.getElementById('toolFrame');
+  function resize(){
+    try{
+      var h=f.contentWindow.document.documentElement.scrollHeight;
+      if(h>200)f.style.height=(h+40)+'px';
+    }catch(e){}
+  }
+  f.addEventListener('load',resize);
+  window.addEventListener('resize',resize);
+  setTimeout(resize,1000);
+})();
+</script>
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h4>Free Online Tools</h4>
+        <p>32+ free, private, browser-based tools. No uploads, no accounts. Your files never leave your device.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Popular Tools</h4>
+        <a href="../image-converter/">Image Converter</a>
+        <a href="../pdf-tools/">PDF Tools</a>
+        <a href="../zip-tool/">ZIP Tool</a>
+        <a href="../text-tools/">Text Tools</a>
+      </div>
+      <div class="footer-col">
+        <h4>SEO Tools</h4>
+        <a href="../canonical-tag-checker/">Canonical Checker</a>
+        <a href="../robots-txt-checker/">Robots.txt Checker</a>
+        <a href="../redirect-chain-checker/">Redirect Chain Checker</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="https://clienvora.com">Clienvora</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>All tools run in your browser. Files are never uploaded. 32+ tools, 100% free, 100% private.</p>
+      <p>Built by <a href="https://clienvora.com">Clienvora</a> &middot; <a href="../">Free Online Tools</a></p>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
