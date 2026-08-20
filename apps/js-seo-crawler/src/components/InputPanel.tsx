@@ -220,86 +220,87 @@ export function InputPanel({inputMode, setInputMode, onResult, isLoading, setIsL
 
   return (
     <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-      <h2 className="text-sm font-semibold text-white mb-3">Analyze</h2>
+      <div className="flex flex-col md:flex-row gap-3">
+        {/* Mode Toggle */}
+        <div className="flex gap-1 bg-slate-800/50 rounded-lg p-1">
+          <button
+            onClick={() => setInputMode('url')}
+            className={`px-3 py-2 text-xs font-medium rounded-md transition-all ${
+              inputMode === 'url'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            URL
+          </button>
+          <button
+            onClick={() => setInputMode('html')}
+            className={`px-3 py-2 text-xs font-medium rounded-md transition-all ${
+              inputMode === 'html'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            HTML
+          </button>
+        </div>
 
-      <div className="flex gap-2 mb-4">
-        <button
-          onClick={() => setInputMode('url')}
-          className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
-            inputMode === 'url'
-              ? 'bg-indigo-600 text-white'
-              : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
-          }`}
-        >
-          URL
-        </button>
-        <button
-          onClick={() => setInputMode('html')}
-          className={`flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors ${
-            inputMode === 'html'
-              ? 'bg-indigo-600 text-white'
-              : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
-          }`}
-        >
-          HTML
-        </button>
+        {inputMode === 'url' ? (
+          <>
+            <div className="flex-1 relative">
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://example.com"
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                onKeyDown={(e) => e.key === 'Enter' && handleAnalyzeURL()}
+              />
+            </div>
+            <button
+              onClick={handleAnalyzeURL}
+              disabled={isLoading}
+              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-all flex items-center gap-2 shadow-lg shadow-indigo-500/25"
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Analyzing...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  Analyze
+                </>
+              )}
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="flex-1">
+              <textarea
+                value={html}
+                onChange={(e) => setHtml(e.target.value)}
+                placeholder="<!DOCTYPE html>..."
+                rows={4}
+                className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-y"
+              />
+            </div>
+            <button
+              onClick={handleAnalyzeHTML}
+              disabled={isLoading}
+              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-all flex items-center gap-2 shadow-lg shadow-indigo-500/25"
+            >
+              Analyze HTML
+            </button>
+          </>
+        )}
       </div>
-
-      {inputMode === 'url' ? (
-        <div className="space-y-3">
-          <div>
-            <label className="block text-xs text-slate-400 mb-1">Enter URL to analyze</label>
-            <input
-              type="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://example.com"
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              onKeyDown={(e) => e.key === 'Enter' && handleAnalyzeURL()}
-            />
-          </div>
-          <button
-            onClick={handleAnalyzeURL}
-            disabled={isLoading}
-            className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
-          >
-            {isLoading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                Analyzing...
-              </span>
-            ) : (
-              'Analyze URL'
-            )}
-          </button>
-          <p className="text-[11px] text-slate-500">
-            Uses CORS proxy to fetch pages. Some sites may block requests.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          <div>
-            <label className="block text-xs text-slate-400 mb-1">Paste HTML source code</label>
-            <textarea
-              value={html}
-              onChange={(e) => setHtml(e.target.value)}
-              placeholder="<!DOCTYPE html>..."
-              rows={12}
-              className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 font-mono text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-y"
-            />
-          </div>
-          <button
-            onClick={handleAnalyzeHTML}
-            disabled={isLoading}
-            className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
-          >
-            Analyze HTML
-          </button>
-        </div>
-      )}
 
       {error && (
         <div className="mt-3 px-3 py-2 bg-red-900/30 border border-red-800 rounded-lg text-xs text-red-400">
@@ -307,35 +308,15 @@ export function InputPanel({inputMode, setInputMode, onResult, isLoading, setIsL
         </div>
       )}
 
-      <div className="mt-4 pt-4 border-t border-slate-800">
-        <h3 className="text-xs font-medium text-slate-400 mb-2">Analysis Includes</h3>
-        <div className="grid grid-cols-2 gap-1 text-[10px] text-slate-500">
-          <span className="flex items-center gap-1">
-            <span className="w-1 h-1 rounded-full bg-indigo-500"></span>
-            Meta tags & headings
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-1 h-1 rounded-full bg-indigo-500"></span>
-            Links & images
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-1 h-1 rounded-full bg-purple-500"></span>
-            JS rendering detection
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-1 h-1 rounded-full bg-purple-500"></span>
-            Framework detection
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-1 h-1 rounded-full bg-purple-500"></span>
-            AI crawler access
-          </span>
-          <span className="flex items-center gap-1">
-            <span className="w-1 h-1 rounded-full bg-purple-500"></span>
-            llms.txt validation
-          </span>
+      {!error && !isLoading && (
+        <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-slate-500">
+          <span className="flex items-center gap-1"><span className="w-1 h-1 rounded-full bg-indigo-500"></span>Meta & Headings</span>
+          <span className="flex items-center gap-1"><span className="w-1 h-1 rounded-full bg-indigo-500"></span>Links & Images</span>
+          <span className="flex items-center gap-1"><span className="w-1 h-1 rounded-full bg-purple-500"></span>JS Rendering</span>
+          <span className="flex items-center gap-1"><span className="w-1 h-1 rounded-full bg-purple-500"></span>AI Crawlers</span>
+          <span className="flex items-center gap-1"><span className="w-1 h-1 rounded-full bg-purple-500"></span>llms.txt</span>
         </div>
-      </div>
+      )}
     </div>
   );
 }
