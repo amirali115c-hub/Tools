@@ -88,24 +88,39 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans antialiased">
-      <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center">
-                <Tag className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-semibold text-white">Meta Tag Generator</h1>
-                <p className="text-xs text-slate-400">SEO-optimized meta tags with preview</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 rounded-full">Free</span>
-            </div>
+      {/* Hero Section */}
+      <div className="tool-hero">
+        <div className="hero-content">
+          <div className="hero-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Free SEO Tool
+          </div>
+          <h1>Free Meta Tag Generator — SEO Title &amp; Description</h1>
+          <p className="subtitle">Generate SEO-optimized title tags, meta descriptions, Open Graph tags, and Twitter Cards. Preview how your page looks in Google search results.</p>
+          <div className="hero-trust">
+            <span className="trust-pill">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+              No uploads
+            </span>
+            <span className="trust-pill">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+              No sign-ups
+            </span>
+            <span className="trust-pill">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              100% private
+            </span>
+            <span className="trust-pill">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Instant results
+            </span>
+            <span className="trust-pill">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Free forever
+            </span>
           </div>
         </div>
-      </header>
+      </div>
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid lg:grid-cols-2 gap-6">
