@@ -1,0 +1,93 @@
+/* === Clienvora Shared Footer === */
+#cv-footer {
+  background: #0F0F1A;
+  color: rgba(255,255,255,.6);
+  padding: 48px 0 0;
+  font-size: .85rem;
+  line-height: 1.6;
+}
+.cvf-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.cvf-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+.cvf-logo img {
+  display: block;
+  margin-bottom: 16px;
+}
+.cvf-desc {
+  color: rgba(255,255,255,.5);
+  max-width: 320px;
+  line-height: 1.7;
+}
+.cvf-socials {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+  display: flex;
+  gap: 8px;
+}
+.cvf-socials a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.5);
+  transition: background .2s, color .2s;
+  text-decoration: none;
+}
+.cvf-socials a:hover {
+  background: rgba(255,255,255,.12);
+  color: #fff;
+}
+.cvf-col h4 {
+  color: #fff;
+  font-size: .9rem;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.cvf-col a {
+  display: block;
+  color: rgba(255,255,255,.5);
+  padding: 4px 0;
+  text-decoration: none;
+  transition: color .2s;
+}
+.cvf-col a:hover {
+  color: #C9A227;
+}
+.cvf-bottom {
+  border-top: 1px solid rgba(255,255,255,.06);
+  padding: 20px 0;
+  text-align: center;
+  font-size: .8rem;
+  color: rgba(255,255,255,.35);
+}
+.cvf-bottom a {
+  color: rgba(255,255,255,.5);
+  text-decoration: none;
+}
+.cvf-bottom a:hover {
+  color: #C9A227;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .cvf-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .cvf-logo img {
+    width: 48px;
+    height: 48px;
+  }
+}

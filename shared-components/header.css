@@ -1,0 +1,224 @@
+/* === Clienvora Shared Header === */
+#clienvora-master-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #0F0F1A;
+}
+
+/* Top bar */
+.h-top-bar {
+  background: #0F0F1A;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  padding: 6px 0;
+}
+.h-top-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+}
+.social-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  transition: background .2s;
+}
+.social-icon-link:hover {
+  background: rgba(255,255,255,.1);
+}
+.social-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* Main bar */
+.h-main-bar {
+  background: #0F0F1A;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.h-main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.h-logo a {
+  display: flex;
+  align-items: center;
+}
+.h-logo img {
+  display: block;
+}
+
+/* Nav */
+.h-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+}
+.h-nav a {
+  display: block;
+  padding: 8px 14px;
+  color: rgba(255,255,255,.65);
+  font-size: .9rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: color .2s, background .2s;
+  text-decoration: none;
+}
+.h-nav a:hover,
+.h-nav a.active {
+  color: #fff;
+  background: rgba(255,255,255,.08);
+}
+
+/* CTA */
+.h-mobile-cta {
+  display: inline-block;
+  background: #C9A227;
+  color: #0F0F1A;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: .9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .2s;
+}
+.h-mobile-cta:hover {
+  background: #E8C54A;
+}
+
+/* Burger */
+.h-burger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  flex-direction: column;
+  gap: 5px;
+}
+.h-burger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #fff;
+  border-radius: 2px;
+  transition: transform .3s, opacity .3s;
+}
+
+/* Mobile menu */
+.h-mobile-menu {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s;
+}
+.h-mobile-menu.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.h-mobile-menu-inner {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 300px;
+  max-width: 85vw;
+  background: #1A1A2E;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform .3s;
+}
+.h-mobile-menu.open .h-mobile-menu-inner {
+  transform: translateX(0);
+}
+.h-mobile-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+.h-mobile-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+.h-mobile-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.h-mobile-nav a {
+  display: block;
+  padding: 12px 16px;
+  color: rgba(255,255,255,.75);
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background .2s, color .2s;
+}
+.h-mobile-nav a:hover,
+.h-mobile-nav a.active {
+  background: rgba(255,255,255,.08);
+  color: #fff;
+}
+.h-mobile-cta-full {
+  display: block;
+  text-align: center;
+  background: #C9A227;
+  color: #0F0F1A;
+  padding: 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  margin-top: 20px;
+  text-decoration: none;
+}
+.h-mobile-cta-full:hover {
+  background: #E8C54A;
+}
+.h-mobile-socials {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .h-nav,
+  .h-mobile-cta {
+    display: none;
+  }
+  .h-burger {
+    display: flex;
+  }
+  .h-mobile-menu {
+    display: block;
+  }
+}
